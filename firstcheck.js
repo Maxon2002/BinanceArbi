@@ -36,9 +36,9 @@ let pricesAsk = {
     }
 }
 
-let amountUsdt = 50
+let amountUsdt = 35
 
-let amountFirstActive = amountUsdt + (amountUsdt * 0.1)
+let amountFirstActive = amountUsdt + (amountUsdt * 2)
 
 let baseBtc = 0
 let baseEth = 0
