@@ -1,5 +1,5 @@
-let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
-let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
+let secretKey = 'HKMjOCgmLuKXgWD53uhd3TsIdaZSwOXrYDtaFPoB9BfLKFAl90FneqRwPnNoxEEZ'
+let publicKey = 'wIJLD96Inswu74tTkdCeDxaag1D0BWydcxIMxzuOAWQsAATvT0zbgBredIbY15F1'
 
 const request = require('request')
 
@@ -36,9 +36,9 @@ let pricesAsk = {
     }
 }
 
-let amountUsdt = 100
+let amountUsdt = 35
 
-let amountFirstActive = amountUsdt + (amountUsdt * 0.1)
+let amountFirstActive = amountUsdt + (amountUsdt * 2)
 
 let baseBtc = 0
 let baseEth = 0
@@ -56,7 +56,7 @@ let amountBnb = 0
 
 
 let commissionAll = 0
-let maxCommissionAll = 60
+let maxCommissionAll = 100
 let stopGame = false
 
 
