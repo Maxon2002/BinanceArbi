@@ -13,6 +13,7 @@ function signature(query) {
 let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
 
 
+setTimeout(() => {
 let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=10&timestamp=${Date.now()}`;
 let hashWithdraw = signature(queryWithdraw);
 
@@ -28,4 +29,4 @@ request.post(
 
         console.log(body)
     }
-)
+)},5000)
