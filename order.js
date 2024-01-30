@@ -4,9 +4,10 @@ const request = require('request')
 
 const crypto = require('crypto');
 
+// let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
+// let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
 let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
 let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
-
 
 function signature(query) {
     return crypto
@@ -142,12 +143,12 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-let queryAsset = `timestamp=${Date.now()}`;
-let hashAsset = signature(queryAsset);
+let queryDepositAddress = `coin=ETH&network=BSC&timestamp=${Date.now()}`;
+let hashDepositAddress = signature(queryDepositAddress);
 
-request.post(
+request.get(
     {
-        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+        url: `https://api.binance.com/sapi/v1/capital/deposit/address?${queryDepositAddress}&signature=${hashDepositAddress}`,
         headers: {
             'X-MBX-APIKEY': publicKey
         }
@@ -155,12 +156,7 @@ request.post(
     (err, response, body) => {
         body = JSON.parse(body)
 
-        for (let i = 0; i < body.length; i++) {
-            if(body[i].asset === 'USDT') {
-                console.log(body[i].free)
-                break
-            }
-        }
+        console.log(body)
     }
 )
 

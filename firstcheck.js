@@ -327,11 +327,7 @@ const WebSocket = require('ws');
         if (!stopGame) {
             console.log('Соединение Binance закрыто в ' + new Date().toLocaleTimeString())
             setTimeout(() => {
-                wsBinUser = new WebSocket(`wss://stream.binance.com:9443/stream?streams=
-                btcusdt@depth5@100ms/
-                ethusdt@depth5@100ms/
-                ethbtc@depth5@100ms/
-                bnbusdt@depth5@100ms`)
+                wsBinUser = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms/ethusdt@depth5@100ms/ethbtc@depth5@100ms/bnbusdt@depth5@100ms`)
 
                 wsBinUser.on('error', () => console.log('Ошибка!' + new Date().toLocaleTimeString()))
 
@@ -655,227 +651,227 @@ const WebSocket = require('ws');
                 generalDeal = true
 
                 console.log("Deal usdtBtcEth")
-                console.log("dealsAm ", ++dealsAm)
+                console.log("dealsAm ", ++dealsAm);
 
 
 
 
-                    (async () => {
-                        Promise.all([
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${(amBuyBtcUsdt - dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
-                                    let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+                (async () => {
+                    Promise.all([
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${(amBuyBtcUsdt - dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
+                                let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Buy BTC usdtBtcEth ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('4 ', body)
-                                                resolve(body)
-                                            }
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
                                         }
-                                    )
-                                })()
-                            }),
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=${amBuyEthBtc}&timestamp=${Date.now()}`;
-                                    let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
-
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthBtc}&signature=${hashOrderBuyEthBtc}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Buy ETH usdtBtcEth ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('5 ', body)
-                                                resolve(body)
-                                            }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Buy BTC usdtBtcEth ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('4 ', body)
+                                            resolve(body)
                                         }
-                                    )
-                                })()
-                            }),
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
-                                    let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
-
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Sell ETH usdtBtcEth ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('6 ', body)
-                                                resolve(body)
-                                            }
-                                        }
-                                    )
-                                })()
-                            }),
-                        ]).then(async (res) => {
-                            let midComission = 0
-                            for (let i = 0; i < res.length; i++) {
-                                let deal = res[i]
-
-                                for (let j = 0; j < deal.fills.length; j++) {
-                                    let fill = deal.fills[j]
-
-                                    let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
-
-                                    commissionAll += commissionInUsdt
-
-                                    midComission += commissionInUsdt
-
-                                    amountBnb -= +fill.commission
-                                }
-
-                                if (deal.symbol === 'ETHBTC') {
-                                    let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty).toFixed(8)
-
-                                    dirtBtc = +(dirtBtc + diff).toFixed(8)
-
-                                    dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
-
-                                    dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
-
-                                }
-
-                            }
-
-                            if (commissionAll + midComission > maxCommissionAll) {
-                                stopGame = true
-                                console.log("commissionAll ", commissionAll)
-                                console.log("dealsAm ", dealsAm)
-                                wsBin.close()
-                            }
-
-                            if (amountBnb * pricesAsk.bnb.usdt < 2 && !stopGame) {
-
-
-
-                                if (moneyForCommission < 5) {
-                                    let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
-
-                                    let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
-                                    if (amountUsdtMinus >= 7) {
-                                        amountUsdt = amountUsdtMinus
-                                        moneyForCommission = 5
-                                    } else {
-                                        await new Promise((resolve, reject) => {
-                                            (function reRequest() {
-                                                let queryAsset = `timestamp=${Date.now()}`;
-                                                let hashAsset = signature(queryAsset);
-
-                                                request.post(
-                                                    {
-                                                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                                        headers: {
-                                                            'X-MBX-APIKEY': publicKey
-                                                        }
-                                                    },
-                                                    (err, response, body) => {
-                                                        body = JSON.parse(body)
-
-                                                        if (body.code) {
-                                                            console.log("Check USDT for bnb usdtBtcEth ", body.code)
-                                                            reRequest()
-                                                        } else {
-                                                            for (let i = 0; i < body.length; i++) {
-                                                                if (body[i].asset === 'USDT') {
-
-                                                                    let factMoney = +body[i].free
-
-                                                                    let factMoneyAfter = +(factMoney - 5).toFixed(8)
-
-                                                                    if (factMoneyAfter >= 7) {
-                                                                        if (factMoneyAfter > fixAmountUsdt) {
-                                                                            amountUsdt = fixAmountUsdt
-                                                                            moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
-                                                                        } else {
-                                                                            amountUsdt = factMoneyAfter
-                                                                            moneyForCommission = 5
-                                                                        }
-
-                                                                    } else {
-                                                                        dontCom = true
-                                                                    }
-                                                                    break
-                                                                }
-                                                            }
-                                                            resolve()
-                                                        }
-                                                    }
-                                                )
-                                            })()
-                                        })
                                     }
-                                }
+                                )
+                            })()
+                        }),
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=${amBuyEthBtc}&timestamp=${Date.now()}`;
+                                let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
 
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthBtc}&signature=${hashOrderBuyEthBtc}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Buy ETH usdtBtcEth ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('5 ', body)
+                                            resolve(body)
+                                        }
+                                    }
+                                )
+                            })()
+                        }),
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
+                                let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
 
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Sell ETH usdtBtcEth ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('6 ', body)
+                                            resolve(body)
+                                        }
+                                    }
+                                )
+                            })()
+                        }),
+                    ]).then(async (res) => {
+                        let midComission = 0
+                        for (let i = 0; i < res.length; i++) {
+                            let deal = res[i]
 
-                                if (!dontCom) {
-                                    (function reRequest() {
-                                        let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
-                                        let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+                            for (let j = 0; j < deal.fills.length; j++) {
+                                let fill = deal.fills[j]
 
-                                        request.post(
-                                            {
-                                                url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
-                                                headers: {
-                                                    'X-MBX-APIKEY': publicKey
-                                                }
-                                            },
-                                            (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Buy dop BNB usdtBtcEth ", body.code)
-                                                    reRequest()
-                                                } else {
-                                                    amountBnb += +body.origQty
+                                let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
 
-                                                    moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
+                                commissionAll += commissionInUsdt
 
-                                                    generalDeal = false
-                                                }
+                                midComission += commissionInUsdt
 
-                                            }
-                                        )
-                                    })()
-                                } else {
-                                    generalDeal = true
-                                }
-                            } else {
-                                generalDeal = false
+                                amountBnb -= +fill.commission
+                            }
+
+                            if (deal.symbol === 'ETHBTC') {
+                                let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty).toFixed(8)
+
+                                dirtBtc = +(dirtBtc + diff).toFixed(8)
+
+                                dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+
+                                dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
 
                             }
 
-                        })
-                    })()
+                        }
+
+                        if (commissionAll + midComission > maxCommissionAll) {
+                            stopGame = true
+                            console.log("commissionAll ", commissionAll)
+                            console.log("dealsAm ", dealsAm)
+                            wsBin.close()
+                        }
+
+                        if (amountBnb * pricesAsk.bnb.usdt < 2 && !stopGame) {
+
+
+
+                            if (moneyForCommission < 5) {
+                                let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
+
+                                let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
+                                if (amountUsdtMinus >= 7) {
+                                    amountUsdt = amountUsdtMinus
+                                    moneyForCommission = 5
+                                } else {
+                                    await new Promise((resolve, reject) => {
+                                        (function reRequest() {
+                                            let queryAsset = `timestamp=${Date.now()}`;
+                                            let hashAsset = signature(queryAsset);
+
+                                            request.post(
+                                                {
+                                                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                                                    headers: {
+                                                        'X-MBX-APIKEY': publicKey
+                                                    }
+                                                },
+                                                (err, response, body) => {
+                                                    body = JSON.parse(body)
+
+                                                    if (body.code) {
+                                                        console.log("Check USDT for bnb usdtBtcEth ", body.code)
+                                                        reRequest()
+                                                    } else {
+                                                        for (let i = 0; i < body.length; i++) {
+                                                            if (body[i].asset === 'USDT') {
+
+                                                                let factMoney = +body[i].free
+
+                                                                let factMoneyAfter = +(factMoney - 5).toFixed(8)
+
+                                                                if (factMoneyAfter >= 7) {
+                                                                    if (factMoneyAfter > fixAmountUsdt) {
+                                                                        amountUsdt = fixAmountUsdt
+                                                                        moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
+                                                                    } else {
+                                                                        amountUsdt = factMoneyAfter
+                                                                        moneyForCommission = 5
+                                                                    }
+
+                                                                } else {
+                                                                    dontCom = true
+                                                                }
+                                                                break
+                                                            }
+                                                        }
+                                                        resolve()
+                                                    }
+                                                }
+                                            )
+                                        })()
+                                    })
+                                }
+                            }
+
+
+
+                            if (!dontCom) {
+                                (function reRequest() {
+                                    let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
+                                    let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+
+                                    request.post(
+                                        {
+                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
+                                            headers: {
+                                                'X-MBX-APIKEY': publicKey
+                                            }
+                                        },
+                                        (err, response, body) => {
+                                            body = JSON.parse(body)
+                                            if (body.code) {
+                                                console.log("Buy dop BNB usdtBtcEth ", body.code)
+                                                reRequest()
+                                            } else {
+                                                amountBnb += +body.origQty
+
+                                                moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                generalDeal = false
+                                            }
+
+                                        }
+                                    )
+                                })()
+                            } else {
+                                generalDeal = true
+                            }
+                        } else {
+                            generalDeal = false
+
+                        }
+
+                    })
+                })()
 
 
                 //заходим в сделку
@@ -897,225 +893,225 @@ const WebSocket = require('ws');
                 // usdtBtcEthDeal = false
                 generalDeal = true
                 console.log("Deal usdtEthBtc")
-                console.log("dealsAm ", ++dealsAm)
+                console.log("dealsAm ", ++dealsAm);
 
 
 
-                    (async () => {
-                        Promise.all([
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${amBuyEthUsdt}&timestamp=${Date.now()}`;
-                                    let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+                (async () => {
+                    Promise.all([
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${amBuyEthUsdt}&timestamp=${Date.now()}`;
+                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Buy ETH usdtEthBtc ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('1 ', body)
-                                                resolve(body)
-                                            }
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
                                         }
-                                    )
-                                })()
-                            }),
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=${amSellEthBtc}&timestamp=${Date.now()}`;
-                                    let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
-
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellEthBtc}&signature=${hashOrderSellEthBtc}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Sell ETH usdtEthBtc ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('2 ', body)
-                                                resolve(body)
-                                            }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Buy ETH usdtEthBtc ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('1 ', body)
+                                            resolve(body)
                                         }
-                                    )
-                                })()
-                            }),
-                            new Promise((resolve) => {
-                                (function reRequest() {
-                                    let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${(amSellBtcUsdt + dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
-                                    let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
-
-                                    request.post(
-                                        {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Sell BTC usdtEthBtc ", body.code)
-                                                reRequest()
-                                            } else {
-                                                // console.log('3 ', body)
-                                                resolve(body)
-                                            }
-                                        }
-                                    )
-                                })()
-                            }),
-                        ]).then(async (res) => {
-                            let midComission = 0
-                            for (let i = 0; i < res.length; i++) {
-                                let deal = res[i]
-
-                                for (let j = 0; j < deal.fills.length; j++) {
-                                    let fill = deal.fills[j]
-
-                                    let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
-
-                                    commissionAll += commissionInUsdt
-
-                                    midComission += commissionInUsdt
-
-                                    amountBnb -= +fill.commission
-                                }
-
-                                if (deal.symbol === 'ETHBTC') {
-                                    let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt).toFixed(8)
-
-                                    dirtBtc = +(dirtBtc + diff).toFixed(8)
-
-                                    dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
-
-                                    dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
-
-                                }
-
-                            }
-
-                            if (commissionAll + midComission > maxCommissionAll) {
-                                stopGame = true
-                                console.log("commissionAll ", commissionAll)
-                                console.log("dealsAm ", dealsAm)
-                                wsBin.close()
-                            }
-
-                            if (amountBnb * pricesAsk.bnb.usdt < 2 && !stopGame) {
-
-
-                                if (moneyForCommission < 5) {
-                                    let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
-
-                                    let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
-                                    if (amountUsdtMinus >= 7) {
-                                        amountUsdt = amountUsdtMinus
-                                        moneyForCommission = 5
-                                    } else {
-                                        await new Promise((resolve, reject) => {
-                                            (function reRequest() {
-                                                let queryAsset = `timestamp=${Date.now()}`;
-                                                let hashAsset = signature(queryAsset);
-
-                                                request.post(
-                                                    {
-                                                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                                        headers: {
-                                                            'X-MBX-APIKEY': publicKey
-                                                        }
-                                                    },
-                                                    (err, response, body) => {
-                                                        body = JSON.parse(body)
-
-                                                        if (body.code) {
-                                                            console.log("Check USDT for bnb usdtEthBtc ", body.code)
-                                                            reRequest()
-                                                        } else {
-                                                            for (let i = 0; i < body.length; i++) {
-                                                                if (body[i].asset === 'USDT') {
-
-                                                                    let factMoney = +body[i].free
-
-                                                                    let factMoneyAfter = +(factMoney - 5).toFixed(8)
-
-                                                                    if (factMoneyAfter >= 7) {
-                                                                        if (factMoneyAfter > fixAmountUsdt) {
-                                                                            amountUsdt = fixAmountUsdt
-                                                                            moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
-                                                                        } else {
-                                                                            amountUsdt = factMoneyAfter
-                                                                            moneyForCommission = 5
-                                                                        }
-
-                                                                    } else {
-                                                                        dontCom = true
-                                                                    }
-                                                                    break
-                                                                }
-                                                            }
-                                                            resolve()
-                                                        }
-                                                    }
-                                                )
-                                            })()
-                                        })
                                     }
-                                }
+                                )
+                            })()
+                        }),
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=${amSellEthBtc}&timestamp=${Date.now()}`;
+                                let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
+
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderSellEthBtc}&signature=${hashOrderSellEthBtc}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Sell ETH usdtEthBtc ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('2 ', body)
+                                            resolve(body)
+                                        }
+                                    }
+                                )
+                            })()
+                        }),
+                        new Promise((resolve) => {
+                            (function reRequest() {
+                                let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${(amSellBtcUsdt + dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
+                                let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
+
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("Sell BTC usdtEthBtc ", body.code)
+                                            reRequest()
+                                        } else {
+                                            // console.log('3 ', body)
+                                            resolve(body)
+                                        }
+                                    }
+                                )
+                            })()
+                        }),
+                    ]).then(async (res) => {
+                        let midComission = 0
+                        for (let i = 0; i < res.length; i++) {
+                            let deal = res[i]
+
+                            for (let j = 0; j < deal.fills.length; j++) {
+                                let fill = deal.fills[j]
+
+                                let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
+
+                                commissionAll += commissionInUsdt
+
+                                midComission += commissionInUsdt
+
+                                amountBnb -= +fill.commission
+                            }
+
+                            if (deal.symbol === 'ETHBTC') {
+                                let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt).toFixed(8)
+
+                                dirtBtc = +(dirtBtc + diff).toFixed(8)
+
+                                dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+
+                                dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+
+                            }
+
+                        }
+
+                        if (commissionAll + midComission > maxCommissionAll) {
+                            stopGame = true
+                            console.log("commissionAll ", commissionAll)
+                            console.log("dealsAm ", dealsAm)
+                            wsBin.close()
+                        }
+
+                        if (amountBnb * pricesAsk.bnb.usdt < 2 && !stopGame) {
 
 
+                            if (moneyForCommission < 5) {
+                                let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
 
-                                if (!dontCom) {
-                                    (function reRequest() {
-                                        let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
-                                        let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
-
-                                        request.post(
-                                            {
-                                                url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
-                                                headers: {
-                                                    'X-MBX-APIKEY': publicKey
-                                                }
-                                            },
-                                            (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Buy dop BNB usdtEthBtc ", body.code)
-                                                    reRequest()
-                                                } else {
-                                                    amountBnb += +body.origQty
-
-                                                    moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
-
-                                                    generalDeal = false
-                                                }
-
-                                            }
-                                        )
-                                    })()
+                                let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
+                                if (amountUsdtMinus >= 7) {
+                                    amountUsdt = amountUsdtMinus
+                                    moneyForCommission = 5
                                 } else {
-                                    generalDeal = false
+                                    await new Promise((resolve, reject) => {
+                                        (function reRequest() {
+                                            let queryAsset = `timestamp=${Date.now()}`;
+                                            let hashAsset = signature(queryAsset);
+
+                                            request.post(
+                                                {
+                                                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                                                    headers: {
+                                                        'X-MBX-APIKEY': publicKey
+                                                    }
+                                                },
+                                                (err, response, body) => {
+                                                    body = JSON.parse(body)
+
+                                                    if (body.code) {
+                                                        console.log("Check USDT for bnb usdtEthBtc ", body.code)
+                                                        reRequest()
+                                                    } else {
+                                                        for (let i = 0; i < body.length; i++) {
+                                                            if (body[i].asset === 'USDT') {
+
+                                                                let factMoney = +body[i].free
+
+                                                                let factMoneyAfter = +(factMoney - 5).toFixed(8)
+
+                                                                if (factMoneyAfter >= 7) {
+                                                                    if (factMoneyAfter > fixAmountUsdt) {
+                                                                        amountUsdt = fixAmountUsdt
+                                                                        moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
+                                                                    } else {
+                                                                        amountUsdt = factMoneyAfter
+                                                                        moneyForCommission = 5
+                                                                    }
+
+                                                                } else {
+                                                                    dontCom = true
+                                                                }
+                                                                break
+                                                            }
+                                                        }
+                                                        resolve()
+                                                    }
+                                                }
+                                            )
+                                        })()
+                                    })
                                 }
+                            }
+
+
+
+                            if (!dontCom) {
+                                (function reRequest() {
+                                    let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
+                                    let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+
+                                    request.post(
+                                        {
+                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
+                                            headers: {
+                                                'X-MBX-APIKEY': publicKey
+                                            }
+                                        },
+                                        (err, response, body) => {
+                                            body = JSON.parse(body)
+                                            if (body.code) {
+                                                console.log("Buy dop BNB usdtEthBtc ", body.code)
+                                                reRequest()
+                                            } else {
+                                                amountBnb += +body.origQty
+
+                                                moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                generalDeal = false
+                                            }
+
+                                        }
+                                    )
+                                })()
                             } else {
                                 generalDeal = false
-
                             }
+                        } else {
+                            generalDeal = false
 
-                        })
-                    })()
+                        }
+
+                    })
+                })()
 
                 //заходим в сделку
             }
