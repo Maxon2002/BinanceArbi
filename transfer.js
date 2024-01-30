@@ -1,12 +1,22 @@
 let secretKey = 'HKMjOCgmLuKXgWD53uhd3TsIdaZSwOXrYDtaFPoB9BfLKFAl90FneqRwPnNoxEEZ'
 let publicKey = 'wIJLD96Inswu74tTkdCeDxaag1D0BWydcxIMxzuOAWQsAATvT0zbgBredIbY15F1'
 
+const crypto = require('crypto');
+
+function signature(query) {
+    return crypto
+        .createHmac('sha256', secretKey)
+        .update(query)
+        .digest('hex');
+}
+
 let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
+
 
 let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=10&timestamp=${Date.now()}`;
 let hashWithdraw = signature(queryWithdraw);
 
-request.get(
+request.post(
     {
         url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
         headers: {
