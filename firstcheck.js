@@ -655,7 +655,7 @@ const WebSocket = require('ws');
                 generalDeal = true
 
                 console.log("Deal usdtBtcEth")
-                console.log("dealsAm ", ++dealsAm)
+                console.log("dealsAm ", ++dealsAm);
 
 
 
@@ -897,7 +897,7 @@ const WebSocket = require('ws');
                 // usdtBtcEthDeal = false
                 generalDeal = true
                 console.log("Deal usdtEthBtc")
-                console.log("dealsAm ", ++dealsAm)
+                console.log("dealsAm ", ++dealsAm);
 
 
 
