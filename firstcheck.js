@@ -59,7 +59,7 @@ let amountBnb = 0
 
 
 let commissionAll = 0
-let maxCommissionAll = 100
+let maxCommissionAll = 40
 let stopGame = false
 
 
