@@ -25,9 +25,9 @@ let hd = dirt
 
 let obj = {
     a: 1
-}
+};
 
-console.log(dirt + dirt2)
+// console.log(new Date().getUTCDate())
 
 // (async () => {
 
@@ -58,28 +58,26 @@ console.log(dirt + dirt2)
 
 
 
+// let stopGame = false
 
 
-let stopGame = false
+// const WebSocket = require('ws');
 
+// (async () => {
+//     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
 
-const WebSocket = require('ws');
+//     wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
+//     wsBin.on('error', () => console.log('Ошибка!'))
+//     wsBin.on('close', (data) => {
+//         console.log(data)
+//     })
 
-(async () => {
-    let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
+//     wsBin.on('message', (data) => {
+//         data = JSON.parse(data.toString())
+//         console.log(data)
 
-    wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
-    wsBin.on('error', () => console.log('Ошибка!'))
-    wsBin.on('close', (data) => {
-        console.log(data)
-    })
-
-    wsBin.on('message', (data) => {
-        data = JSON.parse(data.toString())
-        console.log(data)
-
-    })
-})()
+//     })
+// })()
 
 
 

@@ -127,46 +127,6 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-let i = 1
-console.log(i, Date.now())
-
-request.post(
-    {
-        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
-        }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
-        console.log(body)
-        i++
-    }
-)
-
-console.log(i, Date.now())
-
-
-request.post(
-    {
-        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
-        }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
-        console.log(body)
-        i++
-    }
-)
-
-console.log(i, Date.now())
-
-
-
-
-
 // request.get(
 //     {
 //         url: `https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=5`,
@@ -179,6 +139,30 @@ console.log(i, Date.now())
 //         console.log(body)
 //     }
 // )
+
+
+
+let queryAsset = `timestamp=${Date.now()}`;
+let hashAsset = signature(queryAsset);
+
+request.post(
+    {
+        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+        headers: {
+            'X-MBX-APIKEY': publicKey
+        }
+    },
+    (err, response, body) => {
+        body = JSON.parse(body)
+
+        for (let i = 0; i < body.length; i++) {
+            if(body[i].asset === 'USDT') {
+                console.log(body[i].free)
+                break
+            }
+        }
+    }
+)
 
 
 
