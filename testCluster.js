@@ -2398,7 +2398,7 @@ if (cluster.isMaster) {
             let indexData = 0
             function whyNotYou(data) {
 
-                console.log(`${indexData} в ${Date.now()}`)
+                // console.log(`${++indexData} в ${Date.now()}`)
 
                 data = JSON.parse(data.toString())
                 if (data.stream === 'btcusdt@depth5@100ms') {
@@ -2506,8 +2506,8 @@ if (cluster.isMaster) {
 
 
 
-                let usdtBtcEth = currentAmountUsdt / pricesAsk.btc.usdt / pricesAsk.eth.btc * pricesBid.eth.usdt
-                let usdtEthBtc = currentAmountUsdt / pricesAsk.eth.usdt * pricesBid.eth.btc * pricesBid.btc.usdt
+                // let usdtBtcEth = currentAmountUsdt / pricesAsk.btc.usdt / pricesAsk.eth.btc * pricesBid.eth.usdt
+                // let usdtEthBtc = currentAmountUsdt / pricesAsk.eth.usdt * pricesBid.eth.btc * pricesBid.btc.usdt
 
 
                 console.log('usdtBtcEth ', usdtBtcEth)
