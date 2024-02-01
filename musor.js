@@ -98,13 +98,14 @@ let inter = null
 
 const cluster = require('cluster');
 
+setTimeout(() => {
+    if (cluster.isMaster) {
+        let worker = cluster.fork()
+        console.log(`Мастер ${process.pid}`)
+        setInterval(() => console.log('мастер'), 3000)
 
-if (cluster.isMaster) {
-    let worker = cluster.fork()
-    // console.log(worker.id, ' запущен')
-    setInterval(() => console.log('мастер'), 3000)
-
-} else {
-    console.log(`Воркер ${process.pid}`);
-    setInterval(() => console.log('воркер'), 2000)
-}
+    } else {
+        console.log(`Воркер ${process.pid}`);
+        setInterval(() => console.log('воркер'), 2000)
+    }
+}, 7000)
