@@ -27,6 +27,18 @@ let obj = {
     a: 1
 };
 
+// console.log(Boolean({}))
+
+
+let inter = null
+
+setTimeout(() => {
+    process.exit()
+}, 10000)
+
+inter = setInterval(() => {
+    console.log('хуй')
+}, 1000)
 // console.log(new Date().getUTCDate())
 
 // (async () => {

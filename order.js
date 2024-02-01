@@ -143,12 +143,30 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-let queryDepositAddress = `coin=ETH&network=BSC&timestamp=${Date.now()}`;
-let hashDepositAddress = signature(queryDepositAddress);
+// let queryDepositAddress = `coin=ETH&network=BSC&timestamp=${Date.now()}`;
+// let hashDepositAddress = signature(queryDepositAddress);
+
+// request.get(
+//     {
+//         url: `https://api.binance.com/sapi/v1/capital/deposit/address?${queryDepositAddress}&signature=${hashDepositAddress}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+
+//         console.log(body)
+//     }
+// )
+
+
+
+
 
 request.get(
     {
-        url: `https://api.binance.com/sapi/v1/capital/deposit/address?${queryDepositAddress}&signature=${hashDepositAddress}`,
+        url: `https://api.binance.com/api/v3/exchangeInfo`,
         headers: {
             'X-MBX-APIKEY': publicKey
         }

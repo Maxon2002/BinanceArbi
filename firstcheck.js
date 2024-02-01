@@ -46,10 +46,6 @@ let amountFirstActive = amountUsdt + (amountUsdt * 2)
 let baseBtc = 0
 let baseEth = 0
 
-// купить биткоин +20% к amountUsdt и сразу купить обратные фьючерсы на эту сумму
-// купить эфириум +20% к amountUsdt и сразу купить обратные фьючерсы на эту сумму
-
-// купить bnb и записать сумму bnb в переменную
 
 let dirtBtc = 0
 let dirtAmountGo = 0
@@ -1156,6 +1152,8 @@ setInterval(async () => {
                                 amountBnb += +body.origQty
 
                                 dontCom = false
+
+                                resolve()
                             }
 
                         }

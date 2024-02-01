@@ -16,19 +16,20 @@ let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
 
 
 setTimeout(() => {
-let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=10&transactionFeeFlag=true&timestamp=${Date.now()}`;
-let hashWithdraw = signature(queryWithdraw);
+    let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=104.60846174&transactionFeeFlag=true&timestamp=${Date.now()}`;
+    let hashWithdraw = signature(queryWithdraw);
 
-request.post(
-    {
-        url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
+    request.post(
+        {
+            url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
+            headers: {
+                'X-MBX-APIKEY': publicKey
+            }
+        },
+        (err, response, body) => {
+            body = JSON.parse(body)
+
+            console.log(body)
         }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
-
-        console.log(body)
-    }
-)},5000)
+    )
+}, 5000)
