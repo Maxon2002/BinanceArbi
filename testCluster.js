@@ -2395,9 +2395,11 @@ if (cluster.isMaster) {
 
             })
 
-
+            let indexData = 0
             function whyNotYou(data) {
-                console.log('data идет')
+
+                console.log(`${indexData} в ${Date.now()}`)
+
                 data = JSON.parse(data.toString())
                 if (data.stream === 'btcusdt@depth5@100ms') {
                     let bid = data.data.bids[0][0]
