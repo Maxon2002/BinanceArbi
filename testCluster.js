@@ -27,16 +27,16 @@ const accountsObj = {
 let mainAddress = '0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f'
 
 
-let fixAmountUsdt = 35
+let fixAmountUsdt = 60
 
-let maxCommissionAllMaster = 5
+let maxCommissionAllMaster = 7
 
 let maxCommissionAllSmall = 5
 
 
 let amountUsdt = fixAmountUsdt
 
-let amountFirstActive = amountUsdt + (amountUsdt * 2)
+let amountFirstActive = 105//amountUsdt + (amountUsdt * 2)
 
 let baseBtc = 0
 let baseEth = 0
