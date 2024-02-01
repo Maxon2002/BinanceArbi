@@ -164,20 +164,27 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-request.get(
-    {
-        url: `https://api.binance.com/api/v3/exchangeInfo`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
-        }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
+// request.get(
+//     {
+//         url: `https://api.binance.com/api/v3/exchangeInfo`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
 
-        console.log(body)
-    }
-)
+//         console.log(body)
+//     }
+// )
 
+
+
+process.on('message', (account) => {
+
+    console.log(account)
+
+})
 
 
 

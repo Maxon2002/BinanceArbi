@@ -104,6 +104,12 @@ setTimeout(() => {
         console.log(`Мастер ${process.pid}`)
         setInterval(() => console.log('мастер'), 3000)
 
+        cluster.on('exit', (worker, code, signal) => {
+            console.log(`Воркер ${worker.process.pid} завершил работу`);
+    
+    
+        });
+
     } else {
         console.log(`Воркер ${process.pid}`);
         setInterval(() => console.log('воркер'), 2000);
@@ -125,3 +131,64 @@ setTimeout(() => {
         // })()
     }
 }, 7000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// const pm2 = require('pm2')
+
+// pm2.connect((err) => {
+//     if (err) {
+//         console.error(err);
+//         process.exit(2);
+//     }
+
+//     let workerId = null
+//     // Запуск воркера через PM2
+//     pm2.start({
+//         script: 'order.js',
+//         instances: 1,  // Указывает количество воркеров
+//         name: 'worker1' // Уникальное имя для процесса
+//     }, (err, apps) => {
+//         workerId = apps[0].pm_id;
+//         pm2.disconnect();
+//         if (err) throw err;
+//     });
+
+
+
+//     // Пример отправки сообщения воркеру
+//     pm2.sendDataToProcessId({
+//       id: workerId,
+//       data: {
+//         type: 'custom',
+//         message: 'Hello from master!'
+//       },
+//       topic: 'custom'
+//     });
+// });
