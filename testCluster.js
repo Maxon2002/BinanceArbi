@@ -81,7 +81,7 @@ if (cluster.isMaster) {
         //     countTrueWith++
         // }
 
-        console.log(`Воркер ${worker.process.pid} пишет: ${JSON.stringify(message)}`);
+        console.log(`${worker.process.pid} пишет: ${JSON.stringify(message)}`);
     });
 
 
