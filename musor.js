@@ -108,20 +108,20 @@ setTimeout(() => {
         console.log(`Воркер ${process.pid}`);
         setInterval(() => console.log('воркер'), 2000);
 
-        (async () => {
-            let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
+        // (async () => {
+        //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
 
-            wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
-            wsBin.on('error', () => console.log('Ошибка!'))
-            wsBin.on('close', (data) => {
-                console.log(data)
-            })
+        //     wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
+        //     wsBin.on('error', () => console.log('Ошибка!'))
+        //     wsBin.on('close', (data) => {
+        //         console.log(data)
+        //     })
 
-            wsBin.on('message', (data) => {
-                data = JSON.parse(data.toString())
-                console.log(data)
+        //     wsBin.on('message', (data) => {
+        //         data = JSON.parse(data.toString())
+        //         console.log(data)
 
-            })
-        })()
+        //     })
+        // })()
     }
 }, 7000)
