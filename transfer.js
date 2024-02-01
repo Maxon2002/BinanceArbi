@@ -16,7 +16,7 @@ let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
 
 
 setTimeout(() => {
-    let queryWithdraw = `coin=BTC&network=BSC&address=${adressMain}&amount=0.003&transactionFeeFlag=true&timestamp=${Date.now()}`;
+    let queryWithdraw = `coin=BNB&network=BSC&address=${adressMain}&amount=0.02298275&transactionFeeFlag=true&timestamp=${Date.now()}`;
     let hashWithdraw = signature(queryWithdraw);
 
     request.post(
