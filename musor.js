@@ -32,13 +32,13 @@ let obj = {
 
 let inter = null
 
-setTimeout(() => {
-    process.exit()
-}, 10000)
+// setTimeout(() => {
+//     process.exit()
+// }, 10000)
 
-inter = setInterval(() => {
-    console.log('хуй')
-}, 1000)
+// inter = setInterval(() => {
+//     console.log('хуй')
+// }, 1000)
 // console.log(new Date().getUTCDate())
 
 // (async () => {
@@ -93,3 +93,18 @@ inter = setInterval(() => {
 
 
 
+
+
+
+const cluster = require('cluster');
+
+
+if (cluster.isMaster) {
+    let worker = cluster.fork()
+    console.log(worker.id, ' запущен')
+    setInterval(() => console.log('мастер'), 3000)
+
+} else {
+    console.log(`Воркер ${process.pid}`);
+    setInterval(() => console.log('воркер'), 2000)
+}
