@@ -1,4 +1,4 @@
-const { all } = require("proxy-addr");
+// const { all } = require("proxy-addr");
 
 let a = 0.024933594
 
@@ -100,19 +100,41 @@ const cluster = require('cluster');
 
 setTimeout(() => {
     if (cluster.isMaster) {
-        let worker = cluster.fork()
+        cluster.fork()
+
         console.log(`Мастер ${process.pid}`)
+
         setInterval(() => console.log('мастер'), 3000)
 
         cluster.on('exit', (worker, code, signal) => {
             console.log(`Воркер ${worker.process.pid} завершил работу`);
     
-    
+        });
+
+
+
+
+        cluster.on('message', (worker, message, handle) => {
+
+            if (message.type === 'open') {
+                console.log(cluster.workers)
+            }
         });
 
     } else {
+
+
+        process.send({type: 'open'})
+
         console.log(`Воркер ${process.pid}`);
+
+
+
         setInterval(() => console.log('воркер'), 2000);
+
+
+
+
 
         // (async () => {
         //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
