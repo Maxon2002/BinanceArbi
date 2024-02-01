@@ -101,7 +101,7 @@ const cluster = require('cluster');
 
 if (cluster.isMaster) {
     let worker = cluster.fork()
-    console.log(worker.id, ' запущен')
+    // console.log(worker.id, ' запущен')
     setInterval(() => console.log('мастер'), 3000)
 
 } else {
