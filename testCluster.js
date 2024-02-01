@@ -81,7 +81,7 @@ if (cluster.isMaster) {
         //     countTrueWith++
         // }
 
-        console.log(`${worker.process.pid} пишет: ${JSON.stringify(message)}`);
+        // console.log(`${worker.process.pid} пишет: ${JSON.stringify(message)}`);
     });
 
 
@@ -2397,6 +2397,7 @@ if (cluster.isMaster) {
 
 
             function whyNotYou(data) {
+                console.log('data идет')
                 data = JSON.parse(data.toString())
                 if (data.stream === 'btcusdt@depth5@100ms') {
                     let bid = data.data.bids[0][0]
@@ -2507,7 +2508,8 @@ if (cluster.isMaster) {
                 let usdtEthBtc = currentAmountUsdt / pricesAsk.eth.usdt * pricesBid.eth.btc * pricesBid.btc.usdt
 
 
-
+                console.log('usdtBtcEth ', usdtBtcEth)
+                console.log('usdtEthBtc ', usdtEthBtc)
 
                 if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
 
