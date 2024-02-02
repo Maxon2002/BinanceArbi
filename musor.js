@@ -199,7 +199,9 @@ pm2.connect((err) => {
         instances: 1,  // Указывает количество воркеров
         name: 'worker1' // Уникальное имя для процесса
     }, (err, apps) => {
-        console.log(apps)
+        setTimeout(() => {
+            console.log(apps)
+        }, 3000)
         // workerId = apps[0].pm_id;
         pm2.disconnect();
         if (err) throw err;
