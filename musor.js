@@ -200,7 +200,7 @@ pm2.connect((err) => {
         name: 'worker1' // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;
-        pm2.disconnect();
+        // pm2.disconnect();
         if (err) throw err;
     });
 
