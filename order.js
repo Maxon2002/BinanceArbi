@@ -7,15 +7,15 @@ const crypto = require('crypto');
 
 // // let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
 // // let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
-// let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
-// let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
+let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
+let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
 
-// function signature(query) {
-//     return crypto
-//         .createHmac('sha256', secretKey)
-//         .update(query)
-//         .digest('hex');
-// }
+function signature(query) {
+    return crypto
+        .createHmac('sha256', secretKey)
+        .update(query)
+        .digest('hex');
+}
 
 
 
@@ -181,33 +181,75 @@ const crypto = require('crypto');
 
 
 
-process.on('message', (packet) => {
+// process.on('message', (packet) => {
 
-    console.log('Воркер получил ', packet.data.message)
+//     console.log('Воркер получил ', packet.data.message)
 
-    // setTimeout(() => {
-    //     process.send({
-    //         type: 'custom',
-    //         topic: 'work',
-    //         message: 'Hello from worker!',
-    //     })
-    // }, 5000)
-})
+//     // setTimeout(() => {
+//     //     process.send({
+//     //         type: 'custom',
+//     //         topic: 'work',
+//     //         message: 'Hello from worker!',
+//     //     })
+//     // }, 5000)
+// })
 
-setTimeout(() => {
-    process.send({
-        type: 'process:msg',
-        data: {
-            open: true
-        }
+// setTimeout(() => {
+//     process.send({
+//         type: 'process:msg',
+//         data: {
+//             open: true
+//         }
+//     })
+// }, 5000)
+
+// setInterval(() => {
+//     console.log('Воркер ', process.pid)
+// }, 2000)
+
+(async () => {
+    await new Promise((resolve, reject) => {
+        (function reRequest() {
+            let queryAsset = `timestamp=${Date.now()}`;
+            let hashAsset = signature(queryAsset);
+
+            request.post(
+                {
+                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                    headers: {
+                        'X-MBX-APIKEY': publicKey
+                    }
+                },
+                (err, response, body) => {
+                    body = JSON.parse(body)
+
+                    console.log('Body asset ', body)
+
+
+                    if (body.code) {
+                        console.log("Check start USDT ", body.code)
+                        reRequest()
+                    } else {
+                        for (let i = 0; i < body.length; i++) {
+                            if (body[i].asset === 'USDT') {
+
+
+                                allMoney = +body[i].free
+
+                                console.log('allMoney после чека ', allMoney)
+
+                                moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
+                                break
+                            }
+                        }
+                        resolve()
+                    }
+                }
+            )
+
+        })()
     })
-}, 5000)
-
-setInterval(() => {
-    console.log('Воркер ', process.pid)
-}, 2000)
-
-
+})()
 
 
 

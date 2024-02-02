@@ -219,7 +219,10 @@ process.on('message', (packet) => {
                         }
                     })
 
-                    global();
+                    setTimeout(() => {
+                        global();
+                    }, 15000);
+
 
                     (function reRequest() {
                         request.delete(

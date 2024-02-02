@@ -473,7 +473,7 @@ async function startWorkers() {
     for (let i = 0; i < Object.keys(accountsObj).length; i++) {
         let account = Object.keys(accountsObj)[i];
 
-    
+
 
 
         (function reRequest() {
@@ -688,7 +688,9 @@ async function startGlobalListen() {
                 dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
 
 
-                global();
+                setTimeout(() => {
+                    global();
+                }, 15000);
 
                 // (function reRequest() {
                 //     request.delete(
