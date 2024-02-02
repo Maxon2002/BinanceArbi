@@ -182,7 +182,7 @@ const WebSocket = require('ws');
 
 
 
-let howMuch = 1
+let howMuch = 2
 
 const pm2 = require('pm2')
 let ids = []
