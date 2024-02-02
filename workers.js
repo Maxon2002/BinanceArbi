@@ -305,7 +305,11 @@ process.on('message', (packet) => {
                             for (let i = 0; i < body.length; i++) {
                                 if (body[i].asset === 'USDT') {
 
+                                    console.log('Body asset ', body)
+
                                     allMoney = +body[i].free
+
+                                    console.log('allMoney после чека ', allMoney)
 
                                     moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
                                     break
@@ -642,6 +646,9 @@ process.on('message', (packet) => {
                 if (amountUsdt > allMoney) {
                     wait = true
 
+                    console.log('amountUsdt > all', amountUsdt)
+                    console.log('allMoney > all', amountUsdt)
+
                     if (allMoney > 5) {
                         amountUsdt = allMoney
                     } else {
@@ -651,8 +658,8 @@ process.on('message', (packet) => {
 
                 console.log('usdtBtcEth ', usdtBtcEth)
                 console.log('usdtBtcEthIndex ', usdtBtcEthIndex)
-                console.log('usdtBtcEthDeal ', usdtBtcEthDeal)
-                console.log('generalDeal ', generalDeal)
+                // console.log('usdtBtcEthDeal ', usdtBtcEthDeal)
+                // console.log('generalDeal ', generalDeal)
                 console.log('dontCom ', dontCom)
                 console.log('wait ', wait)
 
@@ -933,6 +940,9 @@ process.on('message', (packet) => {
                 if (amountUsdt > allMoney) {
                     wait = true
 
+                    console.log('amountUsdt > all', amountUsdt)
+                    console.log('allMoney > all', amountUsdt)
+
                     if (allMoney > 5) {
                         amountUsdt = allMoney
                     } else {
@@ -943,8 +953,8 @@ process.on('message', (packet) => {
 
                 console.log('usdtEthBtc ', usdtEthBtc)
                 console.log('usdtEthBtcIndex ', usdtEthBtcIndex)
-                console.log('usdtEthBtcDeal ', usdtEthBtcDeal)
-                console.log('generalDeal ', generalDeal)
+                // console.log('usdtEthBtcDeal ', usdtEthBtcDeal)
+                // console.log('generalDeal ', generalDeal)
                 console.log('dontCom ', dontCom)
                 console.log('wait ', wait)
 
