@@ -647,7 +647,7 @@ process.on('message', (packet) => {
                     wait = true
 
                     console.log('amountUsdt > all', amountUsdt)
-                    console.log('allMoney > all', amountUsdt)
+                    console.log('allMoney > all', allMoney)
 
                     if (allMoney > 5) {
                         amountUsdt = allMoney
@@ -660,8 +660,8 @@ process.on('message', (packet) => {
                 console.log('usdtBtcEthIndex ', usdtBtcEthIndex)
                 // console.log('usdtBtcEthDeal ', usdtBtcEthDeal)
                 // console.log('generalDeal ', generalDeal)
-                console.log('dontCom ', dontCom)
-                console.log('wait ', wait)
+                // console.log('dontCom ', dontCom)
+                // console.log('wait ', wait)
 
                 if (usdtBtcEthIndex > 7 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
                     usdtBtcEthDeal = true
@@ -941,7 +941,7 @@ process.on('message', (packet) => {
                     wait = true
 
                     console.log('amountUsdt > all', amountUsdt)
-                    console.log('allMoney > all', amountUsdt)
+                    console.log('allMoney > all', allMoney)
 
                     if (allMoney > 5) {
                         amountUsdt = allMoney
@@ -955,8 +955,8 @@ process.on('message', (packet) => {
                 console.log('usdtEthBtcIndex ', usdtEthBtcIndex)
                 // console.log('usdtEthBtcDeal ', usdtEthBtcDeal)
                 // console.log('generalDeal ', generalDeal)
-                console.log('dontCom ', dontCom)
-                console.log('wait ', wait)
+                // console.log('dontCom ', dontCom)
+                // console.log('wait ', wait)
 
                 if (usdtEthBtcIndex > 7 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
                     usdtEthBtcDeal = true
