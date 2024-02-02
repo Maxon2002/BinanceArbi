@@ -190,8 +190,15 @@ process.on('message', (data) => {
             type: 'custom',
             topic: 'work',
             message: 'Hello from worker!',
-          })
+        })
     }, 5000)
+})
+
+
+process.send({
+    type: 'open',
+    topic: 'work',
+    message: 'Go',
 })
 
 setInterval(() => {

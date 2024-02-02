@@ -199,31 +199,30 @@ pm2.connect((err) => {
         instances: 1,  // Указывает количество воркеров
         name: 'worker1' // Уникальное имя для процесса
     }, (err, apps) => {
-        setTimeout(() => {
-            console.log(apps.pm_id)
-        }, 3000)
         // workerId = apps[0].pm_id;
         pm2.disconnect();
         if (err) throw err;
     });
 
 
-    setTimeout(() => {
-        pm2.sendDataToProcessId({
-            id: apps[0].pm2_env.pm_id,
-            data: {
-                message: 'Hello from master!',
-            },
-        }, (err, res) => {
-            if (err) console.error(err);
-            else console.log(res);
-        });
-    }, 6000)
+    // setTimeout(() => {
+    //     pm2.sendDataToProcessId({
+    //         id: apps[0].pm2_env.pm_id,
+    //         data: {
+    //             message: 'Hello from master!',
+    //         },
+    //     }, (err, res) => {
+    //         if (err) console.error(err);
+    //         else console.log(res);
+    //     });
+    // }, 6000)
 
 
     pm2.launchBus((err, bus) => {
         bus.on('work', (packet) => {
-            console.log('Received message from worker:', packet.message);
+            if(packet.type === 'open') {
+                console.log(pm2.list)
+            }
         });
     });
 });
