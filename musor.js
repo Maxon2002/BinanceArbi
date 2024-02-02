@@ -182,7 +182,7 @@ const WebSocket = require('ws');
 
 
 
-
+let howMuch = 1
 
 const pm2 = require('pm2')
 let ids = []
@@ -196,7 +196,7 @@ pm2.connect((err) => {
     // Запуск воркера через PM2
     pm2.start({
         script: 'order.js',
-        instances: 1,  // Указывает количество воркеров
+        instances: howMuch,  // Указывает количество воркеров
         name: 'worker1' // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;
@@ -205,24 +205,33 @@ pm2.connect((err) => {
     });
 
 
-    // setTimeout(() => {
-    //     pm2.sendDataToProcessId({
-    //         id: apps[0].pm2_env.pm_id,
-    //         data: {
-    //             message: 'Hello from master!',
-    //         },
-    //     }, (err, res) => {
-    //         if (err) console.error(err);
-    //         else console.log(res);
-    //     });
-    // }, 6000)
+
 
 
     pm2.launchBus((err, bus) => {
         bus.on('process:msg', (packet) => {
             console.log(packet)
-            if(packet.data.open) {
-                console.log(pm2.list)
+            if (packet.data.open) {
+                ids.push(packet.process.pm_id)
+
+                if (ids.length === howMuch) {
+                    for (let i = 0; i < ids.length; i++) {
+                        let workerId = ids[i];
+                        pm2.sendDataToProcessId({
+                            id: workerId,
+                            type : 'process:msg',
+                            data: {
+                                message: 'Hello from master!',
+                            },
+                            topic: 'my'
+                        }, (err, res) => {
+                            if (err) console.error(err);
+                            else console.log(res);
+                        });
+                    }
+
+
+                }
             }
         });
     });
