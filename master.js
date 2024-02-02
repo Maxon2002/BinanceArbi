@@ -68,7 +68,7 @@ pm2.connect((err) => {
     // Запуск воркера через PM2
     pm2.start({
         script: 'workers.js',
-        instances: Object.keys(accountsObj).length,  // Указывает количество воркеров
+        instances: howMuchAccounts,  // Указывает количество воркеров
         name: 'worker' // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;
@@ -214,7 +214,6 @@ let moneyForCommission = 0
 
 let dontCom = false
 
-const WebSocket = require('ws');
 
 
 async function startWorkers() {
