@@ -649,12 +649,12 @@ process.on('message', (packet) => {
                     }
                 }
 
-                // console.log('usdtBtcEth ', usdtBtcEth)
-                // console.log('usdtBtcEthIndex ', usdtBtcEthIndex)
-                // console.log('usdtBtcEthDeal ', usdtBtcEthDeal)
-                // console.log('generalDeal ', generalDeal)
-                // console.log('dontCom ', dontCom)
-                // console.log('wait ', wait)
+                console.log('usdtBtcEth ', usdtBtcEth)
+                console.log('usdtBtcEthIndex ', usdtBtcEthIndex)
+                console.log('usdtBtcEthDeal ', usdtBtcEthDeal)
+                console.log('generalDeal ', generalDeal)
+                console.log('dontCom ', dontCom)
+                console.log('wait ', wait)
 
                 if (usdtBtcEthIndex > 7 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
                     usdtBtcEthDeal = true
@@ -941,12 +941,12 @@ process.on('message', (packet) => {
                 }
 
 
-                // console.log('usdtEthBtc ', usdtEthBtc)
-                // console.log('usdtEthBtcIndex ', usdtEthBtcIndex)
-                // console.log('usdtEthBtcDeal ', usdtEthBtcDeal)
-                // console.log('generalDeal ', generalDeal)
-                // console.log('dontCom ', dontCom)
-                // console.log('wait ', wait)
+                console.log('usdtEthBtc ', usdtEthBtc)
+                console.log('usdtEthBtcIndex ', usdtEthBtcIndex)
+                console.log('usdtEthBtcDeal ', usdtEthBtcDeal)
+                console.log('generalDeal ', generalDeal)
+                console.log('dontCom ', dontCom)
+                console.log('wait ', wait)
 
                 if (usdtEthBtcIndex > 7 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
                     usdtEthBtcDeal = true
