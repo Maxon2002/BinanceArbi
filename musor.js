@@ -1,4 +1,3 @@
-// const { all } = require("proxy-addr");
 
 let a = 0.024933594
 
@@ -73,7 +72,7 @@ let inter = null
 // let stopGame = false
 
 
-const WebSocket = require('ws');
+// const WebSocket = require('ws');
 
 // (async () => {
 //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
@@ -96,123 +95,123 @@ const WebSocket = require('ws');
 
 
 
-const cluster = require('cluster');
+// const cluster = require('cluster');
 
-setTimeout(() => {
-    if (cluster.isMaster) {
+// setTimeout(() => {
+//     if (cluster.isMaster) {
 
-        setTimeout(() => {cluster.fork()},5000)
+//         setTimeout(() => {cluster.fork()},5000)
         
 
-        console.log(`Мастер ${process.pid}`)
+//         console.log(`Мастер ${process.pid}`)
 
-        setInterval(() => console.log('мастер'), 3000)
+//         setInterval(() => console.log('мастер'), 3000)
 
-        cluster.on('exit', (worker, code, signal) => {
-            console.log(`Воркер ${worker.process.pid} завершил работу`);
+//         cluster.on('exit', (worker, code, signal) => {
+//             console.log(`Воркер ${worker.process.pid} завершил работу`);
     
-        });
+//         });
 
 
 
 
-        cluster.on('message', (worker, message, handle) => {
+//         cluster.on('message', (worker, message, handle) => {
 
-            if (message.type === 'open') {
-                console.log(cluster.workers)
-            }
-        });
+//             if (message.type === 'open') {
+//                 console.log(cluster.workers)
+//             }
+//         });
 
-    } else {
-
-
-        process.send({type: 'open'})
-
-        console.log(`Воркер ${process.pid}`);
+//     } else {
 
 
+//         process.send({type: 'open'})
 
-        setInterval(() => console.log('воркер'), 2000);
+//         console.log(`Воркер ${process.pid}`);
 
 
 
-
-
-        // (async () => {
-        //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
-
-        //     wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
-        //     wsBin.on('error', () => console.log('Ошибка!'))
-        //     wsBin.on('close', (data) => {
-        //         console.log(data)
-        //     })
-
-        //     wsBin.on('message', (data) => {
-        //         data = JSON.parse(data.toString())
-        //         console.log(data)
-
-        //     })
-        // })()
-    }
-}, 7000)
+//         setInterval(() => console.log('воркер'), 2000);
 
 
 
 
 
+//         // (async () => {
+//         //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
 
+//         //     wsBin.on('open', () => console.log('Соединение Binance установлено в ' + new Date().toLocaleTimeString()))
+//         //     wsBin.on('error', () => console.log('Ошибка!'))
+//         //     wsBin.on('close', (data) => {
+//         //         console.log(data)
+//         //     })
 
+//         //     wsBin.on('message', (data) => {
+//         //         data = JSON.parse(data.toString())
+//         //         console.log(data)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// const pm2 = require('pm2')
-
-// pm2.connect((err) => {
-//     if (err) {
-//         console.error(err);
-//         process.exit(2);
+//         //     })
+//         // })()
 //     }
-
-//     let workerId = null
-//     // Запуск воркера через PM2
-//     pm2.start({
-//         script: 'order.js',
-//         instances: 1,  // Указывает количество воркеров
-//         name: 'worker1' // Уникальное имя для процесса
-//     }, (err, apps) => {
-//         workerId = apps[0].pm_id;
-//         pm2.disconnect();
-//         if (err) throw err;
-//     });
+// }, 7000)
 
 
 
-//     // Пример отправки сообщения воркеру
-//     pm2.sendDataToProcessId({
-//       id: workerId,
-//       data: {
-//         type: 'custom',
-//         message: 'Hello from master!'
-//       },
-//       topic: 'custom'
-//     });
-// });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const pm2 = require('pm2')
+
+pm2.connect((err) => {
+    if (err) {
+        console.error(err);
+        process.exit(2);
+    }
+
+    let workerId = null
+    // Запуск воркера через PM2
+    pm2.start({
+        script: 'order.js',
+        instances: 1,  // Указывает количество воркеров
+        name: 'worker1' // Уникальное имя для процесса
+    }, (err, apps) => {
+        // workerId = apps[0].pm_id;
+        pm2.disconnect();
+        if (err) throw err;
+    });
+
+
+
+    // Пример отправки сообщения воркеру
+    // pm2.sendDataToProcessId({
+    //   id: workerId,
+    //   data: {
+    //     type: 'custom',
+    //     message: 'Hello from master!'
+    //   },
+    //   topic: 'custom'
+    // });
+});
