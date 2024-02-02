@@ -44,7 +44,7 @@ let baseBtc = 0
 let baseEth = 0
 let baseUsdt = 0
 
-let fixAmountUsdtSmall = +(amountUsdt / Object.keys(accountsObj).length).toFixed(8)
+let fixAmountUsdtSmall = +(fixAmountUsdt / Object.keys(accountsObj).length).toFixed(8)
 let amountUsdtSmall = fixAmountUsdtSmall
 let baseBtcSmall = 0
 let baseEthSmall = 0
@@ -54,10 +54,9 @@ let baseUsdtSmall = 0
 let howMuchAccounts = Object.keys(accountsObj).length
 
 
-// Мастер процесс, создает воркеров для каждого аккаунта
+let countBalanceUp = 0
 
-
-
+let workerIds = []
 
 pm2.connect((err) => {
     if (err) {
@@ -70,7 +69,7 @@ pm2.connect((err) => {
     pm2.start({
         script: 'workers.js',
         instances: howMuchAccounts,  // Указывает количество воркеров
-        name: 'worker1' // Уникальное имя для процесса
+        name: 'worker' // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;
         // pm2.disconnect();
@@ -82,24 +81,33 @@ pm2.connect((err) => {
 
 
     pm2.launchBus((err, bus) => {
+
         bus.on('process:msg', (packet) => {
-            console.log(packet)
-            if (packet.data.open) {
-                ids.push(packet.process.pm_id)
 
-                if (ids.length === howMuch) {
+            // console.log(packet)
 
-                    for (let i = 0; i < ids.length; i++) {
+            if (packet.data.type === 'open') {
+                workerIds.push(packet.process.pm_id)
 
-                        let workerId = ids[i];
+                if (workerIds.length === howMuchAccounts) {
+
+                    for (let i = 0; i < workerIds.length; i++) {
+
+                        let workerId = workerIds[i];
+
+                        let account = accountsObj[Object.keys(accountsObj)[i]]
+
+                        account.id = workerId
 
                         pm2.sendDataToProcessId({
                             id: workerId,
                             type: 'process:msg',
                             data: {
-                                message: 'Hello from master!',
+                                account,
+                                maxCommissionAllSmall,
+                                fixAmountUsdtSmall
                             },
-                            topic: 'my'
+                            topic: 'startWork'
                         }, (err, res) => {
                             if (err) console.error(err);
                             // else console.log(res);
@@ -107,77 +115,30 @@ pm2.connect((err) => {
 
                     }
 
+                    startWorkers()
+
 
                 }
             }
+
+
+
+            if (packet.data.type === 'balanceUp') {
+                countBalanceUp++
+
+                if (countBalanceUp === howMuchAccounts) {
+                    setTimeout(() => {
+                        console.log("Мастер лисен гоу")
+                        startGlobalListen()
+                    }, 5000)
+                }
+            }
+
+            // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
+
         });
     });
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let countBalanceUp = 0
-let howNeedCountBalanceUp = Object.keys(accountsObj).length
-
-let countOpenWorker = 0
-let howNeedCountOpenWorker = Object.keys(accountsObj).length
-
-cluster.on('message', (worker, message, handle) => {
-
-    // message = JSON.stringify(message)
-
-    if (message.type === 'balanceUp') {
-        countBalanceUp++
-
-        if (countBalanceUp === howNeedCountBalanceUp) {
-            setTimeout(() => {
-                console.log("Мастер лисен гоу")
-                startGlobalListen()
-            }, 5000)
-        }
-    }
-
-    if (message.type === 'open') {
-        countOpenWorker++
-
-        if (countOpenWorker === howNeedCountOpenWorker) {
-            startWorkers()
-        }
-    }
-});
-
-
-
-
-cluster.on('exit', (worker, code, signal) => {
-    console.log(`Воркер ${worker.process.pid} завершил работу`);
-
-    // countEndWorkers++
-
-    // if (countEndWorkers === howNeedCountEndWorkers) {
-
-    // }
-});
-
-
 
 
 
@@ -513,14 +474,7 @@ async function startWorkers() {
     for (let i = 0; i < Object.keys(accountsObj).length; i++) {
         let account = Object.keys(accountsObj)[i];
 
-        let workerId = Object.keys(cluster.workers)[i]
-
-        accountsObj[account].id = workerId
-
-
-        cluster.workers[workerId].send(accountsObj[account]);
-
-
+    
 
 
         (function reRequest() {
