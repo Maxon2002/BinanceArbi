@@ -186,6 +186,10 @@ process.on('message', (account) => {
 
 })
 
+setInterval(() => {
+    console.log('Воркер ', process.pid)
+}, 2000)
+
 
 
 

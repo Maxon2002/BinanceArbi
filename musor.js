@@ -1,3 +1,4 @@
+const request = require('request')
 
 let a = 0.024933594
 
@@ -72,7 +73,7 @@ let inter = null
 // let stopGame = false
 
 
-// const WebSocket = require('ws');
+const WebSocket = require('ws');
 
 // (async () => {
 //     let wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms`)
@@ -215,3 +216,7 @@ pm2.connect((err) => {
     //   topic: 'custom'
     // });
 });
+
+setInterval(() => {
+    console.log('Мастер ', process.pid)
+}, 2000)
