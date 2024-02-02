@@ -185,7 +185,7 @@ const WebSocket = require('ws');
 
 
 const pm2 = require('pm2')
-
+let apps
 pm2.connect((err) => {
     if (err) {
         console.error(err);
@@ -198,7 +198,8 @@ pm2.connect((err) => {
         script: 'order.js',
         instances: 1,  // Указывает количество воркеров
         name: 'worker1' // Уникальное имя для процесса
-    }, (err, apps) => {
+    }, (err, appsPm) => {
+        apps = appsPm
         // workerId = apps[0].pm_id;
         pm2.disconnect();
         if (err) throw err;
