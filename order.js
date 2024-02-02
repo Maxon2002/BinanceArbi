@@ -196,8 +196,8 @@ process.on('message', (data) => {
 
 setTimeout(() => {
     process.send({
-        type: 'open',
-        topic: 'work',
+        type: 'process:msg',
+        topic: 'open',
         message: 'Go',
     })
 }, 5000)

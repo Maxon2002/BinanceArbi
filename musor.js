@@ -219,8 +219,8 @@ pm2.connect((err) => {
 
 
     pm2.launchBus((err, bus) => {
-        bus.on('work', (packet) => {
-            if(packet.type === 'open') {
+        bus.on('process:msg', (packet) => {
+            if(packet.topic === 'open') {
                 console.log(pm2.list)
             }
         });
