@@ -2,19 +2,19 @@ const tls = require('tls')
 const request = require('request')
 
 
-const crypto = require('crypto');
+// const crypto = require('crypto');
 
+// // let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
+// // let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
 // let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
 // let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
-let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
-let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
 
-function signature(query) {
-    return crypto
-        .createHmac('sha256', secretKey)
-        .update(query)
-        .digest('hex');
-}
+// function signature(query) {
+//     return crypto
+//         .createHmac('sha256', secretKey)
+//         .update(query)
+//         .digest('hex');
+// }
 
 
 
@@ -22,27 +22,27 @@ function signature(query) {
 
 
 
-console.log('start ', Date.now())
+// console.log('start ', Date.now())
 
-let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+// let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+// let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
-let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
+// let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+// let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
 
-let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+// let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+// let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
 
 
 
-let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+// let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+// let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
+// let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+// let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
 
-let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
+// let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+// let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
