@@ -668,7 +668,7 @@ process.on('message', (packet) => {
                 // console.log('dontCom ', dontCom)
                 // console.log('wait ', wait)
 
-                if (usdtBtcEthIndex > 7 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
+                if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
                     usdtBtcEthDeal = true
                     // usdtEthBtcDeal = false
                     generalDeal = true
@@ -963,7 +963,7 @@ process.on('message', (packet) => {
                 // console.log('dontCom ', dontCom)
                 // console.log('wait ', wait)
 
-                if (usdtEthBtcIndex > 7 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
+                if (usdtEthBtcIndex > 6 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
                     usdtEthBtcDeal = true
                     // usdtBtcEthDeal = false
                     generalDeal = true

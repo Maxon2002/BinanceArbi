@@ -1236,7 +1236,7 @@ async function global() {
                 }
             }
 
-            if (usdtBtcEthIndex > 7 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
+            if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom && !wait) {
                 usdtBtcEthDeal = true
                 // usdtEthBtcDeal = false
                 generalDeal = true
@@ -1522,7 +1522,7 @@ async function global() {
             }
 
 
-            if (usdtEthBtcIndex > 7 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
+            if (usdtEthBtcIndex > 6 && !usdtEthBtcDeal && !generalDeal && !dontCom && !wait) {
                 usdtEthBtcDeal = true
                 // usdtBtcEthDeal = false
                 generalDeal = true
