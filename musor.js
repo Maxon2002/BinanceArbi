@@ -215,8 +215,11 @@ pm2.connect((err) => {
                 ids.push(packet.process.pm_id)
 
                 if (ids.length === howMuch) {
+
                     for (let i = 0; i < ids.length; i++) {
+
                         let workerId = ids[i];
+
                         pm2.sendDataToProcessId({
                             id: workerId,
                             type : 'process:msg',
@@ -226,8 +229,9 @@ pm2.connect((err) => {
                             topic: 'my'
                         }, (err, res) => {
                             if (err) console.error(err);
-                            else console.log(res);
+                            // else console.log(res);
                         });
+                        
                     }
 
 

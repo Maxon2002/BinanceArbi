@@ -200,6 +200,7 @@ setTimeout(() => {
         data: {
             open: true
         },
+        topic: 'Hi!'
     })
 }, 5000)
 
