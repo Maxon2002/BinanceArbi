@@ -220,7 +220,8 @@ pm2.connect((err) => {
 
     pm2.launchBus((err, bus) => {
         bus.on('process:msg', (packet) => {
-            if(packet.topic === 'open') {
+            console.log(packet)
+            if(packet.data.open) {
                 console.log(pm2.list)
             }
         });
