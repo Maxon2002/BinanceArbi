@@ -31,9 +31,9 @@ let mainAddress = '0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f'
 
 let fixAmountUsdt = 60
 
-let maxCommissionAllMaster = 1
+let maxCommissionAllMaster = 2
 
-let maxCommissionAllSmall = 1
+let maxCommissionAllSmall = 2
 
 
 let amountUsdt = fixAmountUsdt
