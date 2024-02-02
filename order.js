@@ -181,10 +181,17 @@ const crypto = require('crypto');
 
 
 
-process.on('message', (account) => {
+process.on('message', (data) => {
 
-    console.log(account)
+    console.log('Воркер получил ', data.message)
 
+    setTimeout(() => {
+        process.send({
+            type: 'custom',
+            topic: 'work',
+            message: 'Hello from worker!',
+          })
+    }, 5000)
 })
 
 setInterval(() => {

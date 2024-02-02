@@ -102,7 +102,7 @@ const WebSocket = require('ws');
 //     if (cluster.isMaster) {
 
 //         setTimeout(() => {cluster.fork()},5000)
-        
+
 
 //         console.log(`Мастер ${process.pid}`)
 
@@ -110,7 +110,7 @@ const WebSocket = require('ws');
 
 //         cluster.on('exit', (worker, code, signal) => {
 //             console.log(`Воркер ${worker.process.pid} завершил работу`);
-    
+
 //         });
 
 
@@ -205,16 +205,24 @@ pm2.connect((err) => {
     });
 
 
+    setTimeout(() => {
+        pm2.sendDataToProcessId({
+            id: apps[0].pm2_env.pm_id,
+            data: {
+                message: 'Hello from master!',
+            },
+        }, (err, res) => {
+            if (err) console.error(err);
+            else console.log(res);
+        });
+    }, 6000)
 
-    // Пример отправки сообщения воркеру
-    // pm2.sendDataToProcessId({
-    //   id: workerId,
-    //   data: {
-    //     type: 'custom',
-    //     message: 'Hello from master!'
-    //   },
-    //   topic: 'custom'
-    // });
+
+    pm2.launchBus((err, bus) => {
+        bus.on('work', (packet) => {
+            console.log('Received message from worker:', packet.message);
+        });
+    });
 });
 
 setInterval(() => {
