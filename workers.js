@@ -298,6 +298,9 @@ process.on('message', (packet) => {
                     (err, response, body) => {
                         body = JSON.parse(body)
 
+                        console.log('Body asset ', body)
+
+
                         if (body.code) {
                             console.log("Check start USDT ", body.code)
                             reRequest()
@@ -305,7 +308,6 @@ process.on('message', (packet) => {
                             for (let i = 0; i < body.length; i++) {
                                 if (body[i].asset === 'USDT') {
 
-                                    console.log('Body asset ', body)
 
                                     allMoney = +body[i].free
 
