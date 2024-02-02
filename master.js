@@ -430,40 +430,42 @@ async function startWorkers() {
 
 
     await new Promise((resolve, reject) => {
-        (function reRequest() {
-            let queryAsset = `timestamp=${Date.now()}`;
-            let hashAsset = signature(queryAsset);
+        setTimeout(() => {
+            (function reRequest() {
+                let queryAsset = `timestamp=${Date.now()}`;
+                let hashAsset = signature(queryAsset);
 
-            request.post(
-                {
-                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-
-                    if (body.code) {
-                        console.log("Check start USDT ", body.code)
-                        reRequest()
-                    } else {
-                        for (let i = 0; i < body.length; i++) {
-                            if (body[i].asset === 'USDT') {
-
-                                baseUsdt = +body[i].free
-
-                                baseUsdtSmall = Math.trunc((baseUsdt / Object.keys(accountsObj).length) * 100000000) / 100000000
-
-                                break
-                            }
+                request.post(
+                    {
+                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                        headers: {
+                            'X-MBX-APIKEY': publicKey
                         }
-                        resolve()
-                    }
-                }
-            )
+                    },
+                    (err, response, body) => {
+                        body = JSON.parse(body)
 
-        })()
+                        if (body.code) {
+                            console.log("Check start USDT ", body.code)
+                            reRequest()
+                        } else {
+                            for (let i = 0; i < body.length; i++) {
+                                if (body[i].asset === 'USDT') {
+
+                                    baseUsdt = +body[i].free
+
+                                    baseUsdtSmall = Math.trunc((baseUsdt / Object.keys(accountsObj).length) * 100000000) / 100000000
+
+                                    break
+                                }
+                            }
+                            resolve()
+                        }
+                    }
+                )
+
+            })()
+        }, 15000)
     })
 
 
@@ -1395,53 +1397,55 @@ async function global() {
                                     moneyForCommission = 5
                                 } else {
                                     await new Promise((resolve, reject) => {
-                                        (function reRequest() {
-                                            let queryAsset = `timestamp=${Date.now()}`;
-                                            let hashAsset = signature(queryAsset);
+                                        setTimeout(() => {
+                                            (function reRequest() {
+                                                let queryAsset = `timestamp=${Date.now()}`;
+                                                let hashAsset = signature(queryAsset);
 
-                                            request.post(
-                                                {
-                                                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                                    headers: {
-                                                        'X-MBX-APIKEY': publicKey
-                                                    }
-                                                },
-                                                (err, response, body) => {
-                                                    body = JSON.parse(body)
-
-                                                    if (body.code) {
-                                                        console.log("Check USDT for bnb usdtBtcEth ", body.code)
-                                                        reRequest()
-                                                    } else {
-                                                        for (let i = 0; i < body.length; i++) {
-                                                            if (body[i].asset === 'USDT') {
-
-                                                                let factMoney = +body[i].free
-
-                                                                allMoney = factMoney
-
-                                                                let factMoneyAfter = +(factMoney - 5).toFixed(8)
-
-                                                                if (factMoneyAfter >= 7) {
-                                                                    if (factMoneyAfter > fixAmountUsdt) {
-                                                                        amountUsdt = fixAmountUsdt
-                                                                        moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
-                                                                    } else {
-                                                                        amountUsdt = factMoneyAfter
-                                                                        moneyForCommission = 5
-                                                                    }
-
-                                                                } else {
-                                                                    dontCom = true
-                                                                }
-                                                                break
-                                                            }
+                                                request.post(
+                                                    {
+                                                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
                                                         }
-                                                        resolve()
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+
+                                                        if (body.code) {
+                                                            console.log("Check USDT for bnb usdtBtcEth ", body.code)
+                                                            reRequest()
+                                                        } else {
+                                                            for (let i = 0; i < body.length; i++) {
+                                                                if (body[i].asset === 'USDT') {
+
+                                                                    let factMoney = +body[i].free
+
+                                                                    allMoney = factMoney
+
+                                                                    let factMoneyAfter = +(factMoney - 5).toFixed(8)
+
+                                                                    if (factMoneyAfter >= 7) {
+                                                                        if (factMoneyAfter > fixAmountUsdt) {
+                                                                            amountUsdt = fixAmountUsdt
+                                                                            moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
+                                                                        } else {
+                                                                            amountUsdt = factMoneyAfter
+                                                                            moneyForCommission = 5
+                                                                        }
+
+                                                                    } else {
+                                                                        dontCom = true
+                                                                    }
+                                                                    break
+                                                                }
+                                                            }
+                                                            resolve()
+                                                        }
                                                     }
-                                                }
-                                            )
-                                        })()
+                                                )
+                                            })()
+                                        }, 10000)
                                     })
                                 }
                             }
@@ -1677,53 +1681,55 @@ async function global() {
                                     moneyForCommission = 5
                                 } else {
                                     await new Promise((resolve, reject) => {
-                                        (function reRequest() {
-                                            let queryAsset = `timestamp=${Date.now()}`;
-                                            let hashAsset = signature(queryAsset);
+                                        setTimeout(() => {
+                                            (function reRequest() {
+                                                let queryAsset = `timestamp=${Date.now()}`;
+                                                let hashAsset = signature(queryAsset);
 
-                                            request.post(
-                                                {
-                                                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                                    headers: {
-                                                        'X-MBX-APIKEY': publicKey
-                                                    }
-                                                },
-                                                (err, response, body) => {
-                                                    body = JSON.parse(body)
-
-                                                    if (body.code) {
-                                                        console.log("Check USDT for bnb usdtEthBtc ", body.code)
-                                                        reRequest()
-                                                    } else {
-                                                        for (let i = 0; i < body.length; i++) {
-                                                            if (body[i].asset === 'USDT') {
-
-                                                                let factMoney = +body[i].free
-
-                                                                allMoney = factMoney
-
-                                                                let factMoneyAfter = +(factMoney - 5).toFixed(8)
-
-                                                                if (factMoneyAfter >= 7) {
-                                                                    if (factMoneyAfter > fixAmountUsdt) {
-                                                                        amountUsdt = fixAmountUsdt
-                                                                        moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
-                                                                    } else {
-                                                                        amountUsdt = factMoneyAfter
-                                                                        moneyForCommission = 5
-                                                                    }
-
-                                                                } else {
-                                                                    dontCom = true
-                                                                }
-                                                                break
-                                                            }
+                                                request.post(
+                                                    {
+                                                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
                                                         }
-                                                        resolve()
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+
+                                                        if (body.code) {
+                                                            console.log("Check USDT for bnb usdtEthBtc ", body.code)
+                                                            reRequest()
+                                                        } else {
+                                                            for (let i = 0; i < body.length; i++) {
+                                                                if (body[i].asset === 'USDT') {
+
+                                                                    let factMoney = +body[i].free
+
+                                                                    allMoney = factMoney
+
+                                                                    let factMoneyAfter = +(factMoney - 5).toFixed(8)
+
+                                                                    if (factMoneyAfter >= 7) {
+                                                                        if (factMoneyAfter > fixAmountUsdt) {
+                                                                            amountUsdt = fixAmountUsdt
+                                                                            moneyForCommission = +(factMoney - amountUsdt).toFixed(8)
+                                                                        } else {
+                                                                            amountUsdt = factMoneyAfter
+                                                                            moneyForCommission = 5
+                                                                        }
+
+                                                                    } else {
+                                                                        dontCom = true
+                                                                    }
+                                                                    break
+                                                                }
+                                                            }
+                                                            resolve()
+                                                        }
                                                     }
-                                                }
-                                            )
-                                        })()
+                                                )
+                                            })()
+                                        }, 10000)
                                     })
                                 }
                             }
