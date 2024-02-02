@@ -194,12 +194,13 @@ process.on('message', (data) => {
     }, 5000)
 })
 
-
-process.send({
-    type: 'open',
-    topic: 'work',
-    message: 'Go',
-})
+setTimeout(() => {
+    process.send({
+        type: 'open',
+        topic: 'work',
+        message: 'Go',
+    })
+}, 5000)
 
 setInterval(() => {
     console.log('Воркер ', process.pid)
