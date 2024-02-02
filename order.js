@@ -1,6 +1,7 @@
 // const tls = require('tls')
 const request = require('request')
 
+const WebSocket = require('ws');
 
 const crypto = require('crypto');
 
