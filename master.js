@@ -68,8 +68,8 @@ pm2.connect((err) => {
     let workerId = null
     // Запуск воркера через PM2
     pm2.start({
-        script: 'order.js',
-        instances: howMuch,  // Указывает количество воркеров
+        script: 'workers.js',
+        instances: howMuchAccounts,  // Указывает количество воркеров
         name: 'worker1' // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;

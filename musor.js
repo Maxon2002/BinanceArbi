@@ -180,8 +180,8 @@ const WebSocket = require('ws');
 
 
 
-
-
+let names = ['humera', 'jopa']
+let indexNames = 0
 let howMuch = 2
 
 const pm2 = require('pm2')
@@ -197,7 +197,7 @@ pm2.connect((err) => {
     pm2.start({
         script: 'order.js',
         instances: howMuch,  // Указывает количество воркеров
-        name: 'worker1' // Уникальное имя для процесса
+        name: names[indexNames++] // Уникальное имя для процесса
     }, (err, apps) => {
         // workerId = apps[0].pm_id;
         // pm2.disconnect();
