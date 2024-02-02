@@ -100,7 +100,9 @@ const cluster = require('cluster');
 
 setTimeout(() => {
     if (cluster.isMaster) {
-        cluster.fork()
+
+        setTimeout(() => {cluster.fork()},5000)
+        
 
         console.log(`Мастер ${process.pid}`)
 
