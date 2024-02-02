@@ -225,13 +225,12 @@ pm2.connect((err) => {
                             type : 'process:msg',
                             data: {
                                 message: 'Hello from master!',
-                            },
-                            topic: 'my'
+                            }
                         }, (err, res) => {
                             if (err) console.error(err);
                             // else console.log(res);
                         });
-                        
+
                     }
 
 

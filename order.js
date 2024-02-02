@@ -199,8 +199,7 @@ setTimeout(() => {
         type: 'process:msg',
         data: {
             open: true
-        },
-        topic: 'Hi!'
+        }
     })
 }, 5000)
 
