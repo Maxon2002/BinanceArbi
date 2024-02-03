@@ -35,10 +35,13 @@ let maxCommissionAllMaster = 2
 
 let maxCommissionAllSmall = 2
 
+let amountFirstActive = 105//amountUsdt + (amountUsdt * 2)
+
+let maxChangeProc = 0.1
+
 
 let amountUsdt = fixAmountUsdt
 
-let amountFirstActive = 105//amountUsdt + (amountUsdt * 2)
 
 let baseBtc = 0
 let baseEth = 0
@@ -49,6 +52,8 @@ let amountUsdtSmall = fixAmountUsdtSmall
 let baseBtcSmall = 0
 let baseEthSmall = 0
 let baseUsdtSmall = 0
+
+
 
 
 let howMuchAccounts = Object.keys(accountsObj).length
@@ -214,6 +219,7 @@ let moneyForCommission = 0
 
 let dontCom = false
 
+let bigChange = false
 
 
 async function startWorkers() {
@@ -1115,6 +1121,16 @@ async function global() {
             let bid = data.data.bids[0][0]
             let ask = data.data.asks[0][0]
 
+            let change = (startPriceBtc - bid) / startPriceBtc
+
+            if (Math.abs(change) > maxChangeProc && !bigChange) {
+                bigChange = true
+
+                smoothMoney(change, 'BTC')
+            }
+
+
+
             if (data.data.bids[0][1] < 1000) {
                 for (let i = 1; i < data.data.bids.length; i++) {
                     let b = data.data.bids
@@ -1142,6 +1158,14 @@ async function global() {
 
             let bid = data.data.bids[0][0]
             let ask = data.data.asks[0][0]
+
+            let change = (startPriceEth - bid) / startPriceEth
+
+            if (Math.abs(change) > maxChangeProc && !bigChange) {
+                bigChange = true
+
+                smoothMoney(change, 'ETH')
+            }
 
             if (data.data.bids[0][1] < 1000) {
                 for (let i = 1; i < data.data.bids.length; i++) {
@@ -1222,7 +1246,7 @@ async function global() {
 
 
 
-        if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
+        if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt && !bigChange) {
 
             usdtBtcEthIndex++
 
@@ -1510,7 +1534,7 @@ async function global() {
 
 
 
-        if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtEthBtc !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
+        if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtEthBtc !== Infinity && !stopGame && currentAmountUsdt === amountUsdt && !bigChange) {
             usdtEthBtcIndex++
 
             let wait = false
@@ -1797,6 +1821,11 @@ async function global() {
 
 
 
+    function smoothMoney (change, symbol) {
+        // логика
+
+        bigChange = false
+    }
 
 
 
@@ -1804,8 +1833,6 @@ async function global() {
 
 
 
-
-    // нужно будет закрывать интервал
 
     let today = new Date().getUTCDate()
 

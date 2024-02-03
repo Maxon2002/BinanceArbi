@@ -221,7 +221,7 @@ pm2.connect((err) => {
 
                         pm2.sendDataToProcessId({
                             id: workerId,
-                            type : 'process:msg',
+                            type: 'process:msg',
                             data: {
                                 message: 'Hello from master!',
                             },
@@ -230,7 +230,7 @@ pm2.connect((err) => {
                             if (err) console.error(err);
                             // else console.log(res);
                         });
-                        
+
                     }
 
 
@@ -243,3 +243,19 @@ pm2.connect((err) => {
 setInterval(() => {
     console.log('Мастер ', process.pid)
 }, 2000)
+
+setTimeout(() => {
+    let workerId = ids[0];
+
+    pm2.sendDataToProcessId({
+        id: workerId,
+        type: 'process:msg',
+        data: {
+            message: 'Dop mes from master',
+        },
+        topic: 'my'
+    }, (err, res) => {
+        if (err) console.error(err);
+        // else console.log(res);
+    });
+}, 14000) 
