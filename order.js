@@ -167,7 +167,7 @@ function signature(query) {
 
 // request.get(
 //     {
-//         url: `https://api.binance.com/api/v3/exchangeInfo`,
+//         url: `https://fapi.binance.com/fapi/v1/exchangeInfo`,
 //         headers: {
 //             'X-MBX-APIKEY': publicKey
 //         }
@@ -175,37 +175,20 @@ function signature(query) {
 //     (err, response, body) => {
 //         body = JSON.parse(body)
 
-//         console.log(body)
+//         for (let i = 0; i < body.symbols.length; i++) {
+//             let element = body.symbols[i];
+
+//             if(element.symbol === 'ETHUSDT') {
+//                 console.log(element)
+//             }
+
+//         }
+
 //     }
 // )
 
 
 
-process.on('message', (packet) => {
-
-    console.log('Воркер получил ', packet.data.message)
-
-    // setTimeout(() => {
-    //     process.send({
-    //         type: 'custom',
-    //         topic: 'work',
-    //         message: 'Hello from worker!',
-    //     })
-    // }, 5000)
-})
-
-setTimeout(() => {
-    process.send({
-        type: 'process:msg',
-        data: {
-            open: true
-        }
-    })
-}, 5000)
-
-setInterval(() => {
-    console.log('Воркер ', process.pid)
-}, 2000)
 
 
 
@@ -217,53 +200,191 @@ setInterval(() => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// let queryOpenOrders = `symbol=BTCUSDT&timestamp=${Date.now()}`;
-
-// let hashOpenOrders = signature(queryOpenOrders)
+// let queryFutBal = `timestamp=${Date.now()}`;
+// let hashFutBal = signature(queryFutBal);
 
 // request.get(
 //     {
-//         url: `https://api.binance.com/api/v3/allOrders?${queryOpenOrders}&signature=${hashOpenOrders}`,
+//         url: `https://fapi.binance.com/fapi/v2/balance?${queryFutBal}&signature=${hashFutBal}`,
 //         headers: {
 //             'X-MBX-APIKEY': publicKey
 //         }
 //     },
 //     (err, response, body) => {
 //         body = JSON.parse(body)
-//         console.log(body)
-//         // console.log(Date.now() - time)
 
+//         console.log(body)
 //     }
 // )
+
+
+
+
+
+// let queryTransferFromFut = `type=UMFUTURE_MAIN&asset=USDT&amount=43.34611018&timestamp=${Date.now()}`;
+// let hashTransferFromFut = signature(queryTransferFromFut);
+
+// request.post(
+//     {
+//         url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromFut}&signature=${hashTransferFromFut}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+
+//         console.log(body)
+//     }
+// )
+
+
+
+
+// let queryTransferFromSpot = `type=MAIN_UMFUTURE&asset=USDT&amount=50&timestamp=${Date.now()}`;
+// let hashTransferFromSpot = signature(queryTransferFromSpot);
+
+// request.post(
+//     {
+//         url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromSpot}&signature=${hashTransferFromSpot}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+
+//         console.log(body)
+//     }
+// )
+
+
+
+
+
+
+
+
+
+let queryOrderSellFutBtc = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.001&reduceOnly=true&timestamp=${Date.now()}`
+let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+
+request.post(
+    {
+        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+        headers: {
+            'X-MBX-APIKEY': publicKey
+        }
+    },
+    (err, response, body) => {
+        body = JSON.parse(body)
+        if (body.code) {
+            console.log("First sell BTC fut ", body)
+        } else {
+            console.log(body)
+        }
+    }
+)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// process.on('message', (packet) => {
+
+//     console.log('Воркер получил ', packet.data.message)
+
+//     // setTimeout(() => {
+//     //     process.send({
+//     //         type: 'custom',
+//     //         topic: 'work',
+//     //         message: 'Hello from worker!',
+//     //     })
+//     // }, 5000)
+// })
+
+// setTimeout(() => {
+//     process.send({
+//         type: 'process:msg',
+//         data: {
+//             open: true
+//         }
+//     })
+// }, 5000)
+
+// setInterval(() => {
+//     console.log('Воркер ', process.pid)
+// }, 2000)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
