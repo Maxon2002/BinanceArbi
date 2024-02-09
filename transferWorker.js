@@ -145,7 +145,7 @@ process.on('message', (packet) => {
                 if (data.e === "balanceUpdate") {
                     indexUpdate++
                     console.log(data)
-                    if (indexUpdate === 3) {
+                    if (indexUpdate === 1) {
                         console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
 
 
@@ -195,8 +195,8 @@ process.on('message', (packet) => {
 
 
             let restBTC = 0
-            let restETH = 0
-            let restUSDT = 0
+            // let restETH = 0
+            // let restUSDT = 0
 
             await new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -223,15 +223,15 @@ process.on('message', (packet) => {
 
                                             restBTC = +body[i].free
                                         }
-                                        if (body[i].asset === 'ETH') {
+                                        // if (body[i].asset === 'ETH') {
 
-                                            restETH = +body[i].free
-                                        }
+                                        //     restETH = +body[i].free
+                                        // }
                                         
-                                        if (body[i].asset === 'USDT') {
+                                        // if (body[i].asset === 'USDT') {
 
-                                            restUSDT = +body[i].free
-                                        }
+                                        //     restUSDT = +body[i].free
+                                        // }
                                     }
                                     resolve()
                                 }
@@ -244,29 +244,29 @@ process.on('message', (packet) => {
 
 
 
-            (function reRequest() {
+            // (function reRequest() {
 
-                let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${mainAddress}&amount=${restUSDT}&transactionFeeFlag=true&timestamp=${Date.now()}`;
-                let hashWithdrawUSDT = signature(queryWithdrawUSDT);
+            //     let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${mainAddress}&amount=${restUSDT}&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            //     let hashWithdrawUSDT = signature(queryWithdrawUSDT);
 
-                request.post(
-                    {
-                        url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawUSDT}&signature=${hashWithdrawUSDT}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code) {
-                            console.log(`With USDT after end from ${account.index} `, body.code)
-                            reRequest()
-                        } else {
-                            console.log(body)
-                        }
-                    }
-                )
-            })();
+            //     request.post(
+            //         {
+            //             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawUSDT}&signature=${hashWithdrawUSDT}`,
+            //             headers: {
+            //                 'X-MBX-APIKEY': publicKey
+            //             }
+            //         },
+            //         (err, response, body) => {
+            //             body = JSON.parse(body)
+            //             if (body.code) {
+            //                 console.log(`With USDT after end from ${account.index} `, body.code)
+            //                 reRequest()
+            //             } else {
+            //                 console.log(body)
+            //             }
+            //         }
+            //     )
+            // })();
 
 
 
@@ -295,29 +295,29 @@ process.on('message', (packet) => {
 
             })();
 
-            (function reRequest() {
+            // (function reRequest() {
 
-                let queryWithdrawETH = `coin=ETH&network=BSC&address=${mainAddress}&amount=${restETH}&transactionFeeFlag=true&timestamp=${Date.now()}`;
-                let hashWithdrawETH = signature(queryWithdrawETH);
+            //     let queryWithdrawETH = `coin=ETH&network=BSC&address=${mainAddress}&amount=${restETH}&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            //     let hashWithdrawETH = signature(queryWithdrawETH);
 
-                request.post(
-                    {
-                        url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawETH}&signature=${hashWithdrawETH}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code) {
-                            console.log(`With ETH after end from ${account.index} `, body.code)
-                            reRequest()
-                        } else {
-                            console.log(body)
-                        }
-                    }
-                )
-            })();
+            //     request.post(
+            //         {
+            //             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawETH}&signature=${hashWithdrawETH}`,
+            //             headers: {
+            //                 'X-MBX-APIKEY': publicKey
+            //             }
+            //         },
+            //         (err, response, body) => {
+            //             body = JSON.parse(body)
+            //             if (body.code) {
+            //                 console.log(`With ETH after end from ${account.index} `, body.code)
+            //                 reRequest()
+            //             } else {
+            //                 console.log(body)
+            //             }
+            //         }
+            //     )
+            // })();
 
 
 

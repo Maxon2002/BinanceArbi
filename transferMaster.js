@@ -167,36 +167,36 @@ async function startWorkers() {
 
 
 
+        // (function reRequest() {
+
+
+        //     let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${accountsObj[account].address}&amount=2&transactionFeeFlag=true&timestamp=${Date.now()}`;
+        //     let hashWithdrawUSDT = signature(queryWithdrawUSDT);
+
+        //     request.post(
+        //         {
+        //             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawUSDT}&signature=${hashWithdrawUSDT}`,
+        //             headers: {
+        //                 'X-MBX-APIKEY': publicKey
+        //             }
+        //         },
+        //         (err, response, body) => {
+        //             body = JSON.parse(body)
+        //             if (body.code) {
+        //                 console.log(`With start USDT to ${accountsObj[account].index} `, body.code)
+        //                 reRequest()
+        //             } else {
+        //                 console.log(body)
+        //             }
+        //         }
+        //     )
+
+        // })();
+
+
         (function reRequest() {
 
-
-            let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${accountsObj[account].address}&amount=2&transactionFeeFlag=true&timestamp=${Date.now()}`;
-            let hashWithdrawUSDT = signature(queryWithdrawUSDT);
-
-            request.post(
-                {
-                    url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawUSDT}&signature=${hashWithdrawUSDT}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code) {
-                        console.log(`With start USDT to ${accountsObj[account].index} `, body.code)
-                        reRequest()
-                    } else {
-                        console.log(body)
-                    }
-                }
-            )
-
-        })();
-
-
-        (function reRequest() {
-
-            let queryWithdrawBTC = `coin=BTC&network=BSC&address=${accountsObj[account].address}&amount=0.0001&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            let queryWithdrawBTC = `coin=BTC&network=BSC&address=${accountsObj[account].address}&amount=0.00067&transactionFeeFlag=true&timestamp=${Date.now()}`;
             let hashWithdrawBTC = signature(queryWithdrawBTC);
 
             request.post(
@@ -219,29 +219,29 @@ async function startWorkers() {
         })();
 
 
-        (function reRequest() {
+        // (function reRequest() {
 
-            let queryWithdrawETH = `coin=ETH&network=BSC&address=${accountsObj[account].address}&amount=0.002&transactionFeeFlag=true&timestamp=${Date.now()}`;
-            let hashWithdrawETH = signature(queryWithdrawETH);
+        //     let queryWithdrawETH = `coin=ETH&network=BSC&address=${accountsObj[account].address}&amount=0.002&transactionFeeFlag=true&timestamp=${Date.now()}`;
+        //     let hashWithdrawETH = signature(queryWithdrawETH);
 
-            request.post(
-                {
-                    url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawETH}&signature=${hashWithdrawETH}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code) {
-                        console.log(`With start ETH to ${accountsObj[account].index} `, body.code)
-                        reRequest()
-                    } else {
-                        console.log(body)
-                    }
-                }
-            )
-        })();
+        //     request.post(
+        //         {
+        //             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdrawETH}&signature=${hashWithdrawETH}`,
+        //             headers: {
+        //                 'X-MBX-APIKEY': publicKey
+        //             }
+        //         },
+        //         (err, response, body) => {
+        //             body = JSON.parse(body)
+        //             if (body.code) {
+        //                 console.log(`With start ETH to ${accountsObj[account].index} `, body.code)
+        //                 reRequest()
+        //             } else {
+        //                 console.log(body)
+        //             }
+        //         }
+        //     )
+        // })();
     }
 
 
@@ -350,7 +350,7 @@ async function startGlobalListen() {
 
     
 
-    let howNeedIndexUpdate = 3 * howMuchAccounts
+    let howNeedIndexUpdate = 1 * howMuchAccounts
 
 
     function listen(data) {
