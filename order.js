@@ -15,8 +15,21 @@ function signature(query) {
         .createHmac('sha256', secretKey)
         .update(query)
         .digest('hex');
-}
+};
 
+
+let kkk = 1;
+(async () => {
+    if(kkk === 1) {
+        await new Promise((resolve, reject) => {
+            setTimeout(() => {
+                console.log('1')
+                resolve()
+            }, 5000)
+        })
+    }
+    console.log('2')
+})()
 
 
 
@@ -266,25 +279,25 @@ function signature(query) {
 
 
 
-let queryOrderSellFutBtc = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.001&reduceOnly=true&timestamp=${Date.now()}`
-let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+// let queryOrderSellFutBtc = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.001&reduceOnly=true&timestamp=${Date.now()}`
+// let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
 
-request.post(
-    {
-        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
-        }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
-        if (body.code) {
-            console.log("First sell BTC fut ", body)
-        } else {
-            console.log(body)
-        }
-    }
-)
+// request.post(
+//     {
+//         url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+//         if (body.code) {
+//             console.log("First sell BTC fut ", body)
+//         } else {
+//             console.log(body)
+//         }
+//     }
+// )
 
 
 
