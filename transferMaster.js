@@ -170,7 +170,7 @@ async function startWorkers() {
         (function reRequest() {
 
 
-            let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${accountsObj[account].address}&amount=1&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            let queryWithdrawUSDT = `coin=USDT&network=BSC&address=${accountsObj[account].address}&amount=2&transactionFeeFlag=true&timestamp=${Date.now()}`;
             let hashWithdrawUSDT = signature(queryWithdrawUSDT);
 
             request.post(
@@ -196,7 +196,7 @@ async function startWorkers() {
 
         (function reRequest() {
 
-            let queryWithdrawBTC = `coin=BTC&network=BSC&address=${accountsObj[account].address}&amount=0.00001&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            let queryWithdrawBTC = `coin=BTC&network=BSC&address=${accountsObj[account].address}&amount=0.0001&transactionFeeFlag=true&timestamp=${Date.now()}`;
             let hashWithdrawBTC = signature(queryWithdrawBTC);
 
             request.post(
@@ -221,7 +221,7 @@ async function startWorkers() {
 
         (function reRequest() {
 
-            let queryWithdrawETH = `coin=ETH&network=BSC&address=${accountsObj[account].address}&amount=0.0002&transactionFeeFlag=true&timestamp=${Date.now()}`;
+            let queryWithdrawETH = `coin=ETH&network=BSC&address=${accountsObj[account].address}&amount=0.002&transactionFeeFlag=true&timestamp=${Date.now()}`;
             let hashWithdrawETH = signature(queryWithdrawETH);
 
             request.post(
