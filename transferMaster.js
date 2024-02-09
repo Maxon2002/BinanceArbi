@@ -66,7 +66,7 @@ pm2.connect((err) => {
     let workerId = null
     // Запуск воркера через PM2
     pm2.start({
-        script: 'workers.js',
+        script: 'transferWorkers.js',
         instances: howMuchAccounts,  // Указывает количество воркеров
         name: 'worker' // Уникальное имя для процесса
     }, (err, apps) => {
