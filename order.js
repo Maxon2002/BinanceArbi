@@ -18,18 +18,23 @@ function signature(query) {
 };
 
 
-let kkk = 1;
-(async () => {
-    if(kkk === 1) {
-        await new Promise((resolve, reject) => {
-            setTimeout(() => {
-                console.log('1')
-                resolve()
-            }, 5000)
-        })
-    }
-    console.log('2')
-})()
+// (async () => {
+//     Promise.all([
+//         new Promise((resolve, reject) => {
+//             setTimeout(() => resolve(1), 3000)
+//         }),
+//         new Promise((resolve, reject) => {
+//             setTimeout(() => resolve(2), 4000)
+
+//         }),
+//         new Promise((resolve, reject) => {
+//             setTimeout(() => resolve(3), 2000)
+
+//         }),
+//     ]).then(res => {
+//         console.log(res)
+//     })
+// })()
 
 
 
@@ -38,25 +43,25 @@ let kkk = 1;
 
 // console.log('start ', Date.now())
 
-// let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-// let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
-// let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-// let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
+let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+let hashOrderBuyEthBtc = signature(queryOrderBuyEthBtc);
 
-// let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-// let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
 
 
 
-// let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-// let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-// let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
-// let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
+let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
 
-// let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
-// let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
+let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
@@ -125,7 +130,7 @@ let kkk = 1;
 
 // request.post(
 //     {
-//         url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
+//         url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
 //         headers: {
 //             'X-MBX-APIKEY': publicKey
 //         }
@@ -138,6 +143,8 @@ let kkk = 1;
 
 
 
+
+console.log(0 / 100000)
 
 
 
