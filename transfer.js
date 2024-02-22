@@ -1,5 +1,5 @@
-let secretKey = 'HKMjOCgmLuKXgWD53uhd3TsIdaZSwOXrYDtaFPoB9BfLKFAl90FneqRwPnNoxEEZ'
-let publicKey = 'wIJLD96Inswu74tTkdCeDxaag1D0BWydcxIMxzuOAWQsAATvT0zbgBredIbY15F1'
+let secretKey = 'wWrKKmoPoaJrQTsh3vkDpfesj2LPuP1rOxulX6ort4l3MIUsZ0KWL4XbATtHJsfo'
+let publicKey = 'UGrmATKOAK7fWhhW1i5x1QbhOoAHXFxFLhQMWZZ26FcyNKyC0JOAYeyMx3zL8aSN'
 
 const request = require('request')
 
@@ -15,21 +15,49 @@ function signature(query) {
 let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
 
 
+// setTimeout(() => {
+//     let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=0.1145082&transactionFeeFlag=true&timestamp=${Date.now()}`;
+//     let hashWithdraw = signature(queryWithdraw);
+
+//     request.post(
+//         {
+//             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
+//             headers: {
+//                 'X-MBX-APIKEY': publicKey
+//             }
+//         },
+//         (err, response, body) => {
+//             body = JSON.parse(body)
+
+//             console.log(body)
+//         }
+//     )
+// }, 5000)
+
+
 setTimeout(() => {
-    let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=0.1145082&transactionFeeFlag=true&timestamp=${Date.now()}`;
-    let hashWithdraw = signature(queryWithdraw);
+    (function reRequest() {
+        let queryAsset = `timestamp=${Date.now()}`;
+        let hashAsset = signature(queryAsset);
 
-    request.post(
-        {
-            url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
-            headers: {
-                'X-MBX-APIKEY': publicKey
+        request.post(
+            {
+                url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                headers: {
+                    'X-MBX-APIKEY': publicKey
+                }
+            },
+            (err, response, body) => {
+                body = JSON.parse(body)
+
+                if (body.code) {
+                    console.log("Check start USDT ", body.code)
+                    reRequest()
+                } else {
+                    console.log(body)
+                }
             }
-        },
-        (err, response, body) => {
-            body = JSON.parse(body)
+        )
 
-            console.log(body)
-        }
-    )
-}, 5000)
+    })()
+}, 15000)
