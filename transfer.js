@@ -12,52 +12,26 @@ function signature(query) {
         .digest('hex');
 }
 
-let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
-
-
-// setTimeout(() => {
-//     let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=0.1145082&transactionFeeFlag=true&timestamp=${Date.now()}`;
-//     let hashWithdraw = signature(queryWithdraw);
-
-//     request.post(
-//         {
-//             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
-//             headers: {
-//                 'X-MBX-APIKEY': publicKey
-//             }
-//         },
-//         (err, response, body) => {
-//             body = JSON.parse(body)
-
-//             console.log(body)
-//         }
-//     )
-// }, 5000)
+let adressMain = "0x30ca4e2074652bed34706d3238c5db93b994dcda"
 
 
 setTimeout(() => {
-    (function reRequest() {
-        let queryAsset = `timestamp=${Date.now()}`;
-        let hashAsset = signature(queryAsset);
+    let queryWithdraw = `coin=USDT&network=BSC&address=${adressMain}&amount=24.33214379&transactionFeeFlag=false&timestamp=${Date.now()}`;
+    let hashWithdraw = signature(queryWithdraw);
 
-        request.post(
-            {
-                url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                headers: {
-                    'X-MBX-APIKEY': publicKey
-                }
-            },
-            (err, response, body) => {
-                body = JSON.parse(body)
-
-                if (body.code) {
-                    console.log("Check start USDT ", body.code)
-                    reRequest()
-                } else {
-                    console.log(body)
-                }
+    request.post(
+        {
+            url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
+            headers: {
+                'X-MBX-APIKEY': publicKey
             }
-        )
+        },
+        (err, response, body) => {
+            body = JSON.parse(body)
 
-    })()
-}, 15000)
+            console.log(body)
+        }
+    )
+}, 10000)
+
+
