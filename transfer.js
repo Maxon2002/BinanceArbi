@@ -12,7 +12,7 @@ function signature(query) {
         .digest('hex');
 }
 
-let adressMain = "0x30ca4e2074652bed34706d3238c5db93b994dcda"
+let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
 
 
 setTimeout(() => {
