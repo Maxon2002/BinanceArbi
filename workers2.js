@@ -17,9 +17,10 @@ let commissionBtc = 0
 let commissionEth = 0
 
 
-let mainAddress = '0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f'
+let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
+let indexError = 0
 
 process.send({
     type: 'process:msg',
@@ -157,8 +158,15 @@ process.on('message', (packet) => {
                         (err, response, body) => {
                             body = JSON.parse(body)
                             if (body.code) {
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
                                 reRequest()
                             } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
                                 listenKey = body.listenKey
                                 resolve()
                             }
@@ -314,8 +322,15 @@ process.on('message', (packet) => {
 
                             if (body.code) {
                                 console.log(`Check start USDT in ${account.index} `, body.code)
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
                                 reRequest()
                             } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
                                 for (let i = 0; i < body.length; i++) {
                                     if (body[i].asset === 'USDT') {
 
@@ -370,7 +385,7 @@ process.on('message', (packet) => {
                                 type: 'workerEnd'
                             }
                         });
-        
+
 
                         let restBTC = 0
                         let restETH = 0
@@ -395,8 +410,15 @@ process.on('message', (packet) => {
 
                                             if (body.code) {
                                                 console.log(`Check end assets in ${account.index} `, body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 for (let i = 0; i < body.length; i++) {
                                                     if (body[i].asset === 'BTC') {
 
@@ -442,8 +464,15 @@ process.on('message', (packet) => {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log(`With USDT after end from ${account.index} `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             console.log(body)
                                         }
                                     }
@@ -468,8 +497,15 @@ process.on('message', (packet) => {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log(`With BTC after end from ${account.index} `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             console.log(body)
                                         }
                                     }
@@ -493,8 +529,15 @@ process.on('message', (packet) => {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log(`With ETH after end from ${account.index} `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             console.log(body)
                                         }
                                     }
@@ -702,7 +745,7 @@ process.on('message', (packet) => {
                         firstDeal = false
                     }
 
-                    
+
 
                     if (amountUsdt > fixAmountUsdt) {
                         amountUsdt = fixAmountUsdt
@@ -811,8 +854,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Buy BTC usdtBtcEth ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('4 ', body)
                                                         resolve(body)
                                                     }
@@ -836,8 +886,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Sell ETH usdtBtcEth ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('6 ', body)
                                                         resolve(body)
                                                     }
@@ -861,8 +918,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Buy ETH usdtBtcEth ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('5 ', body)
                                                         resolve(body)
                                                     }
@@ -1047,8 +1111,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Buy ETH usdtEthBtc ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('1 ', body)
                                                         resolve(body)
                                                     }
@@ -1072,8 +1143,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Sell BTC usdtEthBtc ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('3 ', body)
                                                         resolve(body)
                                                     }
@@ -1097,8 +1175,15 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code) {
                                                         console.log(`Sell ETH usdtEthBtc ${account.index} `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
                                                         reRequest()
                                                     } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
                                                         // console.log('2 ', body)
                                                         resolve(body)
                                                     }
@@ -1257,8 +1342,15 @@ process.on('message', (packet) => {
                             (err, response, body) => {
                                 body = JSON.parse(body)
                                 if (body.code) {
+                                    indexError++
+                                    if (indexError > 5) {
+                                        process.exit()
+                                    }
                                     reRequest()
                                 } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
                                     listenKey = body.listenKey
                                     resolve()
                                 }
@@ -1418,8 +1510,15 @@ process.on('message', (packet) => {
 
                                         if (body.code) {
                                             console.log(`Check bihChange assets ${account.index}`, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             for (let i = 0; i < body.length; i++) {
                                                 // if (body[i].asset === 'BTC') {
 
@@ -1461,8 +1560,15 @@ process.on('message', (packet) => {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With USDT after bigChange from ${account.index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -1487,8 +1593,15 @@ process.on('message', (packet) => {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With BTC after bigChange from ${account.index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -1512,8 +1625,15 @@ process.on('message', (packet) => {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With ETH after bigChange from ${account.index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -1543,8 +1663,15 @@ process.on('message', (packet) => {
 
                                 if (body.code) {
                                     console.log(`Check после bigChange USDT ${account.index}`, body.code)
+                                    indexError++
+                                    if (indexError > 5) {
+                                        process.exit()
+                                    }
                                     reRequest()
                                 } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
                                     for (let i = 0; i < body.length; i++) {
                                         if (body[i].asset === 'USDT') {
 
@@ -1614,8 +1741,15 @@ process.on('message', (packet) => {
 
                                     if (body.code) {
                                         console.log(`Check USDT after day ${account.index}`, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         for (let i = 0; i < body.length; i++) {
                                             if (body[i].asset === 'USDT') {
 
@@ -1653,8 +1787,15 @@ process.on('message', (packet) => {
                                                                 body = JSON.parse(body)
                                                                 if (body.code) {
                                                                     console.log(`With USDT next day from ${account.index} `, body.code)
+                                                                    indexError++
+                                                                    if (indexError > 5) {
+                                                                        process.exit()
+                                                                    }
                                                                     reRequest()
                                                                 } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
                                                                     console.log(body)
 
                                                                     // убить процесс
@@ -1693,8 +1834,11 @@ process.on('message', (packet) => {
         }
 
 
+        setTimeout(() => {
 
-        console.log(`Воркер ${process.pid} начал работу с аккаунтом: ${account.index}`);
+
+            console.log(`Воркер ${process.pid} начал работу с аккаунтом: ${account.index}`);
+        }, 8000)
 
     }
 

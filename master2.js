@@ -13,38 +13,38 @@ const pm2 = require('pm2')
 
 
 const accountsObj = {
-    dikakelana518: {
-        address: "0xe5783129d4082608437e0327021335648a431658",
-        secretKey: "aMsiuzzma4DfwH6olXeTSwaB5n1YlZDpzazzZpPHmyvkR6CTz9FlCfsO73dPhi3V",
-        publicKey: "NW9VD0HKY8kyeeuX2jzZYYi5swEarlYg6b8EclfjNxUyl3zELuTFsJ1wvVmPV4HQ",
+    gilangsky183: {
+        address: "0xff9837e2baa4570e9b71d19bde7279d959c8acfd",
+        secretKey: "BBKsZLYpbealxXH3yLYBaSzz1l3kOJpoowa0eDjntuq6bvrSpsqSrYmL8e3I9YV4",
+        publicKey: "dGI55mC4Y8yBNYhG6jgGgMW4hBaBJjMf8SVuqMX77vlRxGNO1EQd6a4f1LsrY9Ch",
         id: null,
         index: 0
     },
-    Hendrajol266: {
-        address: "0x3306a423e2c39496c3389a3e8606bc32bc58c790",
-        secretKey: "SQg95LHeYfiKzfW0Q4Ph4dsTbS30mGbznJJfAPW3PtQB4TWNMqChNHdnXLrUzHM2",
-        publicKey: "hQx5sbNG7vrZNl0HJ3NzQqRSoJ6uRbEDRe9tgfELurGeASovm0jznj2yOAgWKL2G",
+    gaskuy809: {
+        address: "0x7d41701ab2c42e1b56ad5de3d5591ba9faf8867e",
+        secretKey: "mMspCI4gGKq755PJz0J9vaXUhHDBilPjW1vL3JmMOWroH27mO2jq9kRS6FqNfFG7",
+        publicKey: "epbSzRAF20foJjXgxTQjaGDjaFiR2HERfDXAXWuA8dLeAcehm2IIUR4o1GgD4ugX",
         id: null,
         index: 1
     },
-    kelasabodol66: {
-        address: "0xb951c6476776bf34ad6f934403b8b044d24bf580",
-        secretKey: "wWrKKmoPoaJrQTsh3vkDpfesj2LPuP1rOxulX6ort4l3MIUsZ0KWL4XbATtHJsfo",
-        publicKey: "UGrmATKOAK7fWhhW1i5x1QbhOoAHXFxFLhQMWZZ26FcyNKyC0JOAYeyMx3zL8aSN",
+    adipangestu0905: {
+        address: "0x35214ac926d9652afd31c0009d7670eeee02eccd",
+        secretKey: "enuWvg5XZZt52FGhfBIFSaTqYYMTDYsEvrC2r6cvgs9xbTxmYWxyRfmpNxjpHrIE",
+        publicKey: "aoOrf78vZ2YBeXCAtTixdVAPXjJS3xbX7lnwALEk81up2KbXcFzMsZsPYlkGD92c",
         id: null,
         index: 2
     },
-    binancefresh357: {
-        address: "0x6b955efc0a5ec103932d58bfc38c49af9dc43586",
-        secretKey: "BZmE33uGDyw964A1Tof5WLKb411WMqOUzYNOTzSOzUnq0zLfu3KMzN6J6aiCTrkc",
-        publicKey: "bgRthCiErik6y0D6HWq8sAokEWeJnUGsQqHN3D4JwmqbzRrP5HhgxTT659VZagyB",
+    n2512086: {
+        address: "0xd56e80da921ff76583c0fefa95d81dbb3c05f587",
+        secretKey: "wIOLesFaxSq6QxWC2oyn4ErkSVrXq63FVtbceKNghubk8P6kx06YoYmWPJRaR4Fq",
+        publicKey: "Ibex81efMAPPjKO3GjJoCmvR1XHzqjHUJENYaxrRmg13eMLh9wem2cp9vlTjHPGv",
         id: null,
         index: 3
     },
-    wezezark: {
-        address: "0xc8bcdb399d4be1733a96cb371183c8a674984cbd",
-        secretKey: "28pZLF5o8kdgSMg2JM0YsygyRgrZyilwgKvKuB8zTI9AZDcPCu4MOjm4MSzkg5J9",
-        publicKey: "xSYokGwWrpWELi973zl3UGYY7VrwEcMONk8IbfuduWGRU1WPiAu7kPRO11p4dx7M",
+    yayatkoesmayadi1: {
+        address: "0x78a0e01ad327a9c3e650bff496ab67486fd9cfa2",
+        secretKey: "qCiIjtVeBsXErkEmqfIpKbVgsVX9od71OrTjbUyOYlsO2C78edOc2GLfGWWoEWDt",
+        publicKey: "BIwl24NI5Dk0RDXAY7BiCP6QMOeJe7pwEULOS5c1E14dYu3vJXa61I9W8qabnIDK",
         id: null,
         index: 4
     },
@@ -54,7 +54,7 @@ const accountsObj = {
 
 
 
-let mainAddress = '0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f'
+let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
 let fixAmountUsdt = 60
@@ -84,6 +84,7 @@ let baseUsdtSmall = 0
 
 
 
+let indexError = 0
 
 
 
@@ -213,8 +214,8 @@ pm2.connect((err) => {
 
 
 
-let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
-let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
+let secretKey = 'L4XBqDNAkv0nhulUwxhGC0u5lsqABtipxQxLAKOFeNkolhC9QFhF1tDm5QQbFtun'
+let publicKey = 'Vw8awKzMN7wGzuNZ31KLZByVAHuPu4LtOcGWTwpBaKjWryJ7sXJEoPwF0hyYJnsa'
 
 function signature(query) {
     return crypto
@@ -323,8 +324,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("Depth BTC ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
 
                             startPriceBtc = +body.asks[0][0]
 
@@ -386,8 +394,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("Depth ETH ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             startPriceEth = +body.asks[0][0]
 
 
@@ -458,8 +473,15 @@ async function startWorkers() {
                     body = JSON.parse(body)
                     if (body.code) {
                         console.log("First transfer to fut ", body.code)
+                        indexError++
+                        if (indexError > 5) {
+                            process.exit()
+                        }
                         reRequest()
                     } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
                         resolve()
                     }
                 }
@@ -486,8 +508,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("First buy BTC ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
 
                             // baseBtcInUsdt = +body.cummulativeQuoteQty
 
@@ -514,8 +543,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("First sell BTC fut ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             resolve()
                         }
                     }
@@ -538,8 +574,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("First buy ETH ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
 
                             // baseEthInUsdt = +body.cummulativeQuoteQty
 
@@ -567,8 +610,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log("First sell ETH fut ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             resolve()
                         }
                     }
@@ -596,8 +646,15 @@ async function startWorkers() {
 
                         if (body.code) {
                             console.log("Check start USDT ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             for (let i = 0; i < body.length; i++) {
                                 if (body[i].asset === 'USDT') {
 
@@ -644,8 +701,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log(`With start USDT to ${accountsObj[account].index} `, body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             console.log(body)
                         }
                     }
@@ -670,8 +734,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log(`With start BTC to ${accountsObj[account].index} `, body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             console.log(body)
                         }
                     }
@@ -695,8 +766,15 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code) {
                             console.log(`With start ETH to ${accountsObj[account].index} `, body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
                             reRequest()
                         } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
                             console.log(body)
                         }
                     }
@@ -737,8 +815,15 @@ async function startGlobalListen() {
                 (err, response, body) => {
                     body = JSON.parse(body)
                     if (body.code) {
+                        indexError++
+                        if (indexError > 5) {
+                            process.exit()
+                        }
                         reRequest()
                     } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
                         listenKey = body.listenKey
                         resolve()
                     }
@@ -887,8 +972,15 @@ async function global() {
 
                     if (body.code) {
                         console.log("Check start USDT ", body.code)
+                        indexError++
+                        if (indexError > 5) {
+                            process.exit()
+                        }
                         reRequest()
                     } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
                         for (let i = 0; i < body.length; i++) {
                             if (body[i].asset === 'USDT') {
 
@@ -970,8 +1062,15 @@ async function global() {
 
                                     if (body.code) {
                                         console.log(`Check end assets in ${account.index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         for (let i = 0; i < body.length; i++) {
                                             if (body[i].asset === 'BTC') {
 
@@ -1012,8 +1111,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log("End sell BTC ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
 
                                         resolve()
                                     }
@@ -1037,8 +1143,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log("End buy BTC fut ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         resolve()
                                     }
                                 }
@@ -1061,8 +1174,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log("End sell ETH ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
 
                                         resolve()
                                     }
@@ -1086,8 +1206,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log("End buy ETH fut ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         resolve()
                                     }
                                 }
@@ -1366,8 +1493,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Buy BTC usdtBtcEth ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('4 ', body)
                                                 resolve(body)
                                             }
@@ -1392,8 +1526,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Sell ETH usdtBtcEth ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('6 ', body)
                                                 resolve(body)
                                             }
@@ -1417,8 +1558,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Buy ETH usdtBtcEth ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('5 ', body)
                                                 resolve(body)
                                             }
@@ -1591,8 +1739,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Buy ETH usdtEthBtc ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('1 ', body)
                                                 resolve(body)
                                             }
@@ -1617,8 +1772,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Sell BTC usdtEthBtc ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('3 ', body)
                                                 resolve(body)
                                             }
@@ -1642,8 +1804,15 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code) {
                                                 console.log("Sell ETH usdtEthBtc ", body.code)
+                                                indexError++
+                                                if (indexError > 5) {
+                                                    process.exit()
+                                                }
                                                 reRequest()
                                             } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
                                                 // console.log('2 ', body)
                                                 resolve(body)
                                             }
@@ -1835,8 +2004,15 @@ async function global() {
                             body = JSON.parse(body)
                             if (body.code) {
                                 console.log("Depth BTC after bigChange ", body.code)
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
                                 reRequest()
                             } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
 
                                 newStartPriceBtc = +body.asks[0][0]
 
@@ -1917,8 +2093,15 @@ async function global() {
                             body = JSON.parse(body)
                             if (body.code) {
                                 console.log("Depth ETH after bigChange ", body.code)
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
                                 reRequest()
                             } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
 
                                 newStartPriceEth = +body.asks[0][0]
 
@@ -2087,8 +2270,15 @@ async function global() {
                     body = JSON.parse(body)
                     if (body.code) {
                         console.log(`Trans ${typeTransfer} after bigChange `, body.code)
+                        indexError++
+                        if (indexError > 5) {
+                            process.exit()
+                        }
                         reRequest()
                     } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
 
                         buyCoinsEnd()
 
@@ -2153,8 +2343,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`${sideDealBtc} BTC bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
 
 
                                         resolve()
@@ -2190,8 +2387,15 @@ async function global() {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             resolve()
                                         }
                                     }
@@ -2213,8 +2417,15 @@ async function global() {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log("Buy BTC fut for dopMinus ", body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             (function reRequest() {
                                                 let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${minimumBuyBtc}&timestamp=${Date.now()}`
                                                 let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
@@ -2230,8 +2441,15 @@ async function global() {
                                                         body = JSON.parse(body)
                                                         if (body.code) {
                                                             console.log("Sell BTC fut after dopMinus ", body.code)
+                                                            indexError++
+                                                            if (indexError > 5) {
+                                                                process.exit()
+                                                            }
                                                             reRequest()
                                                         } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
                                                             resolve()
                                                         }
                                                     }
@@ -2263,8 +2481,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
 
 
 
@@ -2301,8 +2526,15 @@ async function global() {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             resolve()
                                         }
                                     }
@@ -2324,8 +2556,15 @@ async function global() {
                                         body = JSON.parse(body)
                                         if (body.code) {
                                             console.log("Buy ETH fut for dopMinus ", body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
                                             reRequest()
                                         } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
                                             (function reRequest() {
                                                 let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumBuyEth}&timestamp=${Date.now()}`
                                                 let hashOrderSellFutEth = signature(queryOrderSellFutEth)
@@ -2341,8 +2580,15 @@ async function global() {
                                                         body = JSON.parse(body)
                                                         if (body.code) {
                                                             console.log("Sell ETH fut after dopMinus ", body.code)
+                                                            indexError++
+                                                            if (indexError > 5) {
+                                                                process.exit()
+                                                            }
                                                             reRequest()
                                                         } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
                                                             resolve()
                                                         }
                                                     }
@@ -2393,8 +2639,15 @@ async function global() {
 
                                 if (body.code) {
                                     console.log("Check bigChange USDT ", body.code)
+                                    indexError++
+                                    if (indexError > 5) {
+                                        process.exit()
+                                    }
                                     reRequest()
                                 } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
                                     for (let i = 0; i < body.length; i++) {
                                         if (body[i].asset === 'USDT') {
 
@@ -2454,8 +2707,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With bigChange USDT to ${accountsObj[account].index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -2480,8 +2740,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With bigChange BTC to ${accountsObj[account].index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -2505,8 +2772,15 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code) {
                                         console.log(`With bigChange ETH to ${accountsObj[account].index} `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
                                         reRequest()
                                     } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
                                         console.log(body)
                                     }
                                 }
@@ -2569,8 +2843,15 @@ async function global() {
 
                             if (body.code) {
                                 console.log("Check USDT after day ", body.code)
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
                                 reRequest()
                             } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
                                 for (let i = 0; i < body.length; i++) {
                                     if (body[i].asset === 'USDT') {
 
