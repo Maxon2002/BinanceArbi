@@ -1366,7 +1366,7 @@ async function global() {
                 }
             }
 
-            if (firstDeal) {
+            if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
                 // dopComissionBtc = ((Math.trunc(midComissionBtc * 100000) / 100000) + 0.00001).toFixed(5)
 
                 if (allMoney < fixAmountUsdt) {

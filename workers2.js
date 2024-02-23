@@ -724,7 +724,7 @@ process.on('message', (packet) => {
                         }
                     }
 
-                    if (firstDeal) {
+                    if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
 
                         if (allMoney < fixAmountUsdt) {
                             amountUsdt = allMoney
