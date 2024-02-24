@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const config = require('config.json');
+const config = require('./config.json');
 // Создаем объект для отправки электронной почты
 let transporter = nodemailer.createTransport({
     host: 'smtp.mail.ru',
