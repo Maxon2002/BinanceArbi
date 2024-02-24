@@ -1,13 +1,13 @@
 const nodemailer = require('nodemailer');
-
+const config = require('./config.json');
 // Создаем объект для отправки электронной почты
 let transporter = nodemailer.createTransport({
     host: 'smtp.mail.ru',
     port: 465,
     secure: true, // используется SSL
     auth: {
-        user: 'haisarov-2002@mail.ru',
-        pass: 'FpmSiFfmckvum5VWqdkW'
+        user: config.email.username,
+        pass: config.email.password
     }
 });
 
