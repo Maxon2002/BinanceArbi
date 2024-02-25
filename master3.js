@@ -1392,14 +1392,7 @@ async function global() {
                 //     }
                 // }
 
-                if (dopComissionBtc !== 0 && dopComissionEth === 0) {
-                    amBuyBtcUsdt = +(amBuyBtcUsdt + dopComissionBtc).toFixed(5)
 
-                } else if (dopComissionEth !== 0) {
-                    amBuyEthBtc = +(amBuyEthBtc + dopComissionEth).toFixed(4)
-
-                    amBuyBtcUsdt = +((Math.trunc((amBuyEthBtc * pricesAsk.eth.btc) * 100000) / 100000) + 0.00001 + dopComissionBtc).toFixed(5)
-                }
 
                 if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom) {
                     usdtBtcEthDeal = true
@@ -1410,7 +1403,14 @@ async function global() {
                     console.log("dealsAm ", ++dealsAm);
 
 
+                    if (dopComissionBtc !== 0 && dopComissionEth === 0) {
+                        amBuyBtcUsdt = +(amBuyBtcUsdt + dopComissionBtc).toFixed(5)
 
+                    } else if (dopComissionEth !== 0) {
+                        amBuyEthBtc = +(amBuyEthBtc + dopComissionEth).toFixed(4)
+
+                        amBuyBtcUsdt = +((Math.trunc((amBuyEthBtc * pricesAsk.eth.btc) * 100000) / 100000) + 0.00001 + dopComissionBtc).toFixed(5)
+                    };
 
                     (async () => {
                         Promise.all([
@@ -1608,6 +1608,8 @@ async function global() {
 
                             }
 
+                            generalDeal = false
+
                         })
                     })()
 
@@ -1640,14 +1642,7 @@ async function global() {
                 // }
 
 
-                if (dopComissionEth !== 0 && dopComissionBtc === 0) {
-                    amBuyEthUsdt = +(amBuyEthUsdt + dopComissionEth).toFixed(4)
 
-                } else if (dopComissionBtc !== 0) {
-                    amSellEthBtc = +((Math.trunc(((amSellBtcUsdt + dopComissionBtc) / pricesBid.eth.btc) * 10000) / 10000) + 0.0001).toFixed(4)
-
-                    amBuyEthUsdt = +(amSellEthBtc + dopComissionEth).toFixed(4)
-                }
 
                 if (usdtEthBtcIndex > 6 && !usdtEthBtcDeal && !generalDeal && !dontCom) {
                     usdtEthBtcDeal = true
@@ -1656,6 +1651,15 @@ async function global() {
                     console.log("Deal usdtEthBtc")
                     console.log("dealsAm ", ++dealsAm);
 
+
+                    if (dopComissionEth !== 0 && dopComissionBtc === 0) {
+                        amBuyEthUsdt = +(amBuyEthUsdt + dopComissionEth).toFixed(4)
+
+                    } else if (dopComissionBtc !== 0) {
+                        amSellEthBtc = +((Math.trunc(((amSellBtcUsdt + dopComissionBtc) / pricesBid.eth.btc) * 10000) / 10000) + 0.0001).toFixed(4)
+
+                        amBuyEthUsdt = +(amSellEthBtc + dopComissionEth).toFixed(4)
+                    };
 
 
                     (async () => {
@@ -1840,6 +1844,8 @@ async function global() {
                                 dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
 
                             }
+
+                            generalDeal = false
 
                         })
                     })()

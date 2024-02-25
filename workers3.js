@@ -596,6 +596,7 @@ process.on('message', (packet) => {
                         amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
                         amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
 
+                        console.log("amountUsdt firstDeal ", amountUsdt)
 
                         firstDeal = false
                     }
@@ -649,8 +650,10 @@ process.on('message', (packet) => {
 
 
 
-                    // console.log('usdtBtcEth ', usdtBtcEth)
-                    // console.log('usdtEthBtc ', usdtEthBtc)
+                    console.log('usdtBtcEth ', usdtBtcEth)
+                    console.log('usdtEthBtc ', usdtEthBtc)
+                    console.log('amountUsdt ', amountUsdt)
+                    console.log('dontCom ', dontCom)
 
                     if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
 
@@ -671,14 +674,7 @@ process.on('message', (packet) => {
                         //     }
                         // }
 
-                        if (dopComissionBtc !== 0 && dopComissionEth === 0) {
-                            amBuyBtcUsdt = +(amBuyBtcUsdt + dopComissionBtc).toFixed(5)
 
-                        } else if (dopComissionEth !== 0) {
-                            amBuyEthBtc = +(amBuyEthBtc + dopComissionEth).toFixed(4)
-
-                            amBuyBtcUsdt = +((Math.trunc((amBuyEthBtc * pricesAsk.eth.btc) * 100000) / 100000) + 0.00001 + dopComissionBtc).toFixed(5)
-                        }
 
                         if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom) {
                             usdtBtcEthDeal = true
@@ -689,6 +685,14 @@ process.on('message', (packet) => {
                             console.log("dealsAm ", ++dealsAm);
 
 
+                            if (dopComissionBtc !== 0 && dopComissionEth === 0) {
+                                amBuyBtcUsdt = +(amBuyBtcUsdt + dopComissionBtc).toFixed(5)
+
+                            } else if (dopComissionEth !== 0) {
+                                amBuyEthBtc = +(amBuyEthBtc + dopComissionEth).toFixed(4)
+
+                                amBuyBtcUsdt = +((Math.trunc((amBuyEthBtc * pricesAsk.eth.btc) * 100000) / 100000) + 0.00001 + dopComissionBtc).toFixed(5)
+                            };
 
 
                             (async () => {
@@ -893,6 +897,8 @@ process.on('message', (packet) => {
 
                                     }
 
+                                    generalDeal = false
+
                                 })
                             })()
 
@@ -928,14 +934,7 @@ process.on('message', (packet) => {
                         // }
 
 
-                        if (dopComissionEth !== 0 && dopComissionBtc === 0) {
-                            amBuyEthUsdt = +(amBuyEthUsdt + dopComissionEth).toFixed(4)
 
-                        } else if (dopComissionBtc !== 0) {
-                            amSellEthBtc = +((Math.trunc(((amSellBtcUsdt + dopComissionBtc) / pricesBid.eth.btc) * 10000) / 10000) + 0.0001).toFixed(4)
-
-                            amBuyEthUsdt = +(amSellEthBtc + dopComissionEth).toFixed(4)
-                        }
 
 
 
@@ -946,6 +945,15 @@ process.on('message', (packet) => {
                             // console.log("Deal usdtEthBtc")
                             console.log("dealsAm ", ++dealsAm);
 
+
+                            if (dopComissionEth !== 0 && dopComissionBtc === 0) {
+                                amBuyEthUsdt = +(amBuyEthUsdt + dopComissionEth).toFixed(4)
+
+                            } else if (dopComissionBtc !== 0) {
+                                amSellEthBtc = +((Math.trunc(((amSellBtcUsdt + dopComissionBtc) / pricesBid.eth.btc) * 10000) / 10000) + 0.0001).toFixed(4)
+
+                                amBuyEthUsdt = +(amSellEthBtc + dopComissionEth).toFixed(4)
+                            };
 
 
                             (async () => {
@@ -1143,6 +1151,8 @@ process.on('message', (packet) => {
                                         dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
 
                                     }
+
+                                    generalDeal = false
 
                                 })
                             })()
