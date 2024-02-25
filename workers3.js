@@ -596,7 +596,6 @@ process.on('message', (packet) => {
                         amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
                         amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
 
-                        console.log("amountUsdt firstDeal ", amountUsdt)
 
                         firstDeal = false
                     }
@@ -650,10 +649,10 @@ process.on('message', (packet) => {
 
 
 
-                    console.log('usdtBtcEth ', usdtBtcEth)
-                    console.log('usdtEthBtc ', usdtEthBtc)
-                    console.log('amountUsdt ', amountUsdt)
-                    console.log('dontCom ', dontCom)
+                    // console.log('usdtBtcEth ', usdtBtcEth)
+                    // console.log('usdtEthBtc ', usdtEthBtc)
+                    // console.log('amountUsdt ', amountUsdt)
+                    // console.log('dontCom ', dontCom)
 
                     if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
 
