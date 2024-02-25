@@ -423,9 +423,13 @@ process.on('message', (packet) => {
 
                     Перевести деньги из ${account.name}`
 
-                    botMax.sendMessage(userChatId, messageBot);
+                    setTimeout(() => {
+                        botMax.sendMessage(userChatId, messageBot);
+                    }, account.index * 3000);
 
-                    console.log(`Дело сделано у ${account.index} ` + new Date().toLocaleTimeString())
+
+
+                    console.log(`Дело сделано у ${account.name} ` + new Date().toLocaleTimeString())
 
                 }
             })
@@ -1240,7 +1244,7 @@ process.on('message', (packet) => {
 
                 wsBin.on('open', () => {
 
-                
+
 
                     console.log(`Соединение ${account.index} listenKey после bigChange установлено в ` + new Date().toLocaleTimeString())
 
@@ -1465,12 +1469,14 @@ process.on('message', (packet) => {
 
                                                     Баланс ${factMoney} USDT`
 
-                                                    botMax.sendMessage(userChatId, messageBot);
-
                                                     setTimeout(() => {
-                                                        process.exit()
-                                                    }, 60000);
 
+                                                        botMax.sendMessage(userChatId, messageBot);
+
+                                                        setTimeout(() => {
+                                                            process.exit()
+                                                        }, 60000);
+                                                    }, account.index * 3000);
 
 
 
