@@ -20,7 +20,7 @@ const botMax = new TelegramBot(botKey, { polling: true });
 const userChatId = 647607874;
 
 botMax.on('polling_error', (error) => {
-    console.error('Ошибка опроса:', error.code); // Логируем ошибку
+    // console.error('Ошибка опроса:', error.code); // Логируем ошибку
     if (error.code === 'ECONNRESET') {
         console.error('Соединение было неожиданно разорвано'); // Дополнительные действия для этой ошибки
 
