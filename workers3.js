@@ -7,37 +7,36 @@ const crypto = require('crypto');
 const WebSocket = require('ws');
 
 
-const nodemailer = require('nodemailer');
 
-// Создаем объект для отправки электронной почты
-let transporter = nodemailer.createTransport({
-    host: 'smtp.mail.ru',
-    port: 465,
-    secure: true, // используется SSL
-    auth: {
-        user: 'haisarov-2002@mail.ru',
-        pass: 'FpmSiFfmckvum5VWqdkW'
+let messageBot = null
+
+let botKey = "7176718080:AAHk5RzYR7uL9BmeqQNrJ3B_sxA6Ucnu_aM"
+
+const TelegramBot = require('node-telegram-bot-api');
+
+const botMax = new TelegramBot(botKey, { polling: true });
+
+
+const userChatId = 647607874;
+
+botMax.on('polling_error', (error) => {
+    console.error('Ошибка опроса:', error.code); // Логируем ошибку
+    if (error.code === 'ECONNRESET') {
+        console.error('Соединение было неожиданно разорвано'); // Дополнительные действия для этой ошибки
+
+        setTimeout(() => {
+            botMax.sendMessage(userChatId, messageBot);
+
+        }, 5000);
     }
 });
 
-// Функция для отправки уведомления по электронной почте
-function sendEmail(subject, text) {
-    let mailOptions = {
-        from: 'haisarov-2002@mail.ru',
-        to: 'haisarov16@gmail.com',
-        subject: subject,
-        text: text
-    };
+process.on('unhandledRejection', (reason, promise) => {
+    setTimeout(() => {
+        botMax.sendMessage(userChatId, messageBot);
 
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-}
-
+    }, 5000);
+});
 
 
 
@@ -419,8 +418,12 @@ process.on('message', (packet) => {
                         }
                     });
 
-                    sendEmail('Воркер закончил работу', `Перевести деньги из ${account.name}`);
 
+                    messageBot = `Воркер закончил работу
+
+                    Перевести деньги из ${account.name}`
+
+                    botMax.sendMessage(userChatId, messageBot);
 
                     console.log(`Дело сделано у ${account.index} ` + new Date().toLocaleTimeString())
 
@@ -1237,9 +1240,7 @@ process.on('message', (packet) => {
 
                 wsBin.on('open', () => {
 
-                    setTimeout(() => {
-                        buybuyMoney()
-                    }, 1000)
+                
 
                     console.log(`Соединение ${account.index} listenKey после bigChange установлено в ` + new Date().toLocaleTimeString())
 
@@ -1331,14 +1332,6 @@ process.on('message', (packet) => {
 
                 }
 
-
-                async function buybuyMoney() {
-
-
-                    sendEmail('Котировки слишком изменились', `Перевести по: ${baseBtc} BTC, ${baseEth} ETH и весь USDT`);
-
-            
-                }
 
 
                 function checkMoney() {
@@ -1467,14 +1460,21 @@ process.on('message', (packet) => {
                                                 } else if (stopGame) {
 
 
-                                                    sendEmail('Перевод из воркера на следующий день после конца', `Баланс ${factMoney} USDT`);
+
+                                                    messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
+
+                                                    Баланс ${factMoney} USDT`
+
+                                                    botMax.sendMessage(userChatId, messageBot);
+
+                                                    setTimeout(() => {
+                                                        process.exit()
+                                                    }, 60000);
 
 
-                                                    process.exit()
 
 
-
-                                                } 
+                                                }
                                                 // moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
 
                                                 break

@@ -9,37 +9,35 @@ const WebSocket = require('ws');
 const pm2 = require('pm2')
 
 
-const nodemailer = require('nodemailer');
+let messageBot = null
 
-// Создаем объект для отправки электронной почты
-let transporter = nodemailer.createTransport({
-    host: 'smtp.mail.ru',
-    port: 465,
-    secure: true, // используется SSL
-    auth: {
-        user: 'haisarov-2002@mail.ru',
-        pass: 'FpmSiFfmckvum5VWqdkW'
+let botKey = "7176718080:AAHk5RzYR7uL9BmeqQNrJ3B_sxA6Ucnu_aM"
+
+const TelegramBot = require('node-telegram-bot-api');
+
+const botMax = new TelegramBot(botKey, { polling: true });
+
+
+const userChatId = 647607874;
+
+botMax.on('polling_error', (error) => {
+    console.error('Ошибка опроса:', error.code); // Логируем ошибку
+    if (error.code === 'ECONNRESET') {
+        console.error('Соединение было неожиданно разорвано'); // Дополнительные действия для этой ошибки
+
+        setTimeout(() => {
+            botMax.sendMessage(userChatId, messageBot);
+
+        }, 5000);
     }
 });
 
-// Функция для отправки уведомления по электронной почте
-function sendEmail(subject, text) {
-    let mailOptions = {
-        from: 'haisarov-2002@mail.ru',
-        to: 'haisarov16@gmail.com',
-        subject: subject,
-        text: text
-    };
+process.on('unhandledRejection', (reason, promise) => {
+    setTimeout(() => {
+        botMax.sendMessage(userChatId, messageBot);
 
-    transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-            console.log(error);
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
-}
-
+    }, 5000);
+});
 
 
 const accountsObj = {
@@ -217,6 +215,14 @@ pm2.connect((err) => {
 
                 if (!workerSayChange) {
                     workerSayChange = true
+
+
+
+                    messageBot = `Котировки слишком изменились
+
+                    Перевести по: ${baseBtc} BTC, ${baseEth} ETH и весь USDT`
+
+                    botMax.sendMessage(userChatId, messageBot);
                 }
             }
 
@@ -711,9 +717,12 @@ async function startWorkers() {
 
 
 
-    sendEmail('Сделать стартовый перевод', `Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`);
 
+    messageBot = `Стартовый перевод
 
+    Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`
+
+    botMax.sendMessage(userChatId, messageBot);
 
 };
 
@@ -2614,10 +2623,13 @@ async function global() {
             } else if (workerSayChange) {
 
 
-                sendEmail('Перевод после bigChange', `Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`);
 
 
+                messageBot = `Перевод после bigChange
 
+                Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`
+
+                botMax.sendMessage(userChatId, messageBot);
             }
 
 
