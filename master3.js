@@ -94,11 +94,11 @@ let fixAmountUsdt = 60
 
 let maxCommissionAllMaster = 2
 
-let maxCommissionAllSmall = 5
+let maxCommissionAllSmall = 6
 
 let amountFirstActive = 100//amountUsdt + (amountUsdt * 2)
 
-let maxChangeProc = 0.015
+let maxChangeProc = 0.01
 
 
 let amountUsdt = fixAmountUsdt
@@ -1664,7 +1664,7 @@ async function global() {
 
                     commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
                     commissionEth = +(commissionEth + dopComissionEth).toFixed(8);
-                    
+
                     (async () => {
                         Promise.all([
                             new Promise((resolve) => {
