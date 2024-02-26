@@ -1287,18 +1287,17 @@ async function global() {
         if (!bigChange) {
 
             if (!firstDeal) {
-                if (dopComissionBtc !== 0) {
+                if (dopComissionBtc !== 0 && dopComissionEth !== 0) {
+
+                    amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+
+                } else if (dopComissionBtc !== 0 && dopComissionEth === 0) {
 
                     amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
 
-                    commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
+                } else if (dopComissionEth !== 0 && dopComissionBtc === 0) {
 
-                }
-
-                if (dopComissionEth !== 0) {
                     amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
-
-                    commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
                 }
             }
@@ -1318,8 +1317,7 @@ async function global() {
                 dopComissionEth = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.eth.usdt) - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
                 commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
-                amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
-                amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
+                amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                 firstDeal = false
             }
@@ -1411,6 +1409,9 @@ async function global() {
 
                         amBuyBtcUsdt = +((Math.trunc((amBuyEthBtc * pricesAsk.eth.btc) * 100000) / 100000) + 0.00001 + dopComissionBtc).toFixed(5)
                     };
+
+                    commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
+                    commissionEth = +(commissionEth + dopComissionEth).toFixed(8);
 
                     (async () => {
                         Promise.all([
@@ -1539,12 +1540,12 @@ async function global() {
 
                                         midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
 
-                                        commissionAll = +(commissionAll - +fill.commission * +fill.price).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
                                     }
 
                                     if (fill.commissionAsset === 'USDT') {
                                         ethPrice = +fill.price
-                                        commissionAll = +(commissionAll - +fill.commission).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission).toFixed(8)
 
                                         allMoney = +(allMoney - +fill.commission).toFixed(8)
                                     }
@@ -1554,7 +1555,7 @@ async function global() {
 
                                         midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
 
-                                        commissionAll = +(commissionAll - +fill.commission * ethPrice).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission * ethPrice).toFixed(8)
                                     }
                                 }
 
@@ -1661,7 +1662,9 @@ async function global() {
                         amBuyEthUsdt = +(amSellEthBtc + dopComissionEth).toFixed(4)
                     };
 
-
+                    commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
+                    commissionEth = +(commissionEth + dopComissionEth).toFixed(8);
+                    
                     (async () => {
                         Promise.all([
                             new Promise((resolve) => {
@@ -1780,12 +1783,12 @@ async function global() {
 
                                         midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
 
-                                        commissionAll = +(commissionAll - +fill.commission * +fill.price).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
                                     }
 
                                     if (fill.commissionAsset === 'USDT') {
                                         btcPrice = +fill.price
-                                        commissionAll = +(commissionAll - +fill.commission).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission).toFixed(8)
 
                                         allMoney = +(allMoney - +fill.commission).toFixed(8)
                                     }
@@ -1796,7 +1799,7 @@ async function global() {
 
                                         midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
 
-                                        commissionAll = +(commissionAll - +fill.commission * btcPrice).toFixed(8)
+                                        commissionAll = +(commissionAll + +fill.commission * btcPrice).toFixed(8)
                                     }
                                 }
 
