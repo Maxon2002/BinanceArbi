@@ -385,9 +385,9 @@ async function startWorkers() {
 
                             baseBtc = +(factAmount + 0.001).toFixed(3)
 
-                            firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
+                            // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
 
-                            commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
+                            // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
 
                             baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
 
@@ -454,9 +454,9 @@ async function startWorkers() {
 
                             baseEth = +(factAmount + 0.001).toFixed(3)
 
-                            firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
+                            // firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
 
-                            commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
+                            // commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
 
                             baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
 
@@ -535,7 +535,7 @@ async function startWorkers() {
     await Promise.all([
         new Promise((resolve, reject) => {
             (function reRequest() {
-                let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${(baseBtc + firstComBtc).toFixed(5)}&timestamp=${Date.now()}`;
+                let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${baseBtc}&timestamp=${Date.now()}`;
                 let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
                 request.post(
@@ -601,7 +601,7 @@ async function startWorkers() {
         }),
         new Promise((resolve, reject) => {
             (function reRequest() {
-                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${(baseEth + firstComEth).toFixed(4)}&timestamp=${Date.now()}`;
+                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${baseEth}&timestamp=${Date.now()}`;
                 let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
                 request.post(
@@ -668,6 +668,8 @@ async function startWorkers() {
         })
     ])
 
+    let restBtcSmall = 0
+    let restEthSmall = 0
 
     await new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -703,7 +705,18 @@ async function startWorkers() {
 
                                     baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
 
-                                    break
+                                    
+                                }
+                                if (body[i].asset === 'BTC') {
+
+                                    restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+    
+                                }
+                                if (body[i].asset === 'ETH') {
+    
+                                    restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+
+    
                                 }
                             }
                             resolve()
@@ -720,7 +733,7 @@ async function startWorkers() {
 
     messageBot = `Стартовый перевод
 
-    Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`
+    Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
 
     botMax.sendMessage(userChatId, messageBot);
 
@@ -1312,10 +1325,10 @@ async function global() {
                 }
 
                 dopComissionBtc = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.btc.usdt) - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
-                commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
+                // commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
 
                 dopComissionEth = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.eth.usdt) - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
-                commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
+                // commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
                 amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
@@ -1560,7 +1573,7 @@ async function global() {
                                 }
 
                                 if (deal.symbol === 'ETHBTC') {
-                                    let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc - midComissionBtc).toFixed(8)
+                                    let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc).toFixed(8)
 
                                     dirtBtc = +(dirtBtc + diff).toFixed(8)
 
@@ -1578,6 +1591,10 @@ async function global() {
                             if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
                                 let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+
+                                if(lastDeal) {
+                                    lastDeal = false
+                                }
 
                                 howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
 
@@ -1599,13 +1616,13 @@ async function global() {
                                 }
                             }
 
-                            if (commissionBtc - midComissionBtc * 1.05 <= 0) {
-                                dopComissionBtc = +((Math.trunc(midComissionBtc * 1.05 * 100000) / 100000) + 0.00001).toFixed(5)
+                            if (commissionBtc - midComissionBtc <= 0) {
+                                dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                             }
 
-                            if (commissionEth - midComissionEth * 1.05 <= 0) {
-                                dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
+                            if (commissionEth - midComissionEth <= 0) {
+                                dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
                             }
 
@@ -1804,7 +1821,7 @@ async function global() {
                                 }
 
                                 if (deal.symbol === 'ETHBTC') {
-                                    let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc - midComissionBtc).toFixed(8)
+                                    let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc).toFixed(8)
 
                                     dirtBtc = +(dirtBtc + diff).toFixed(8)
 
@@ -1819,6 +1836,10 @@ async function global() {
                             if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
                                 let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+
+                                if(lastDeal) {
+                                    lastDeal = false
+                                }
 
                                 howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
 
@@ -1838,13 +1859,13 @@ async function global() {
                                 }
                             }
 
-                            if (commissionBtc - midComissionBtc * 1.05 <= 0) {
-                                dopComissionBtc = +((Math.trunc(midComissionBtc * 1.05 * 100000) / 100000) + 0.00001).toFixed(5)
+                            if (commissionBtc - midComissionBtc <= 0) {
+                                dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                             }
 
-                            if (commissionEth - midComissionEth * 1.05 <= 0) {
-                                dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
+                            if (commissionEth - midComissionEth <= 0) {
+                                dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
                             }
 
@@ -1902,6 +1923,8 @@ async function global() {
 
         let newBaseBtcSmall = 0
         let newBaseEthSmall = 0
+
+        let minimumSpotEth = 0
 
 
         await new Promise((resolve, reject) => {
@@ -1962,25 +1985,6 @@ async function global() {
 
                                 newStartPriceBtc = +body.asks[0][0]
 
-                                for (let i = 0; i < workerIds.length; i++) {
-
-                                    let workerId = workerIds[i];
-
-
-                                    pm2.sendDataToProcessId({
-                                        id: workerId,
-                                        type: 'process:msg',
-                                        data: {
-                                            startPriceBtc: newStartPriceBtc
-                                        },
-                                        topic: 'startBtc'
-                                    }, (err, res) => {
-                                        if (err) console.error(err);
-                                        // else console.log(res);
-                                    });
-
-                                }
-
 
 
                                 let possibleAmount = amountFirstActive / +body.asks[0][0]
@@ -2000,25 +2004,7 @@ async function global() {
 
                                 newHedgeForBtc = +(newBaseBtcInUsdt * 0.15).toFixed(8)
 
-                                for (let i = 0; i < workerIds.length; i++) {
 
-                                    let workerId = workerIds[i];
-
-
-                                    pm2.sendDataToProcessId({
-                                        id: workerId,
-                                        type: 'process:msg',
-                                        data: {
-                                            startPriceBtc: newStartPriceBtc,
-                                            baseBtcSmall: newBaseBtcSmall
-                                        },
-                                        topic: 'startBtc'
-                                    }, (err, res) => {
-                                        if (err) console.error(err);
-                                        // else console.log(res);
-                                    });
-
-                                }
 
                                 resolve()
                             }
@@ -2069,27 +2055,13 @@ async function global() {
 
                                 minimumBuyEth = Math.trunc((minimumPossibleAmount + 0.002) * 1000) / 1000
 
+                                let minimumPossibleAmountSpot = 5 / +body.asks[0][0]
+
+                                minimumSpotEth = Math.trunc((minimumPossibleAmountSpot + 0.0002) * 10000) / 10000
+
                                 newHedgeForEth = +(newBaseEthInUsdt * 0.15).toFixed(8)
 
-                                for (let i = 0; i < workerIds.length; i++) {
 
-                                    let workerId = workerIds[i];
-
-
-                                    pm2.sendDataToProcessId({
-                                        id: workerId,
-                                        type: 'process:msg',
-                                        data: {
-                                            startPriceEth: newStartPriceEth,
-                                            baseEthSmall: newBaseEthSmall
-                                        },
-                                        topic: 'startEth'
-                                    }, (err, res) => {
-                                        if (err) console.error(err);
-                                        // else console.log(res);
-                                    });
-
-                                }
 
                                 resolve()
                             }
@@ -2163,12 +2135,13 @@ async function global() {
         let sideDealEthFut = null
 
         let dopMinimumEth = null
+        let dopMinimumSpotEth = null
 
         let diffBaseEth = +(baseEth - newBaseEth).toFixed(3)
 
         if (diffBaseEth < 0) {
 
-            sideDealEth = 'BUY'
+            sideDealEth = 'BUY'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
 
             sideDealEthFut = 'SELL'
 
@@ -2178,10 +2151,18 @@ async function global() {
                 dopMinimumEth = +(minimumBuyEth - diffBaseEth).toFixed(3)
             }
 
+            if (diffBaseEth < minimumSpotEth) {
+                dopMinimumSpotEth = true
+            }
+
         } else if (diffBaseEth > 0) {
-            sideDealEth = 'SELL'
+            sideDealEth = 'SELL'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
 
             sideDealEthFut = 'BUY'
+
+            if (diffBaseEth < minimumSpotEth) {
+                dopMinimumSpotEth = true
+            }
 
             diffBaseEth = Math.abs(diffBaseEth)
         }
@@ -2237,33 +2218,33 @@ async function global() {
 
         // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
 
-        let smallDopComBtc = 0
-        let smallDopComEth = 0
+        // let smallDopComBtc = 0
+        // let smallDopComEth = 0
 
-        if (sideDealBtc === 'BUY') {
-            if (diffBaseBtc * 0.001 < commissionBtc) {
-                commissionBtc = +(commissionBtc - diffBaseBtc * 0.001).toFixed(8)
-            } else {
-                smallDopComBtc = +((Math.trunc(diffBaseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-                // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
+        // if (sideDealBtc === 'BUY') {
+        //     if (diffBaseBtc * 0.001 < commissionBtc) {
+        //         commissionBtc = +(commissionBtc - diffBaseBtc * 0.001).toFixed(8)///////////////////////////////
+        //     } else {
+        //         smallDopComBtc = +((Math.trunc(diffBaseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
+        //         // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
 
-                let restDopComBtc = +(smallDopComBtc - (+(diffBaseBtc + smallDopComBtc).toFixed(5) * 0.001)).toFixed(8)
+        //         let restDopComBtc = +(smallDopComBtc - (+(diffBaseBtc + smallDopComBtc).toFixed(5) * 0.001)).toFixed(8)
 
-                commissionBtc = +(commissionBtc + restDopComBtc).toFixed(8)
-            }
-        }
+        //         commissionBtc = +(commissionBtc + restDopComBtc).toFixed(8)////////////////////////////////////
+        //     }
+        // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        if (sideDealEth === 'BUY') {
-            if (diffBaseEth * 0.001 < commissionEth) {
-                commissionEth = +(commissionEth - diffBaseEth * 0.001).toFixed(8)
-            } else {
-                smallDopComEth = +((Math.trunc(diffBaseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
+        // if (sideDealEth === 'BUY') {
+        //     if (diffBaseEth * 0.001 < commissionEth) {
+        //         commissionEth = +(commissionEth - diffBaseEth * 0.001).toFixed(8)//////////////
+        //     } else {
+        //         smallDopComEth = +((Math.trunc(diffBaseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
 
-                let restDopComEth = +(smallDopComEth - (+(diffBaseEth + smallDopComEth).toFixed(4) * 0.001)).toFixed(8)
+        //         let restDopComEth = +(smallDopComEth - (+(diffBaseEth + smallDopComEth).toFixed(4) * 0.001)).toFixed(8)
 
-                commissionEth = +(commissionEth + restDopComEth).toFixed(8)
-            }
-        }
+        //         commissionEth = +(commissionEth + restDopComEth).toFixed(8)//////////////////////////
+        //     }
+        // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         async function buyCoinsEnd() {
 
@@ -2275,7 +2256,7 @@ async function global() {
                     if (sideDealBtc) {
 
                         (function reRequest() {
-                            let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${(diffBaseBtc + smallDopComBtc).toFixed(5)}&timestamp=${Date.now()}`;
+                            let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${diffBaseBtc}&timestamp=${Date.now()}`;
                             let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
                             request.post(
@@ -2305,6 +2286,8 @@ async function global() {
                                 }
                             )
                         })()
+                    } else {
+                        resolve()
                     }
                 }),
                 new Promise((resolve, reject) => {
@@ -2406,44 +2389,113 @@ async function global() {
                                 )
                             })()
                         }
+                    } else {
+                        resolve()
                     }
                 }),
                 new Promise((resolve, reject) => {
                     if (sideDealEth) {
 
+                        if (!dopMinimumSpotEth) {
 
-                        (function reRequest() {
-                            let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${(diffBaseEth + smallDopComEth).toFixed(4)}&timestamp=${Date.now()}`;
-                            let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+                            (function reRequest() {
+                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${diffBaseEth}&timestamp=${Date.now()}`;
+                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-                            request.post(
-                                {
-                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                    headers: {
-                                        'X-MBX-APIKEY': publicKey
-                                    }
-                                },
-                                (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code) {
-                                        console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                        indexError++
-                                        if (indexError > 5) {
-                                            process.exit()
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
                                         }
-                                        reRequest()
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
+                                            reRequest()
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+
+
+
+                                            resolve()
                                         }
-
-
-
-                                        resolve()
                                     }
-                                }
-                            )
-                        })()
+                                )
+                            })()
+                        } else {
+                            (function reRequest() {
+                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${(diffBaseEth + minimumSpotEth).toFixed(4)}&timestamp=${Date.now()}`;
+                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                            indexError++
+                                            if (indexError > 5) {
+                                                process.exit()
+                                            }
+                                            reRequest()
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            };
+
+                                            (function reRequest() {
+                                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumSpotEth}&timestamp=${Date.now()}`;
+                                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+
+                                                request.post(
+                                                    {
+                                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
+                                                        }
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+                                                        if (body.code) {
+                                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                                            indexError++
+                                                            if (indexError > 5) {
+                                                                process.exit()
+                                                            }
+                                                            reRequest()
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+
+
+
+                                                            resolve()
+                                                        }
+                                                    }
+                                                )
+                                            })()
+
+                                        }
+                                    }
+                                )
+                            })()
+                        }
+                    } else {
+                        resolve()
                     }
                 }),
                 new Promise((resolve, reject) => {
@@ -2545,6 +2597,8 @@ async function global() {
                                 )
                             })()
                         }
+                    } else {
+                        resolve()
                     }
                 })
             ])
@@ -2566,6 +2620,50 @@ async function global() {
             baseBtcInUsdt = newBaseBtcInUsdt
             baseEthInUsdt = newBaseEthInUsdt
 
+
+
+            for (let i = 0; i < workerIds.length; i++) {
+
+                let workerId = workerIds[i];
+
+
+                pm2.sendDataToProcessId({
+                    id: workerId,
+                    type: 'process:msg',
+                    data: {
+                        startPriceBtc,
+                        baseBtcSmall
+                    },
+                    topic: 'startBtc'
+                }, (err, res) => {
+                    if (err) console.error(err);
+                    // else console.log(res);
+                });
+
+            }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+            for (let i = 0; i < workerIds.length; i++) {
+
+                let workerId = workerIds[i];
+
+
+                pm2.sendDataToProcessId({
+                    id: workerId,
+                    type: 'process:msg',
+                    data: {
+                        startPriceEth,
+                        baseEthSmall
+                    },
+                    topic: 'startEth'
+                }, (err, res) => {
+                    if (err) console.error(err);
+                    // else console.log(res);
+                });
+
+            }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+            let restBtcSmall = 0
+            let restEthSmall = 0
 
             await new Promise((resolve, reject) => {
                 setTimeout(() => {
@@ -2612,7 +2710,21 @@ async function global() {
                                                 baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
                                             }
 
-                                            break
+
+                                        }
+                                        if (body[i].asset === 'BTC') {
+                                            if (bigChange) {
+                                                commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+                                            } else if (workerSayChange) {
+                                                restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                            }
+                                        }
+                                        if (body[i].asset === 'ETH') {
+                                            if (bigChange) {
+                                                commissionEth = +(+body[i].free - baseEth).toFixed(8)
+                                            } else if (workerSayChange) {
+                                                restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                            }
                                         }
                                     }
                                     resolve()
@@ -2636,7 +2748,7 @@ async function global() {
 
                 messageBot = `Перевод после bigChange
 
-                Перевести по: ${baseUsdtSmall} USDT, ${baseBtcSmall} BTC, ${baseEthSmall} ETH`
+                Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
 
                 botMax.sendMessage(userChatId, messageBot);
             }

@@ -374,6 +374,17 @@ process.on('message', (packet) => {
                                         // moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
                                     }
 
+                                    if (body[i].asset === 'BTC') {
+
+                                        commissionBtc = +(+body[i].free - baseBtc).toFixed(8)
+        
+                                    }
+                                    if (body[i].asset === 'ETH') {
+        
+                                        commissionEth = +(+body[i].free - baseEth).toFixed(8)
+        
+                                    }
+
                                 }
                                 resolve()
                             }
@@ -587,10 +598,10 @@ process.on('message', (packet) => {
                         }
 
                         dopComissionBtc = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.btc.usdt) - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
-                        commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
+                        // commissionBtc = +(commissionBtc + dopComissionBtc).toFixed(8)
 
                         dopComissionEth = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.eth.usdt) - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
-                        commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
+                        // commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
                         amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
@@ -846,7 +857,7 @@ process.on('message', (packet) => {
                                         }
 
                                         if (deal.symbol === 'ETHBTC') {
-                                            let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc - midComissionBtc).toFixed(8)
+                                            let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc).toFixed(8)
 
                                             dirtBtc = +(dirtBtc + diff).toFixed(8)
 
@@ -864,6 +875,10 @@ process.on('message', (packet) => {
                                     if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
                                         let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+
+                                        if(lastDeal) {
+                                            lastDeal = false
+                                        }
 
                                         howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
 
@@ -887,13 +902,13 @@ process.on('message', (packet) => {
                                         }
                                     }
 
-                                    if (commissionBtc - midComissionBtc * 1.05 <= 0) {
-                                        dopComissionBtc = +((Math.trunc(midComissionBtc * 1.05 * 100000) / 100000) + 0.00001).toFixed(5)
+                                    if (commissionBtc - midComissionBtc <= 0) {
+                                        dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                                     }
 
-                                    if (commissionEth - midComissionEth * 1.05 <= 0) {
-                                        dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
+                                    if (commissionEth - midComissionEth <= 0) {
+                                        dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
                                     }
 
@@ -1105,7 +1120,7 @@ process.on('message', (packet) => {
                                         }
 
                                         if (deal.symbol === 'ETHBTC') {
-                                            let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc - midComissionBtc).toFixed(8)///////////
+                                            let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc).toFixed(8)///////////
 
                                             dirtBtc = +(dirtBtc + diff).toFixed(8)
 
@@ -1123,6 +1138,10 @@ process.on('message', (packet) => {
                                     if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
                                         let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+
+                                        if(lastDeal) {
+                                            lastDeal = false
+                                        }
 
                                         howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
 
@@ -1144,13 +1163,13 @@ process.on('message', (packet) => {
                                         }
                                     }
 
-                                    if (commissionBtc - midComissionBtc * 1.05 <= 0) {
-                                        dopComissionBtc = +((Math.trunc(midComissionBtc * 1.05 * 100000) / 100000) + 0.00001).toFixed(5)
+                                    if (commissionBtc - midComissionBtc <= 0) {
+                                        dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                                     }
 
-                                    if (commissionEth - midComissionEth * 1.05 <= 0) {
-                                        dopComissionEth = +((Math.trunc(midComissionEth * 1.05 * 10000) / 10000) + 0.0001).toFixed(4)
+                                    if (commissionEth - midComissionEth <= 0) {
+                                        dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
                                     }
 
@@ -1389,10 +1408,16 @@ process.on('message', (packet) => {
                                             console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
 
 
+                                        }
+                                        if (body[i].asset === 'BTC') {
 
-
-
-                                            break
+                                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+            
+                                        }
+                                        if (body[i].asset === 'ETH') {
+            
+                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
+            
                                         }
                                     }
 

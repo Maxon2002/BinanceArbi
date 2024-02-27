@@ -7,8 +7,8 @@ const crypto = require('crypto');
 
 // // let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
 // // let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
-let secretKey = 'qauOJPVzeJrXwZ5whQlRkQ3em0PaDJHSwI8b39njdqrINLJZl2rQLKSYzJRs76gw'
-let publicKey = 'xfZZma9C73PyUNd4JP6FlHQaS5gzYZmaaVyL2yrbFKxFrb2it2uMn1VOgwDzVjfA'
+let secretKey = 'L4XBqDNAkv0nhulUwxhGC0u5lsqABtipxQxLAKOFeNkolhC9QFhF1tDm5QQbFtun'
+let publicKey = 'Vw8awKzMN7wGzuNZ31KLZByVAHuPu4LtOcGWTwpBaKjWryJ7sXJEoPwF0hyYJnsa'
 
 function signature(query) {
     return crypto
@@ -57,10 +57,10 @@ let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
 let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
 let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
+let queryOrderSellEthBtc = `symbol=ETHBTC&side=SELL&type=MARKET&quantity=0.004&timestamp=${Date.now()}`;
 let hashOrderSellEthBtc = signature(queryOrderSellEthBtc);
 
-let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=0.00128&timestamp=${Date.now()}`;
 let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
@@ -144,7 +144,7 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-console.log(+((Math.trunc(((12 * 0.001 / 0) - 0) * 100000) / 100000) + 0.00001).toFixed(5))
+// console.log(typeof (Math.trunc(((12 * 0.001 / 51800) - 0) * 100000) / 100000))
 
 
 
