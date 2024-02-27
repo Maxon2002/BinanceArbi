@@ -92,7 +92,7 @@ let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 let fixAmountUsdt = 60
 
-let maxCommissionAllMaster = 2
+let maxCommissionAllMaster = 12
 
 let maxCommissionAllSmall = 6
 
@@ -1176,7 +1176,7 @@ async function global() {
 
                 console.log('Дело сделано ' + new Date().toLocaleTimeString())
 
-                process.exit()
+                // process.exit()
             })()
         }
     })
