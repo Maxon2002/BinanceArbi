@@ -82,11 +82,11 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 36
+let fixAmountUsdt = 40
 
 let maxCommissionAllMaster = 15
 
-let maxCommissionAllSmall = 5
+let maxCommissionAllSmall = 6
 
 let amountFirstActive = 100//amountUsdt + (amountUsdt * 2)
 
