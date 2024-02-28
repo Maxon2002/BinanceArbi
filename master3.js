@@ -212,7 +212,7 @@ pm2.connect((err) => {
 
                     messageBot = `Котировки слишком изменились
 
-                    Перевести по: ${baseBtc} BTC, ${baseEth} ETH и весь USDT`
+                    Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
 
                     botMax.sendMessage(userChatId, messageBot);
                 }
@@ -1887,889 +1887,6 @@ async function global() {
 
 
 
-
-
-
-
-
-    async function smoothMoney(change) {
-        // логика
-
-        let newStartPriceBtc = 0
-        let newStartPriceEth = 0
-
-        let newBaseBtc = 0
-        let newBaseEth = 0
-
-        let newBaseBtcInUsdt = 0
-        let newBaseEthInUsdt = 0
-
-        let notionalBtc = 0
-        let notionalEth = 0
-
-        let minimumBuyBtc = 0
-        let minimumBuyEth = 0
-
-        let newHedgeForBtc = 0
-        let newHedgeForEth = 0
-
-        let newBaseBtcSmall = 0
-        let newBaseEthSmall = 0
-
-        let minimumSpotEth = 0
-
-
-        await new Promise((resolve, reject) => {
-            (function reRequest() {
-                request.get(
-                    {
-                        url: `https://fapi.binance.com/fapi/v1/exchangeInfo`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-
-                        for (let i = 0; i < body.symbols.length; i++) {
-                            let element = body.symbols[i];
-
-                            if (element.symbol === 'BTCUSDT') {
-                                notionalBtc = +element.filters[5].notional ? +element.filters[5].notional : 100
-                            }
-
-                            if (element.symbol === 'ETHUSDT') {
-                                notionalEth = +element.filters[5].notional ? +element.filters[5].notional : 20
-                            }
-
-                        }
-                        resolve()
-                    }
-                )
-            })()
-        })
-
-
-        await Promise.all([
-
-            new Promise((resolve, reject) => {
-                (function reRequest() {
-                    request.get(
-                        {
-                            url: `https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=5`,
-                            headers: {
-                                'X-MBX-APIKEY': publicKey
-                            }
-                        },
-                        (err, response, body) => {
-                            body = JSON.parse(body)
-                            if (body.code) {
-                                console.log("Depth BTC after bigChange ", body.code)
-                                indexError++
-                                if (indexError > 5) {
-                                    process.exit()
-                                }
-                                reRequest()
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
-                                }
-
-                                newStartPriceBtc = +body.asks[0][0]
-
-
-
-                                let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                                newBaseBtc = +(factAmount + 0.001).toFixed(3)
-
-                                newBaseBtcSmall = Math.trunc((newBaseBtc / howMuchAccounts) * 100000000) / 100000000
-
-
-                                newBaseBtcInUsdt = +(newBaseBtc * newStartPriceBtc).toFixed(8)
-
-                                let minimumPossibleAmount = notionalBtc / +body.asks[0][0]
-
-                                minimumBuyBtc = Math.trunc((minimumPossibleAmount + 0.001) * 1000) / 1000
-
-                                newHedgeForBtc = +(newBaseBtcInUsdt * 0.15).toFixed(8)
-
-
-
-                                resolve()
-                            }
-                        }
-                    )
-                })()
-            }),
-            new Promise((resolve, reject) => {
-                (function reRequest() {
-                    request.get(
-                        {
-                            url: `https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=5`,
-                            headers: {
-                                'X-MBX-APIKEY': publicKey
-                            }
-                        },
-                        (err, response, body) => {
-                            body = JSON.parse(body)
-                            if (body.code) {
-                                console.log("Depth ETH after bigChange ", body.code)
-                                indexError++
-                                if (indexError > 5) {
-                                    process.exit()
-                                }
-                                reRequest()
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
-                                }
-
-                                newStartPriceEth = +body.asks[0][0]
-
-
-
-                                let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                                newBaseEth = +(factAmount + 0.001).toFixed(3)
-
-                                newBaseEthSmall = Math.trunc((newBaseEth / howMuchAccounts) * 10000000) / 10000000
-
-
-                                newBaseEthInUsdt = +(newBaseEth * newStartPriceEth).toFixed(8)
-
-
-                                let minimumPossibleAmount = notionalEth / +body.asks[0][0]
-
-                                minimumBuyEth = Math.trunc((minimumPossibleAmount + 0.002) * 1000) / 1000
-
-                                let minimumPossibleAmountSpot = 5 / +body.asks[0][0]
-
-                                minimumSpotEth = Math.trunc((minimumPossibleAmountSpot + 0.0002) * 10000) / 10000
-
-                                newHedgeForEth = +(newBaseEthInUsdt * 0.15).toFixed(8)
-
-
-
-                                resolve()
-                            }
-                        }
-                    )
-                })()
-            })
-        ])
-
-
-        let sideMinusBtc = null
-
-        let changeBtcProc = (startPriceBtc - newStartPriceBtc) / startPriceBtc
-
-        if (changeBtcProc > 0) {
-            sideMinusBtc = 'spot'
-        } else {
-            sideMinusBtc = 'fut'
-        }
-
-        let howChangeBtc = Math.abs(baseBtcInUsdt * changeBtcProc)
-
-        let diffHedgeBtc = +(hedgeForBtc - newHedgeForBtc).toFixed(8)
-
-
-        let sideMinusEth = null
-
-        let changeEthProc = (startPriceEth - newStartPriceEth) / startPriceEth
-
-        if (changeEthProc > 0) {
-            sideMinusEth = 'spot'
-        } else {
-            sideMinusEth = 'fut'
-        }
-
-        let howChangeEth = Math.abs(baseEthInUsdt * changeEthProc)
-
-        let diffHedgeEth = +(hedgeForEth - newHedgeForEth).toFixed(8)
-
-
-        let sideDealBtc = null
-        let sideDealBtcFut = null
-
-        let dopMinimumBtc = null
-
-        let diffBaseBtc = +(baseBtc - newBaseBtc).toFixed(3)
-
-        if (diffBaseBtc < 0) {
-
-            sideDealBtc = 'BUY'
-
-            sideDealBtcFut = 'SELL'
-
-            diffBaseBtc = Math.abs(diffBaseBtc)
-
-            if (diffBaseBtc < minimumBuyBtc) {
-                dopMinimumBtc = +(minimumBuyBtc - diffBaseBtc).toFixed(3)
-            }
-
-        } else if (diffBaseBtc > 0) {
-            sideDealBtc = 'SELL'
-
-            sideDealBtcFut = 'BUY'
-
-
-            diffBaseBtc = Math.abs(diffBaseBtc)
-        }
-
-
-        let sideDealEth = null
-        let sideDealEthFut = null
-
-        let dopMinimumEth = null
-        let dopMinimumSpotEth = null
-
-        let diffBaseEth = +(baseEth - newBaseEth).toFixed(3)
-
-        if (diffBaseEth < 0) {
-
-            sideDealEth = 'BUY'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
-
-            sideDealEthFut = 'SELL'
-
-            diffBaseEth = Math.abs(diffBaseEth)
-
-            if (diffBaseEth < minimumBuyEth) {
-                dopMinimumEth = +(minimumBuyEth - diffBaseEth).toFixed(3)
-            }
-
-            if (diffBaseEth < minimumSpotEth) {
-                dopMinimumSpotEth = true
-            }
-
-        } else if (diffBaseEth > 0) {
-            sideDealEth = 'SELL'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
-
-            sideDealEthFut = 'BUY'
-
-            if (diffBaseEth < minimumSpotEth) {
-                dopMinimumSpotEth = true
-            }
-
-            diffBaseEth = Math.abs(diffBaseEth)
-        }
-
-
-        let howTransfer = 0
-        let typeTransfer = null
-
-        if (sideMinusBtc === 'spot' && sideMinusEth === 'spot') {
-
-            howTransfer = +(howChangeBtc + howChangeEth + diffHedgeBtc + diffHedgeEth).toFixed(8);
-
-            typeTransfer = 'UMFUTURE_MAIN'
-        } else if (sideMinusBtc === 'fut' && sideMinusEth === 'fut') {
-            howTransfer = +(howChangeBtc + howChangeEth - diffHedgeBtc - diffHedgeEth).toFixed(8);
-
-            typeTransfer = 'MAIN_UMFUTURE'
-        };
-
-        (function reRequest() {
-            let queryTransferFromFut = `type=${typeTransfer}&asset=USDT&amount=${howTransfer}&timestamp=${Date.now()}`;
-            let hashTransferFromFut = signature(queryTransferFromFut);
-
-            request.post(
-                {
-                    url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromFut}&signature=${hashTransferFromFut}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code) {
-                        console.log(`Trans ${typeTransfer} after bigChange `, body.code)
-                        indexError++
-                        if (indexError > 5) {
-                            process.exit()
-                        }
-                        reRequest()
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
-                        }
-
-                        buyCoinsEnd()
-
-                    }
-                }
-            )
-        })();
-
-
-
-        // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-
-        // let smallDopComBtc = 0
-        // let smallDopComEth = 0
-
-        // if (sideDealBtc === 'BUY') {
-        //     if (diffBaseBtc * 0.001 < commissionBtc) {
-        //         commissionBtc = +(commissionBtc - diffBaseBtc * 0.001).toFixed(8)///////////////////////////////
-        //     } else {
-        //         smallDopComBtc = +((Math.trunc(diffBaseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-        //         // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-        //         let restDopComBtc = +(smallDopComBtc - (+(diffBaseBtc + smallDopComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-        //         commissionBtc = +(commissionBtc + restDopComBtc).toFixed(8)////////////////////////////////////
-        //     }
-        // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        // if (sideDealEth === 'BUY') {
-        //     if (diffBaseEth * 0.001 < commissionEth) {
-        //         commissionEth = +(commissionEth - diffBaseEth * 0.001).toFixed(8)//////////////
-        //     } else {
-        //         smallDopComEth = +((Math.trunc(diffBaseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
-
-        //         let restDopComEth = +(smallDopComEth - (+(diffBaseEth + smallDopComEth).toFixed(4) * 0.001)).toFixed(8)
-
-        //         commissionEth = +(commissionEth + restDopComEth).toFixed(8)//////////////////////////
-        //     }
-        // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        async function buyCoinsEnd() {
-
-
-
-
-            await Promise.all([
-                new Promise((resolve, reject) => {
-                    if (sideDealBtc) {
-
-                        (function reRequest() {
-                            let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${diffBaseBtc}&timestamp=${Date.now()}`;
-                            let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
-
-                            request.post(
-                                {
-                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
-                                    headers: {
-                                        'X-MBX-APIKEY': publicKey
-                                    }
-                                },
-                                (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code) {
-                                        console.log(`${sideDealBtc} BTC bigChange `, body.code)
-                                        indexError++
-                                        if (indexError > 5) {
-                                            process.exit()
-                                        }
-                                        reRequest()
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        }
-
-
-                                        resolve()
-                                    }
-                                }
-                            )
-                        })()
-                    } else {
-                        resolve()
-                    }
-                }),
-                new Promise((resolve, reject) => {
-                    if (sideDealBtc) {
-
-                        if (!dopMinimumBtc) {
-
-                            let reduce = false
-
-                            if (sideDealBtcFut === 'BUY') {
-                                reduce = true
-                            }
-
-                            (function reRequest() {
-                                let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${diffBaseBtc}&reduceOnly=${reduce}&timestamp=${Date.now()}`
-                                let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
-
-                                request.post(
-                                    {
-                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-                                            resolve()
-                                        }
-                                    }
-                                )
-                            })()
-                        } else {
-                            (function reRequest() {
-                                let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${dopMinimumBtc}&reduceOnly=true&timestamp=${Date.now()}`
-                                let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
-
-                                request.post(
-                                    {
-                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log("Buy BTC fut for dopMinus ", body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-                                            (function reRequest() {
-                                                let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${minimumBuyBtc}&timestamp=${Date.now()}`
-                                                let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
-
-                                                request.post(
-                                                    {
-                                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-                                                        headers: {
-                                                            'X-MBX-APIKEY': publicKey
-                                                        }
-                                                    },
-                                                    (err, response, body) => {
-                                                        body = JSON.parse(body)
-                                                        if (body.code) {
-                                                            console.log("Sell BTC fut after dopMinus ", body.code)
-                                                            indexError++
-                                                            if (indexError > 5) {
-                                                                process.exit()
-                                                            }
-                                                            reRequest()
-                                                        } else {
-                                                            if (indexError !== 0) {
-                                                                indexError = 0
-                                                            }
-                                                            resolve()
-                                                        }
-                                                    }
-                                                )
-                                            })()
-                                        }
-                                    }
-                                )
-                            })()
-                        }
-                    } else {
-                        resolve()
-                    }
-                }),
-                new Promise((resolve, reject) => {
-                    if (sideDealEth) {
-
-                        if (!dopMinimumSpotEth) {
-
-                            (function reRequest() {
-                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${diffBaseEth}&timestamp=${Date.now()}`;
-                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
-
-                                request.post(
-                                    {
-                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-
-
-
-                                            resolve()
-                                        }
-                                    }
-                                )
-                            })()
-                        } else {
-                            (function reRequest() {
-                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${(diffBaseEth + minimumSpotEth).toFixed(4)}&timestamp=${Date.now()}`;
-                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
-
-                                request.post(
-                                    {
-                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            };
-
-                                            (function reRequest() {
-                                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumSpotEth}&timestamp=${Date.now()}`;
-                                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
-
-                                                request.post(
-                                                    {
-                                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                                        headers: {
-                                                            'X-MBX-APIKEY': publicKey
-                                                        }
-                                                    },
-                                                    (err, response, body) => {
-                                                        body = JSON.parse(body)
-                                                        if (body.code) {
-                                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                                            indexError++
-                                                            if (indexError > 5) {
-                                                                process.exit()
-                                                            }
-                                                            reRequest()
-                                                        } else {
-                                                            if (indexError !== 0) {
-                                                                indexError = 0
-                                                            }
-
-
-
-                                                            resolve()
-                                                        }
-                                                    }
-                                                )
-                                            })()
-
-                                        }
-                                    }
-                                )
-                            })()
-                        }
-                    } else {
-                        resolve()
-                    }
-                }),
-                new Promise((resolve, reject) => {
-                    if (sideDealEth) {
-
-                        if (!dopMinimumEth) {
-
-                            let reduce = false
-
-                            if (sideDealEthFut === 'BUY') {
-                                reduce = true
-                            }
-
-                            (function reRequest() {
-                                let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${diffBaseEth}&reduceOnly=${reduce}&timestamp=${Date.now()}`
-                                let hashOrderSellFutEth = signature(queryOrderSellFutEth)
-
-                                request.post(
-                                    {
-                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-                                            resolve()
-                                        }
-                                    }
-                                )
-                            })()
-                        } else {
-                            (function reRequest() {
-                                let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${dopMinimumEth}&reduceOnly=true&timestamp=${Date.now()}`
-                                let hashOrderSellFutEth = signature(queryOrderSellFutEth)
-
-                                request.post(
-                                    {
-                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log("Buy ETH fut for dopMinus ", body.code)
-                                            indexError++
-                                            if (indexError > 5) {
-                                                process.exit()
-                                            }
-                                            reRequest()
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-                                            (function reRequest() {
-                                                let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumBuyEth}&timestamp=${Date.now()}`
-                                                let hashOrderSellFutEth = signature(queryOrderSellFutEth)
-
-                                                request.post(
-                                                    {
-                                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
-                                                        headers: {
-                                                            'X-MBX-APIKEY': publicKey
-                                                        }
-                                                    },
-                                                    (err, response, body) => {
-                                                        body = JSON.parse(body)
-                                                        if (body.code) {
-                                                            console.log("Sell ETH fut after dopMinus ", body.code)
-                                                            indexError++
-                                                            if (indexError > 5) {
-                                                                process.exit()
-                                                            }
-                                                            reRequest()
-                                                        } else {
-                                                            if (indexError !== 0) {
-                                                                indexError = 0
-                                                            }
-                                                            resolve()
-                                                        }
-                                                    }
-                                                )
-                                            })()
-                                        }
-                                    }
-                                )
-                            })()
-                        }
-                    } else {
-                        resolve()
-                    }
-                })
-            ])
-
-
-
-            startPriceBtc = newStartPriceBtc
-            startPriceEth = newStartPriceEth
-
-            baseBtc = newBaseBtc
-            baseEth = newBaseEth
-
-            baseBtcSmall = newBaseBtcSmall
-            baseEthSmall = newBaseEthSmall
-
-            hedgeForBtc = newHedgeForBtc
-            hedgeForEth = newHedgeForEth
-
-            baseBtcInUsdt = newBaseBtcInUsdt
-            baseEthInUsdt = newBaseEthInUsdt
-
-
-
-            for (let i = 0; i < workerIds.length; i++) {
-
-                let workerId = workerIds[i];
-
-
-                pm2.sendDataToProcessId({
-                    id: workerId,
-                    type: 'process:msg',
-                    data: {
-                        startPriceBtc,
-                        baseBtcSmall
-                    },
-                    topic: 'startBtc'
-                }, (err, res) => {
-                    if (err) console.error(err);
-                    // else console.log(res);
-                });
-
-            }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
-
-            for (let i = 0; i < workerIds.length; i++) {
-
-                let workerId = workerIds[i];
-
-
-                pm2.sendDataToProcessId({
-                    id: workerId,
-                    type: 'process:msg',
-                    data: {
-                        startPriceEth,
-                        baseEthSmall
-                    },
-                    topic: 'startEth'
-                }, (err, res) => {
-                    if (err) console.error(err);
-                    // else console.log(res);
-                });
-
-            }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
-
-            let restBtcSmall = 0
-            let restEthSmall = 0
-
-            await new Promise((resolve, reject) => {
-                setTimeout(() => {
-                    (function reRequest() {
-                        let queryAsset = `timestamp=${Date.now()}`;
-                        let hashAsset = signature(queryAsset);
-
-                        request.post(
-                            {
-                                url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                headers: {
-                                    'X-MBX-APIKEY': publicKey
-                                }
-                            },
-                            (err, response, body) => {
-                                body = JSON.parse(body)
-
-                                if (body.code) {
-                                    console.log("Check bigChange USDT ", body.code)
-                                    indexError++
-                                    if (indexError > 5) {
-                                        process.exit()
-                                    }
-                                    reRequest()
-                                } else {
-                                    if (indexError !== 0) {
-                                        indexError = 0
-                                    }
-                                    for (let i = 0; i < body.length; i++) {
-                                        if (body[i].asset === 'USDT') {
-
-                                            if (bigChange) {
-                                                let factMoney = +body[i].free
-                                                firstDeal = true
-                                                allMoney = factMoney
-
-
-
-
-                                            } else if (workerSayChange) {
-
-                                                baseUsdt = +body[i].free
-
-                                                baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
-                                            }
-
-
-                                        }
-                                        if (body[i].asset === 'BTC') {
-                                            if (bigChange) {
-                                                commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
-                                            } else if (workerSayChange) {
-                                                restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-                                            }
-                                        }
-                                        if (body[i].asset === 'ETH') {
-                                            if (bigChange) {
-                                                commissionEth = +(+body[i].free - baseEth).toFixed(8)
-                                            } else if (workerSayChange) {
-                                                restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-                                            }
-                                        }
-                                    }
-                                    resolve()
-                                }
-                            }
-                        )
-
-                    })()
-                }, 15000)
-            })
-
-
-
-            if (bigChange) {
-                bigChange = false
-
-            } else if (workerSayChange) {
-
-
-
-
-                messageBot = `Перевод после bigChange
-
-                Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
-
-                botMax.sendMessage(userChatId, messageBot);
-            }
-
-
-
-
-
-        }
-
-
-
-
-
-
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
     let today = new Date().getUTCDate()
 
     setInterval(() => {
@@ -2830,24 +1947,874 @@ async function global() {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 }
 
 
 
 
+async function smoothMoney(change) {
+    // логика
 
+    let newStartPriceBtc = 0
+    let newStartPriceEth = 0
+
+    let newBaseBtc = 0
+    let newBaseEth = 0
+
+    let newBaseBtcInUsdt = 0
+    let newBaseEthInUsdt = 0
+
+    let notionalBtc = 0
+    let notionalEth = 0
+
+    let minimumBuyBtc = 0
+    let minimumBuyEth = 0
+
+    let newHedgeForBtc = 0
+    let newHedgeForEth = 0
+
+    let newBaseBtcSmall = 0
+    let newBaseEthSmall = 0
+
+    let minimumSpotEth = 0
+
+
+    await new Promise((resolve, reject) => {
+        (function reRequest() {
+            request.get(
+                {
+                    url: `https://fapi.binance.com/fapi/v1/exchangeInfo`,
+                    headers: {
+                        'X-MBX-APIKEY': publicKey
+                    }
+                },
+                (err, response, body) => {
+                    body = JSON.parse(body)
+
+                    for (let i = 0; i < body.symbols.length; i++) {
+                        let element = body.symbols[i];
+
+                        if (element.symbol === 'BTCUSDT') {
+                            notionalBtc = +element.filters[5].notional ? +element.filters[5].notional : 100
+                        }
+
+                        if (element.symbol === 'ETHUSDT') {
+                            notionalEth = +element.filters[5].notional ? +element.filters[5].notional : 20
+                        }
+
+                    }
+                    resolve()
+                }
+            )
+        })()
+    })
+
+
+    await Promise.all([
+
+        new Promise((resolve, reject) => {
+            (function reRequest() {
+                request.get(
+                    {
+                        url: `https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=5`,
+                        headers: {
+                            'X-MBX-APIKEY': publicKey
+                        }
+                    },
+                    (err, response, body) => {
+                        body = JSON.parse(body)
+                        if (body.code) {
+                            console.log("Depth BTC after bigChange ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
+                            reRequest()
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+
+                            newStartPriceBtc = +body.asks[0][0]
+
+
+
+                            let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                            newBaseBtc = +(factAmount + 0.001).toFixed(3)
+
+                            newBaseBtcSmall = Math.trunc((newBaseBtc / howMuchAccounts) * 100000000) / 100000000
+
+
+                            newBaseBtcInUsdt = +(newBaseBtc * newStartPriceBtc).toFixed(8)
+
+                            let minimumPossibleAmount = notionalBtc / +body.asks[0][0]
+
+                            minimumBuyBtc = Math.trunc((minimumPossibleAmount + 0.001) * 1000) / 1000
+
+                            newHedgeForBtc = +(newBaseBtcInUsdt * 0.15).toFixed(8)
+
+
+
+                            resolve()
+                        }
+                    }
+                )
+            })()
+        }),
+        new Promise((resolve, reject) => {
+            (function reRequest() {
+                request.get(
+                    {
+                        url: `https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=5`,
+                        headers: {
+                            'X-MBX-APIKEY': publicKey
+                        }
+                    },
+                    (err, response, body) => {
+                        body = JSON.parse(body)
+                        if (body.code) {
+                            console.log("Depth ETH after bigChange ", body.code)
+                            indexError++
+                            if (indexError > 5) {
+                                process.exit()
+                            }
+                            reRequest()
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+
+                            newStartPriceEth = +body.asks[0][0]
+
+
+
+                            let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                            newBaseEth = +(factAmount + 0.001).toFixed(3)
+
+                            newBaseEthSmall = Math.trunc((newBaseEth / howMuchAccounts) * 10000000) / 10000000
+
+
+                            newBaseEthInUsdt = +(newBaseEth * newStartPriceEth).toFixed(8)
+
+
+                            let minimumPossibleAmount = notionalEth / +body.asks[0][0]
+
+                            minimumBuyEth = Math.trunc((minimumPossibleAmount + 0.002) * 1000) / 1000
+
+                            let minimumPossibleAmountSpot = 5 / +body.asks[0][0]
+
+                            minimumSpotEth = Math.trunc((minimumPossibleAmountSpot + 0.0002) * 10000) / 10000
+
+                            newHedgeForEth = +(newBaseEthInUsdt * 0.15).toFixed(8)
+
+
+
+                            resolve()
+                        }
+                    }
+                )
+            })()
+        })
+    ])
+
+
+    let sideMinusBtc = null
+
+    let changeBtcProc = (startPriceBtc - newStartPriceBtc) / startPriceBtc
+
+    if (changeBtcProc > 0) {
+        sideMinusBtc = 'spot'
+    } else {
+        sideMinusBtc = 'fut'
+    }
+
+    let howChangeBtc = Math.abs(baseBtcInUsdt * changeBtcProc)
+
+    let diffHedgeBtc = +(hedgeForBtc - newHedgeForBtc).toFixed(8)
+
+
+    let sideMinusEth = null
+
+    let changeEthProc = (startPriceEth - newStartPriceEth) / startPriceEth
+
+    if (changeEthProc > 0) {
+        sideMinusEth = 'spot'
+    } else {
+        sideMinusEth = 'fut'
+    }
+
+    let howChangeEth = Math.abs(baseEthInUsdt * changeEthProc)
+
+    let diffHedgeEth = +(hedgeForEth - newHedgeForEth).toFixed(8)
+
+
+    let sideDealBtc = null
+    let sideDealBtcFut = null
+
+    let dopMinimumBtc = null
+
+    let diffBaseBtc = +(baseBtc - newBaseBtc).toFixed(3)
+
+    if (diffBaseBtc < 0) {
+
+        sideDealBtc = 'BUY'
+
+        sideDealBtcFut = 'SELL'
+
+        diffBaseBtc = Math.abs(diffBaseBtc)
+
+        if (diffBaseBtc < minimumBuyBtc) {
+            dopMinimumBtc = +(minimumBuyBtc - diffBaseBtc).toFixed(3)
+        }
+
+    } else if (diffBaseBtc > 0) {
+        sideDealBtc = 'SELL'
+
+        sideDealBtcFut = 'BUY'
+
+
+        diffBaseBtc = Math.abs(diffBaseBtc)
+    }
+
+
+    let sideDealEth = null
+    let sideDealEthFut = null
+
+    let dopMinimumEth = null
+    let dopMinimumSpotEth = null
+
+    let diffBaseEth = +(baseEth - newBaseEth).toFixed(3)
+
+    if (diffBaseEth < 0) {
+
+        sideDealEth = 'BUY'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+        sideDealEthFut = 'SELL'
+
+        diffBaseEth = Math.abs(diffBaseEth)
+
+        if (diffBaseEth < minimumBuyEth) {
+            dopMinimumEth = +(minimumBuyEth - diffBaseEth).toFixed(3)
+        }
+
+        if (diffBaseEth < minimumSpotEth) {
+            dopMinimumSpotEth = true
+        }
+
+    } else if (diffBaseEth > 0) {
+        sideDealEth = 'SELL'//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+        sideDealEthFut = 'BUY'
+
+        if (diffBaseEth < minimumSpotEth) {
+            dopMinimumSpotEth = true
+        }
+
+        diffBaseEth = Math.abs(diffBaseEth)
+    }
+
+
+    let howTransfer = 0
+    let typeTransfer = null
+
+    if (sideMinusBtc === 'spot' && sideMinusEth === 'spot') {
+
+        howTransfer = +(howChangeBtc + howChangeEth + diffHedgeBtc + diffHedgeEth).toFixed(8);
+
+        typeTransfer = 'UMFUTURE_MAIN'
+    } else if (sideMinusBtc === 'fut' && sideMinusEth === 'fut') {
+        howTransfer = +(howChangeBtc + howChangeEth - diffHedgeBtc - diffHedgeEth).toFixed(8);
+
+        typeTransfer = 'MAIN_UMFUTURE'
+    };
+
+    (function reRequest() {
+        let queryTransferFromFut = `type=${typeTransfer}&asset=USDT&amount=${howTransfer}&timestamp=${Date.now()}`;
+        let hashTransferFromFut = signature(queryTransferFromFut);
+
+        request.post(
+            {
+                url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromFut}&signature=${hashTransferFromFut}`,
+                headers: {
+                    'X-MBX-APIKEY': publicKey
+                }
+            },
+            (err, response, body) => {
+                body = JSON.parse(body)
+                if (body.code) {
+                    console.log(`Trans ${typeTransfer} after bigChange `, body.code)
+                    indexError++
+                    if (indexError > 5) {
+                        process.exit()
+                    }
+                    reRequest()
+                } else {
+                    if (indexError !== 0) {
+                        indexError = 0
+                    }
+
+                    buyCoinsEnd()
+
+                }
+            }
+        )
+    })();
+
+
+
+    // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
+
+    // let smallDopComBtc = 0
+    // let smallDopComEth = 0
+
+    // if (sideDealBtc === 'BUY') {
+    //     if (diffBaseBtc * 0.001 < commissionBtc) {
+    //         commissionBtc = +(commissionBtc - diffBaseBtc * 0.001).toFixed(8)///////////////////////////////
+    //     } else {
+    //         smallDopComBtc = +((Math.trunc(diffBaseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
+    //         // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
+
+    //         let restDopComBtc = +(smallDopComBtc - (+(diffBaseBtc + smallDopComBtc).toFixed(5) * 0.001)).toFixed(8)
+
+    //         commissionBtc = +(commissionBtc + restDopComBtc).toFixed(8)////////////////////////////////////
+    //     }
+    // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // if (sideDealEth === 'BUY') {
+    //     if (diffBaseEth * 0.001 < commissionEth) {
+    //         commissionEth = +(commissionEth - diffBaseEth * 0.001).toFixed(8)//////////////
+    //     } else {
+    //         smallDopComEth = +((Math.trunc(diffBaseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
+
+    //         let restDopComEth = +(smallDopComEth - (+(diffBaseEth + smallDopComEth).toFixed(4) * 0.001)).toFixed(8)
+
+    //         commissionEth = +(commissionEth + restDopComEth).toFixed(8)//////////////////////////
+    //     }
+    // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    async function buyCoinsEnd() {
+
+
+
+
+        await Promise.all([
+            new Promise((resolve, reject) => {
+                if (sideDealBtc) {
+
+                    (function reRequest() {
+                        let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${diffBaseBtc}&timestamp=${Date.now()}`;
+                        let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+
+                        request.post(
+                            {
+                                url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
+                                headers: {
+                                    'X-MBX-APIKEY': publicKey
+                                }
+                            },
+                            (err, response, body) => {
+                                body = JSON.parse(body)
+                                if (body.code) {
+                                    console.log(`${sideDealBtc} BTC bigChange `, body.code)
+                                    indexError++
+                                    if (indexError > 5) {
+                                        process.exit()
+                                    }
+                                    reRequest()
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+
+
+                                    resolve()
+                                }
+                            }
+                        )
+                    })()
+                } else {
+                    resolve()
+                }
+            }),
+            new Promise((resolve, reject) => {
+                if (sideDealBtc) {
+
+                    if (!dopMinimumBtc) {
+
+                        let reduce = false
+
+                        if (sideDealBtcFut === 'BUY') {
+                            reduce = true
+                        }
+
+                        (function reRequest() {
+                            let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${diffBaseBtc}&reduceOnly=${reduce}&timestamp=${Date.now()}`
+                            let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+
+                            request.post(
+                                {
+                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+                                        resolve()
+                                    }
+                                }
+                            )
+                        })()
+                    } else {
+                        (function reRequest() {
+                            let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtc}&type=MARKET&quantity=${dopMinimumBtc}&reduceOnly=true&timestamp=${Date.now()}`
+                            let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+
+                            request.post(
+                                {
+                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log("Buy BTC fut for dopMinus ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+                                        (function reRequest() {
+                                            let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${minimumBuyBtc}&timestamp=${Date.now()}`
+                                            let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+
+                                            request.post(
+                                                {
+                                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+                                                    headers: {
+                                                        'X-MBX-APIKEY': publicKey
+                                                    }
+                                                },
+                                                (err, response, body) => {
+                                                    body = JSON.parse(body)
+                                                    if (body.code) {
+                                                        console.log("Sell BTC fut after dopMinus ", body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
+                                                        reRequest()
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        resolve()
+                                                    }
+                                                }
+                                            )
+                                        })()
+                                    }
+                                }
+                            )
+                        })()
+                    }
+                } else {
+                    resolve()
+                }
+            }),
+            new Promise((resolve, reject) => {
+                if (sideDealEth) {
+
+                    if (!dopMinimumSpotEth) {
+
+                        (function reRequest() {
+                            let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${diffBaseEth}&timestamp=${Date.now()}`;
+                            let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+
+                            request.post(
+                                {
+                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+
+
+
+                                        resolve()
+                                    }
+                                }
+                            )
+                        })()
+                    } else {
+                        (function reRequest() {
+                            let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${(diffBaseEth + minimumSpotEth).toFixed(4)}&timestamp=${Date.now()}`;
+                            let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+
+                            request.post(
+                                {
+                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        };
+
+                                        (function reRequest() {
+                                            let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumSpotEth}&timestamp=${Date.now()}`;
+                                            let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+
+                                            request.post(
+                                                {
+                                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                                    headers: {
+                                                        'X-MBX-APIKEY': publicKey
+                                                    }
+                                                },
+                                                (err, response, body) => {
+                                                    body = JSON.parse(body)
+                                                    if (body.code) {
+                                                        console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
+                                                        reRequest()
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+
+
+
+                                                        resolve()
+                                                    }
+                                                }
+                                            )
+                                        })()
+
+                                    }
+                                }
+                            )
+                        })()
+                    }
+                } else {
+                    resolve()
+                }
+            }),
+            new Promise((resolve, reject) => {
+                if (sideDealEth) {
+
+                    if (!dopMinimumEth) {
+
+                        let reduce = false
+
+                        if (sideDealEthFut === 'BUY') {
+                            reduce = true
+                        }
+
+                        (function reRequest() {
+                            let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${diffBaseEth}&reduceOnly=${reduce}&timestamp=${Date.now()}`
+                            let hashOrderSellFutEth = signature(queryOrderSellFutEth)
+
+                            request.post(
+                                {
+                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+                                        resolve()
+                                    }
+                                }
+                            )
+                        })()
+                    } else {
+                        (function reRequest() {
+                            let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEth}&type=MARKET&quantity=${dopMinimumEth}&reduceOnly=true&timestamp=${Date.now()}`
+                            let hashOrderSellFutEth = signature(queryOrderSellFutEth)
+
+                            request.post(
+                                {
+                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code) {
+                                        console.log("Buy ETH fut for dopMinus ", body.code)
+                                        indexError++
+                                        if (indexError > 5) {
+                                            process.exit()
+                                        }
+                                        reRequest()
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+                                        (function reRequest() {
+                                            let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumBuyEth}&timestamp=${Date.now()}`
+                                            let hashOrderSellFutEth = signature(queryOrderSellFutEth)
+
+                                            request.post(
+                                                {
+                                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
+                                                    headers: {
+                                                        'X-MBX-APIKEY': publicKey
+                                                    }
+                                                },
+                                                (err, response, body) => {
+                                                    body = JSON.parse(body)
+                                                    if (body.code) {
+                                                        console.log("Sell ETH fut after dopMinus ", body.code)
+                                                        indexError++
+                                                        if (indexError > 5) {
+                                                            process.exit()
+                                                        }
+                                                        reRequest()
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        resolve()
+                                                    }
+                                                }
+                                            )
+                                        })()
+                                    }
+                                }
+                            )
+                        })()
+                    }
+                } else {
+                    resolve()
+                }
+            })
+        ])
+
+
+
+        startPriceBtc = newStartPriceBtc
+        startPriceEth = newStartPriceEth
+
+        baseBtc = newBaseBtc
+        baseEth = newBaseEth
+
+        baseBtcSmall = newBaseBtcSmall
+        baseEthSmall = newBaseEthSmall
+
+        hedgeForBtc = newHedgeForBtc
+        hedgeForEth = newHedgeForEth
+
+        baseBtcInUsdt = newBaseBtcInUsdt
+        baseEthInUsdt = newBaseEthInUsdt
+
+
+
+        for (let i = 0; i < workerIds.length; i++) {
+
+            let workerId = workerIds[i];
+
+
+            pm2.sendDataToProcessId({
+                id: workerId,
+                type: 'process:msg',
+                data: {
+                    startPriceBtc,
+                    baseBtcSmall
+                },
+                topic: 'startBtc'
+            }, (err, res) => {
+                if (err) console.error(err);
+                // else console.log(res);
+            });
+
+        }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+        for (let i = 0; i < workerIds.length; i++) {
+
+            let workerId = workerIds[i];
+
+
+            pm2.sendDataToProcessId({
+                id: workerId,
+                type: 'process:msg',
+                data: {
+                    startPriceEth,
+                    baseEthSmall
+                },
+                topic: 'startEth'
+            }, (err, res) => {
+                if (err) console.error(err);
+                // else console.log(res);
+            });
+
+        }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+
+        let restBtcSmall = 0
+        let restEthSmall = 0
+
+        await new Promise((resolve, reject) => {
+            setTimeout(() => {
+                (function reRequest() {
+                    let queryAsset = `timestamp=${Date.now()}`;
+                    let hashAsset = signature(queryAsset);
+
+                    request.post(
+                        {
+                            url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                            headers: {
+                                'X-MBX-APIKEY': publicKey
+                            }
+                        },
+                        (err, response, body) => {
+                            body = JSON.parse(body)
+
+                            if (body.code) {
+                                console.log("Check bigChange USDT ", body.code)
+                                indexError++
+                                if (indexError > 5) {
+                                    process.exit()
+                                }
+                                reRequest()
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+                                for (let i = 0; i < body.length; i++) {
+                                    if (body[i].asset === 'USDT') {
+
+                                        if (bigChange) {
+                                            let factMoney = +body[i].free
+                                            firstDeal = true
+                                            allMoney = factMoney
+
+
+
+
+                                        } else if (workerSayChange) {
+
+                                            baseUsdt = +body[i].free
+
+                                            baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
+                                        }
+
+
+                                    }
+                                    if (body[i].asset === 'BTC') {
+                                        if (bigChange) {
+                                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+                                        } else if (workerSayChange) {
+                                            restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                        }
+                                    }
+                                    if (body[i].asset === 'ETH') {
+                                        if (bigChange) {
+                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
+                                        } else if (workerSayChange) {
+                                            restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                        }
+                                    }
+                                }
+                                resolve()
+                            }
+                        }
+                    )
+
+                })()
+            }, 15000)
+        })
+
+
+
+        if (bigChange) {
+            bigChange = false
+
+        } else if (workerSayChange) {
+
+
+
+
+            messageBot = `Перевод после bigChange
+
+            Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
+
+            botMax.sendMessage(userChatId, messageBot);
+        }
+
+
+
+
+
+    }
+
+
+
+
+}
 
 
 
