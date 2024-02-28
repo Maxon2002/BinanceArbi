@@ -72,15 +72,7 @@ const accountsObj = {
         id: null,
         index: 3,
         name: 'n2512086'
-    },
-    e: {
-        address: "0x78a0e01ad327a9c3e650bff496ab67486fd9cfa2",
-        secretKey: "qCiIjtVeBsXErkEmqfIpKbVgsVX9od71OrTjbUyOYlsO2C78edOc2GLfGWWoEWDt",
-        publicKey: "BIwl24NI5Dk0RDXAY7BiCP6QMOeJe7pwEULOS5c1E14dYu3vJXa61I9W8qabnIDK",
-        id: null,
-        index: 4,
-        name: 'yayatkoesmayadi1'
-    },
+    }
 }
 
 
@@ -90,15 +82,15 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 60
+let fixAmountUsdt = 36
 
-let maxCommissionAllMaster = 12
+let maxCommissionAllMaster = 15
 
-let maxCommissionAllSmall = 6
+let maxCommissionAllSmall = 5
 
 let amountFirstActive = 100//amountUsdt + (amountUsdt * 2)
 
-let maxChangeProc = 0.01
+let maxChangeProc = 0.008
 
 
 let amountUsdt = fixAmountUsdt
@@ -1302,21 +1294,22 @@ async function global() {
             if (!firstDeal) {
                 if (dopComissionBtc !== 0 && dopComissionEth !== 0) {
 
-                    amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                    amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                 } else if (dopComissionBtc !== 0 && dopComissionEth === 0) {
 
-                    amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
+                    amountUsdt = +(allMoney - 0.8 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
 
                 } else if (dopComissionEth !== 0 && dopComissionBtc === 0) {
 
-                    amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
+                    amountUsdt = +(allMoney - 0.8 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
 
                 }
             }
 
             if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
-                // dopComissionBtc = ((Math.trunc(midComissionBtc * 100000) / 100000) + 0.00001).toFixed(5)
+
+                firstDeal = false
 
                 if (allMoney < fixAmountUsdt) {
                     amountUsdt = allMoney
@@ -1330,9 +1323,8 @@ async function global() {
                 dopComissionEth = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.eth.usdt) - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
                 // commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
-                amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
-                firstDeal = false
             }
 
 
