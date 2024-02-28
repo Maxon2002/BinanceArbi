@@ -47,7 +47,7 @@ const accountsObj = {
         publicKey: "dGI55mC4Y8yBNYhG6jgGgMW4hBaBJjMf8SVuqMX77vlRxGNO1EQd6a4f1LsrY9Ch",
         id: null,
         index: 0,
-        name: 'gilangsky183'
+        name: 'gilangsky'
     },
     b: {
         address: "0x7d41701ab2c42e1b56ad5de3d5591ba9faf8867e",
@@ -55,7 +55,7 @@ const accountsObj = {
         publicKey: "epbSzRAF20foJjXgxTQjaGDjaFiR2HERfDXAXWuA8dLeAcehm2IIUR4o1GgD4ugX",
         id: null,
         index: 1,
-        name: 'gaskuy809'
+        name: 'gaskuy'
     },
     c: {
         address: "0x35214ac926d9652afd31c0009d7670eeee02eccd",
@@ -63,7 +63,7 @@ const accountsObj = {
         publicKey: "aoOrf78vZ2YBeXCAtTixdVAPXjJS3xbX7lnwALEk81up2KbXcFzMsZsPYlkGD92c",
         id: null,
         index: 2,
-        name: 'adipangestu0905'
+        name: 'adipangestu'
     },
     d: {
         address: "0xd56e80da921ff76583c0fefa95d81dbb3c05f587",
@@ -71,7 +71,7 @@ const accountsObj = {
         publicKey: "Ibex81efMAPPjKO3GjJoCmvR1XHzqjHUJENYaxrRmg13eMLh9wem2cp9vlTjHPGv",
         id: null,
         index: 3,
-        name: 'n2512086'
+        name: 'n25'
     }
 }
 
