@@ -1439,7 +1439,6 @@ process.on('message', (packet) => {
 
                                     bigChange = false
 
-                                    resolve()
                                 }
                             }
                         )
