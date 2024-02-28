@@ -697,18 +697,18 @@ async function startWorkers() {
 
                                     baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
 
-                                    
+
                                 }
                                 if (body[i].asset === 'BTC') {
 
                                     restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-    
+
                                 }
                                 if (body[i].asset === 'ETH') {
-    
+
                                     restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
 
-    
+
                                 }
                             }
                             resolve()
@@ -883,7 +883,10 @@ async function startGlobalListen() {
             indexUpdateBigChange++
 
             if (indexUpdateBigChange === howNeedIndexUpdateBigChange) {
-                smoothMoney()
+                setTimeout(() => {
+                    smoothMoney()
+                }, 5000)
+
             }
         }
 
@@ -1584,7 +1587,7 @@ async function global() {
 
                                 let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
 
-                                if(lastDeal) {
+                                if (lastDeal) {
                                     lastDeal = false
                                 }
 
@@ -1829,7 +1832,7 @@ async function global() {
 
                                 let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
 
-                                if(lastDeal) {
+                                if (lastDeal) {
                                     lastDeal = false
                                 }
 
