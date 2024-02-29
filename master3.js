@@ -1432,7 +1432,7 @@ async function global() {
 
             if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
 
-                
+
 
                 if (allMoney < fixAmountUsdt) {
                     amountUsdt = allMoney
@@ -1562,19 +1562,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy BTC usdtBtcEth ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Buy BTC usdtBtcEth ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -1603,19 +1603,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell ETH usdtBtcEth ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Sell ETH usdtBtcEth ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -1643,19 +1643,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy ETH usdtBtcEth ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Buy ETH usdtBtcEth ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -1842,19 +1842,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy ETH usdtEthBtc ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Buy ETH usdtEthBtc ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -1883,19 +1883,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell BTC usdtEthBtc ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Sell BTC usdtEthBtc ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -1923,19 +1923,19 @@ async function global() {
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell ETH usdtEthBtc ", body.code)
                                                 indexError++
-                                                
+
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
                                                 fatalError = true
-        
+
                                                 messageBot = `Конечная у мастера
                         
                                                 Sell ETH usdtEthBtc ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
-        
+
                                                 botMax.sendMessage(userChatId, messageBot);
-                                            }else {
+                                            } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
                                                 }
@@ -2085,7 +2085,7 @@ async function global() {
                             if (body.code && indexError <= 5) {
                                 console.log("Check USDT after day ", body.code)
                                 indexError++
-                                
+
                                 reRequest()
                             } else if (body.code && !fatalError) {
                                 fatalError = true
@@ -2097,7 +2097,7 @@ async function global() {
                                 Заплаченная комиссия ${commissionAll}`
 
                                 botMax.sendMessage(userChatId, messageBot);
-                            }else {
+                            } else {
                                 if (indexError !== 0) {
                                     indexError = 0
                                 }
@@ -2207,7 +2207,7 @@ async function smoothMoney(change) {
                         if (body.code && indexError <= 5) {
                             console.log("Depth BTC after bigChange ", body.code)
                             indexError++
-                            
+
                             reRequest()
                         } else if (body.code && !fatalError) {
                             fatalError = true
@@ -2219,7 +2219,7 @@ async function smoothMoney(change) {
                             Заплаченная комиссия ${commissionAll}`
 
                             botMax.sendMessage(userChatId, messageBot);
-                        }else {
+                        } else {
                             if (indexError !== 0) {
                                 indexError = 0
                             }
@@ -2267,7 +2267,7 @@ async function smoothMoney(change) {
                         if (body.code && indexError <= 5) {
                             console.log("Depth ETH after bigChange ", body.code)
                             indexError++
-                            
+
                             reRequest()
                         } else if (body.code && !fatalError) {
                             fatalError = true
@@ -2279,7 +2279,7 @@ async function smoothMoney(change) {
                             Заплаченная комиссия ${commissionAll}`
 
                             botMax.sendMessage(userChatId, messageBot);
-                        }else {
+                        } else {
                             if (indexError !== 0) {
                                 indexError = 0
                             }
@@ -2447,7 +2447,7 @@ async function smoothMoney(change) {
                 if (body.code && indexError <= 5) {
                     console.log(`Trans ${typeTransfer} after bigChange `, body.code)
                     indexError++
-                    
+
                     reRequest()
                 } else if (body.code && !fatalError) {
                     fatalError = true
@@ -2459,7 +2459,7 @@ async function smoothMoney(change) {
                     Заплаченная комиссия ${commissionAll}`
 
                     botMax.sendMessage(userChatId, messageBot);
-                }else {
+                } else {
                     if (indexError !== 0) {
                         indexError = 0
                     }
@@ -2528,19 +2528,19 @@ async function smoothMoney(change) {
                                 if (body.code && indexError <= 5) {
                                     console.log(`${sideDealBtc} BTC bigChange `, body.code)
                                     indexError++
-                                    
+
                                     reRequest()
                                 } else if (body.code && !fatalError) {
                                     fatalError = true
-                
+
                                     messageBot = `Конечная у мастера
                 
                                     ${sideDealBtc} BTC bigChange ${body.code}
                                     
                                     Заплаченная комиссия ${commissionAll}`
-                
+
                                     botMax.sendMessage(userChatId, messageBot);
-                                }else {
+                                } else {
                                     if (indexError !== 0) {
                                         indexError = 0
                                     }
@@ -2582,19 +2582,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         ${sideDealBtcFut} BTC fut bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         }
@@ -2620,19 +2620,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log("Buy BTC fut for dopMinus ", body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         Buy BTC fut for dopMinus ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         }
@@ -2652,19 +2652,19 @@ async function smoothMoney(change) {
                                                     if (body.code && indexError <= 5) {
                                                         console.log("Sell BTC fut after dopMinus ", body.code)
                                                         indexError++
-                                                        
+
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
                                                         fatalError = true
-                                    
+
                                                         messageBot = `Конечная у мастера
                                     
                                                         Sell BTC fut after dopMinus ${body.code}
                                                         
                                                         Заплаченная комиссия ${commissionAll}`
-                                    
+
                                                         botMax.sendMessage(userChatId, messageBot);
-                                                    }else {
+                                                    } else {
                                                         if (indexError !== 0) {
                                                             indexError = 0
                                                         }
@@ -2703,19 +2703,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEth} ETH bigChange `, body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         ${sideDealEth} ETH bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         }
@@ -2744,19 +2744,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEth} 1 ETH bigChange dopMinimumSpotEth `, body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         ${sideDealEth} 1 ETH bigChange dopMinimumSpotEth ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         };
@@ -2777,19 +2777,19 @@ async function smoothMoney(change) {
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth `, body.code)
                                                         indexError++
-                                                        
+
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
                                                         fatalError = true
-                                    
+
                                                         messageBot = `Конечная у мастера
                                     
                                                         ${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth ${body.code}
                                                         
                                                         Заплаченная комиссия ${commissionAll}`
-                                    
+
                                                         botMax.sendMessage(userChatId, messageBot);
-                                                    }else {
+                                                    } else {
                                                         if (indexError !== 0) {
                                                             indexError = 0
                                                         }
@@ -2838,19 +2838,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         ${sideDealEthFut} ETH fut bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         }
@@ -2876,19 +2876,19 @@ async function smoothMoney(change) {
                                     if (body.code && indexError <= 5) {
                                         console.log("Buy ETH fut for dopMinus ", body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true
-                    
+
                                         messageBot = `Конечная у мастера
                     
                                         Buy ETH fut for dopMinus ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
-                    
+
                                         botMax.sendMessage(userChatId, messageBot);
-                                    }else {
+                                    } else {
                                         if (indexError !== 0) {
                                             indexError = 0
                                         }
@@ -2908,19 +2908,19 @@ async function smoothMoney(change) {
                                                     if (body.code && indexError <= 5) {
                                                         console.log("Sell ETH fut after dopMinus ", body.code)
                                                         indexError++
-                                                        
+
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
                                                         fatalError = true
-                                    
+
                                                         messageBot = `Конечная у мастера
                                     
                                                         Sell ETH fut after dopMinus ${body.code}
                                                         
                                                         Заплаченная комиссия ${commissionAll}`
-                                    
+
                                                         botMax.sendMessage(userChatId, messageBot);
-                                                    }else {
+                                                    } else {
                                                         if (indexError !== 0) {
                                                             indexError = 0
                                                         }
@@ -3021,19 +3021,19 @@ async function smoothMoney(change) {
                             if (body.code && indexError <= 5) {
                                 console.log("Check bigChange USDT ", body.code)
                                 indexError++
-                                
+
                                 reRequest()
                             } else if (body.code && !fatalError) {
                                 fatalError = true
-            
+
                                 messageBot = `Конечная у мастера
             
                                 Check bigChange USDT ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
-            
+
                                 botMax.sendMessage(userChatId, messageBot);
-                            }else {
+                            } else {
                                 if (indexError !== 0) {
                                     indexError = 0
                                 }
