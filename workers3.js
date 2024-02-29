@@ -607,7 +607,7 @@ process.on('message', (packet) => {
 
                     if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
 
-                        firstDeal = false
+
 
                         if (allMoney < fixAmountUsdt) {
                             amountUsdt = allMoney
@@ -628,7 +628,7 @@ process.on('message', (packet) => {
 
                         amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
-
+                        firstDeal = false
                     }
 
 
@@ -1566,7 +1566,7 @@ process.on('message', (packet) => {
                                     if (body.code && indexError <= 5) {
                                         console.log(`Check USDT after day ${account.index}`, body.code)
                                         indexError++
-                                        
+
                                         reRequest()
                                     } else if (body.code && !fatalError) {
                                         fatalError = true

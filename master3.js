@@ -82,15 +82,15 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 40
+let fixAmountUsdt = 210
 
-let maxCommissionAllMaster = 15
+let maxCommissionAllMaster = 595.21
 
-let maxCommissionAllSmall = 6
+let maxCommissionAllSmall = 184.05
 
-let amountFirstActive = 100//amountUsdt + (amountUsdt * 2)
+let amountFirstActive = fixAmountUsdt * 1.15
 
-let maxChangeProc = 0.008
+let maxChangeProc = 0.1
 
 
 let amountUsdt = fixAmountUsdt
@@ -1432,7 +1432,7 @@ async function global() {
 
             if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
 
-                firstDeal = false
+                
 
                 if (allMoney < fixAmountUsdt) {
                     amountUsdt = allMoney
@@ -1447,6 +1447,8 @@ async function global() {
                 // commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
                 amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+
+                firstDeal = false
 
             }
 
