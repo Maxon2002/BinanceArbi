@@ -185,27 +185,29 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-// request.get(
-//     {
-//         url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
-//         headers: {
-//             'X-MBX-APIKEY': publicKey
-//         }
-//     },
-//     (err, response, body) => {
-//         body = JSON.parse(body)
-//         // console.log(body)
-//         for (let i = 0; i < body.symbols.length; i++) {
-//             let element = body.symbols[i];
+request.get(
+    {
+        url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+        headers: {
+            'X-MBX-APIKEY': publicKey
+        }
+    },
+    (err, response, body) => {
+        body = JSON.parse(body)
+        // console.log(body)
+        let symbol = body.symbols[0]
 
-//             // if(element.symbol === 'ETHBTC') {
-//             //     console.log(element)
-//             // }
-//             console.log(element)
-//         }
+        for (let i = 0; i < symbol.filters.length; i++) {
+            let filter = symbol.filters[i]
 
-//     }
-// )
+            if (filter.filterType === "NOTIONAL") {
+                console.log(+filter.minNotional)
+            }
+
+        }
+
+    }
+)
 
 
 
