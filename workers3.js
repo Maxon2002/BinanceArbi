@@ -191,7 +191,9 @@ process.on('message', (packet) => {
                         (err, response, body) => {
                             body = JSON.parse(body)
                             if (body.code && indexError <= 5) {
-                                indexError++
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
                                 reRequest()
                             } else if (body.code && !fatalError) {
@@ -363,7 +365,9 @@ process.on('message', (packet) => {
 
                             if (body.code && indexError <= 5) {
                                 console.log(`Check start USDT in ${account.index} `, body.code)
-                                indexError++
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
                                 reRequest()
                             } else if (body.code && !fatalError) {
@@ -746,7 +750,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy BTC usdtBtcEth ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -786,7 +792,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell ETH usdtBtcEth ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -826,7 +834,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy ETH usdtBtcEth ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -1037,7 +1047,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy ETH usdtEthBtc ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -1077,7 +1089,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell BTC usdtEthBtc ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -1117,7 +1131,9 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell ETH usdtEthBtc ${account.index} `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -1298,7 +1314,9 @@ process.on('message', (packet) => {
                             (err, response, body) => {
                                 body = JSON.parse(body)
                                 if (body.code && indexError <= 5) {
-                                    indexError++
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
                                     reRequest()
                                 } else if (body.code && !fatalError) {
@@ -1466,7 +1484,9 @@ process.on('message', (packet) => {
 
                                 if (body.code && indexError <= 5) {
                                     console.log(`Check после bigChange USDT ${account.index}`, body.code)
-                                    indexError++
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
                                     reRequest()
                                 } else if (body.code && !fatalError) {
@@ -1565,7 +1585,9 @@ process.on('message', (packet) => {
 
                                     if (body.code && indexError <= 5) {
                                         console.log(`Check USDT after day ${account.index}`, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {

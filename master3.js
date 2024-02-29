@@ -357,7 +357,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("Depth BTC ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -435,7 +437,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("Depth ETH ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -522,7 +526,9 @@ async function startWorkers() {
                     body = JSON.parse(body)
                     if (body.code && indexError <= 5) {
                         console.log("First transfer to fut ", body.code)
-                        indexError++
+                        if (body.code !== -1021) {
+                            indexError++
+                        }
 
                         reRequest()
                     } else if (body.code && !fatalError) {
@@ -565,7 +571,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("First buy BTC ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -608,7 +616,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("First sell BTC fut ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -647,7 +657,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("First buy ETH ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -691,7 +703,9 @@ async function startWorkers() {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("First sell ETH fut ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -737,7 +751,9 @@ async function startWorkers() {
 
                         if (body.code && indexError <= 5) {
                             console.log("Check start USDT для запуска ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -821,7 +837,9 @@ async function startGlobalListen() {
                 (err, response, body) => {
                     body = JSON.parse(body)
                     if (body.code && indexError <= 5) {
-                        indexError++
+                        if (body.code !== -1021) {
+                            indexError++
+                        }
 
                         reRequest()
                     } else if (body.code && !fatalError) {
@@ -989,7 +1007,9 @@ async function global() {
 
                     if (body.code && indexError <= 5) {
                         console.log("Check start USDT ", body.code)
-                        indexError++
+                        if (body.code !== -1021) {
+                            indexError++
+                        }
 
                         reRequest()
                     } else if (body.code && !fatalError) {
@@ -1087,7 +1107,9 @@ async function global() {
 
                                     if (body.code && indexError <= 5) {
                                         console.log(`Check end assets in master `, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -1144,7 +1166,9 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("End sell BTC ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -1184,7 +1208,9 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("End buy BTC fut ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -1223,7 +1249,9 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("End sell ETH ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -1263,7 +1291,9 @@ async function global() {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("End buy ETH fut ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -1561,7 +1591,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy BTC usdtBtcEth ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -1602,7 +1634,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell ETH usdtBtcEth ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -1642,7 +1676,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy ETH usdtBtcEth ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -1841,7 +1877,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Buy ETH usdtEthBtc ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -1882,7 +1920,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell BTC usdtEthBtc ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -1922,7 +1962,9 @@ async function global() {
                                             body = JSON.parse(body)
                                             if (body.code && indexError <= 5) {
                                                 console.log("Sell ETH usdtEthBtc ", body.code)
-                                                indexError++
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
                                                 reRequest()
                                             } else if (body.code && !fatalError) {
@@ -2084,7 +2126,9 @@ async function global() {
 
                             if (body.code && indexError <= 5) {
                                 console.log("Check USDT after day ", body.code)
-                                indexError++
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
                                 reRequest()
                             } else if (body.code && !fatalError) {
@@ -2206,7 +2250,9 @@ async function smoothMoney(change) {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("Depth BTC after bigChange ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -2266,7 +2312,9 @@ async function smoothMoney(change) {
                         body = JSON.parse(body)
                         if (body.code && indexError <= 5) {
                             console.log("Depth ETH after bigChange ", body.code)
-                            indexError++
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
                             reRequest()
                         } else if (body.code && !fatalError) {
@@ -2446,7 +2494,9 @@ async function smoothMoney(change) {
                 body = JSON.parse(body)
                 if (body.code && indexError <= 5) {
                     console.log(`Trans ${typeTransfer} after bigChange `, body.code)
-                    indexError++
+                    if (body.code !== -1021) {
+                        indexError++
+                    }
 
                     reRequest()
                 } else if (body.code && !fatalError) {
@@ -2527,7 +2577,9 @@ async function smoothMoney(change) {
                                 body = JSON.parse(body)
                                 if (body.code && indexError <= 5) {
                                     console.log(`${sideDealBtc} BTC bigChange `, body.code)
-                                    indexError++
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
                                     reRequest()
                                 } else if (body.code && !fatalError) {
@@ -2581,7 +2633,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2619,7 +2673,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("Buy BTC fut for dopMinus ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2651,7 +2707,9 @@ async function smoothMoney(change) {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log("Sell BTC fut after dopMinus ", body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -2702,7 +2760,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2743,7 +2803,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEth} 1 ETH bigChange dopMinimumSpotEth `, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2776,7 +2838,9 @@ async function smoothMoney(change) {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth `, body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -2837,7 +2901,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2875,7 +2941,9 @@ async function smoothMoney(change) {
                                     body = JSON.parse(body)
                                     if (body.code && indexError <= 5) {
                                         console.log("Buy ETH fut for dopMinus ", body.code)
-                                        indexError++
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
                                         reRequest()
                                     } else if (body.code && !fatalError) {
@@ -2907,7 +2975,9 @@ async function smoothMoney(change) {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log("Sell ETH fut after dopMinus ", body.code)
-                                                        indexError++
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
                                                         reRequest()
                                                     } else if (body.code && !fatalError) {
@@ -3020,7 +3090,9 @@ async function smoothMoney(change) {
 
                             if (body.code && indexError <= 5) {
                                 console.log("Check bigChange USDT ", body.code)
-                                indexError++
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
                                 reRequest()
                             } else if (body.code && !fatalError) {
