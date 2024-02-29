@@ -1417,15 +1417,15 @@ async function global() {
             if (!firstDeal) {
                 if (dopComissionBtc !== 0 && dopComissionEth !== 0) {
 
-                    amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                    amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                 } else if (dopComissionBtc !== 0 && dopComissionEth === 0) {
 
-                    amountUsdt = +(allMoney - 0.8 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
+                    amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
 
                 } else if (dopComissionEth !== 0 && dopComissionBtc === 0) {
 
-                    amountUsdt = +(allMoney - 0.8 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
+                    amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
 
                 }
             }
@@ -1446,7 +1446,7 @@ async function global() {
                 dopComissionEth = +((Math.trunc(((amountUsdt * 0.001 / pricesAsk.eth.usdt) - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
                 // commissionEth = +(commissionEth + dopComissionEth).toFixed(8)
 
-                amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                 firstDeal = false
 

@@ -592,15 +592,15 @@ process.on('message', (packet) => {
                     if (!firstDeal) {
                         if (dopComissionBtc !== 0 && dopComissionEth !== 0) {
 
-                            amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                            amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                         } else if (dopComissionBtc !== 0 && dopComissionEth === 0) {
 
-                            amountUsdt = +(allMoney - 0.8 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
+                            amountUsdt = +(allMoney - 1 - dopComissionBtc * pricesAsk.btc.usdt).toFixed(8)
 
                         } else if (dopComissionEth !== 0 && dopComissionBtc === 0) {
 
-                            amountUsdt = +(allMoney - 0.8 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
+                            amountUsdt = +(allMoney - 1 - dopComissionEth * pricesAsk.eth.usdt).toFixed(8)
 
                         }
                     }
@@ -626,7 +626,7 @@ process.on('message', (packet) => {
                         console.log(`Доп комиссии начало dopComissionBtc ${dopComissionBtc} dopComissionEth ${dopComissionEth}`)
 
 
-                        amountUsdt = +(allMoney - 1.6 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
+                        amountUsdt = +(allMoney - 2 - (dopComissionBtc * pricesAsk.btc.usdt) - (dopComissionEth * pricesAsk.eth.usdt)).toFixed(8)
 
                         firstDeal = false
                     }
