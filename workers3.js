@@ -137,6 +137,9 @@ process.on('message', (packet) => {
 
         let amountBnb = 0
 
+        let minNotionalEthbtc = 0
+        let changeNotionalEthBtc = false
+
 
         let commissionAll = 0
         let maxCommissionAll = packet.data.maxCommissionAllSmall
@@ -344,6 +347,58 @@ process.on('message', (packet) => {
 
 
         async function global() {
+
+            await new Promise((resolve, reject) => {
+                (function reRequest() {
+                    request.get(
+                        {
+                            url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+                            headers: {
+                                'X-MBX-APIKEY': publicKey
+                            }
+                        },
+                        (err, response, body) => {
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log(`Старт exchangeInfo ${account.index} `, body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
+
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
+
+                                messageBot = `Конечная у ${account.name}
+
+                                Старт exchangeInfo ${body.code}
+                                
+                                Заплаченная комиссия ${commissionAll}`
+
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                let symbol = body.symbols[0]
+
+                                for (let i = 0; i < symbol.filters.length; i++) {
+                                    let filter = symbol.filters[i]
+
+                                    if (filter.filterType === "NOTIONAL") {
+                                        minNotionalEthbtc = +filter.minNotional
+                                    }
+
+                                }
+
+                                resolve()
+                            }
+
+                        }
+                    )
+                })()
+            })
 
             await new Promise((resolve, reject) => {
                 (function reRequest() {
@@ -647,21 +702,7 @@ process.on('message', (packet) => {
                         }
                     }
 
-                    if (amountUsdt < 6) {
-                        dontCom = true
 
-                        if (lastDeal) {
-                            stopGame = true
-
-                            console.log(`commissionAll in ${account.index} `, commissionAll)
-                            console.log(`dealsAm in ${account.index} `, dealsAm)
-                            wsBin.close()
-                        }
-                    } else {
-                        if (dontCom) {
-                            dontCom = false
-                        }
-                    }
 
                     let currentAmountUsdt = amountUsdt
 
@@ -682,6 +723,21 @@ process.on('message', (packet) => {
 
 
 
+                    if (amountUsdt < 6 || amSellBtcUsdt < minNotionalEthbtc || amBuyBtcUsdt <= minNotionalEthbtc) {
+                        dontCom = true
+
+                        if (lastDeal) {
+                            stopGame = true
+
+                            console.log(`commissionAll in ${account.index} `, commissionAll)
+                            console.log(`dealsAm in ${account.index} `, dealsAm)
+                            wsBin.close()
+                        }
+                    } else {
+                        if (dontCom) {
+                            dontCom = false
+                        }
+                    }
 
 
                     // console.log('usdtBtcEth ', usdtBtcEth)
@@ -750,7 +806,11 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy BTC usdtBtcEth ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -792,7 +852,11 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell ETH usdtBtcEth ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -834,7 +898,11 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy ETH usdtBtcEth ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -863,113 +931,335 @@ process.on('message', (packet) => {
 
                                 ]).then(async (res) => {
 
+                                    if (!changeNotionalEthBtc) {
+                                        let midComissionBtc = 0
 
-                                    let midComissionBtc = 0
+                                        let midComissionEth = 0
 
-                                    let midComissionEth = 0
+                                        let ethPrice = 0
 
-                                    let ethPrice = 0
+                                        for (let i = 0; i < res.length; i++) {
+                                            let deal = res[i]
 
-                                    for (let i = 0; i < res.length; i++) {
-                                        let deal = res[i]
-
-                                        if (deal.symbol === 'BTCUSDT') {
-                                            allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
-                                        }
-
-                                        if (deal.symbol === 'ETHUSDT') {
-                                            allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
-                                        }
-
-
-
-                                        for (let j = 0; j < deal.fills.length; j++) {
-                                            let fill = deal.fills[j]
-
-
-                                            if (fill.commissionAsset === 'BTC') {
-                                                commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
-
-                                                midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
-
-                                                commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                            if (deal.symbol === 'BTCUSDT') {
+                                                allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
                                             }
 
-                                            if (fill.commissionAsset === 'USDT') {
-                                                ethPrice = +fill.price
-                                                commissionAll = +(commissionAll + +fill.commission).toFixed(8)
-
-                                                allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                            if (deal.symbol === 'ETHUSDT') {
+                                                allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
                                             }
 
-                                            if (fill.commissionAsset === 'ETH') {
-                                                commissionEth = +(commissionEth - +fill.commission).toFixed(8)
 
-                                                midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
 
-                                                commissionAll = +(commissionAll + +fill.commission * ethPrice).toFixed(8)
+                                            for (let j = 0; j < deal.fills.length; j++) {
+                                                let fill = deal.fills[j]
+
+
+                                                if (fill.commissionAsset === 'BTC') {
+                                                    commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
+
+                                                    midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
+
+                                                    commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                }
+
+                                                if (fill.commissionAsset === 'USDT') {
+                                                    ethPrice = +fill.price
+                                                    commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                    allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                }
+
+                                                if (fill.commissionAsset === 'ETH') {
+                                                    commissionEth = +(commissionEth - +fill.commission).toFixed(8)
+
+                                                    midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
+
+                                                    commissionAll = +(commissionAll + +fill.commission * ethPrice).toFixed(8)
+                                                }
+
+                                            }
+
+                                            if (deal.symbol === 'ETHBTC') {
+                                                let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc).toFixed(8)
+
+                                                dirtBtc = +(dirtBtc + diff).toFixed(8)
+
+                                                dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+
+                                                dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+
                                             }
 
                                         }
 
-                                        if (deal.symbol === 'ETHBTC') {
-                                            let diff = +(amBuyBtcUsdt - deal.cummulativeQuoteQty - dopComissionBtc).toFixed(8)
+                                        dopComissionBtc = 0
+                                        dopComissionEth = 0
 
-                                            dirtBtc = +(dirtBtc + diff).toFixed(8)
+                                        if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
-                                            dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+                                            let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
 
-                                            dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+                                            if (lastDeal) {
+                                                lastDeal = false
+                                            }
+
+                                            howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+
+                                            if (howNeedAmountLast >= 6) {
+
+
+                                                // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
+
+                                                lastDeal = true
+
+                                                amountUsdt = howNeedAmountLast
+
+                                                console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+
+                                            } else {
+
+                                                stopGame = true
+                                                console.log(`commissionAll in ${account.index} `, commissionAll)
+                                                console.log(`dealsAm in ${account.index} `, dealsAm)
+                                                wsBin.close()
+                                            }
+                                        }
+
+                                        if (commissionBtc - midComissionBtc <= 0) {
+                                            dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                                         }
 
-                                    }
+                                        if (commissionEth - midComissionEth <= 0) {
+                                            dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
-                                    dopComissionBtc = 0
-                                    dopComissionEth = 0
-
-                                    if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
-
-                                        let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
-
-                                        if (lastDeal) {
-                                            lastDeal = false
                                         }
 
-                                        howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+                                        generalDeal = false
+                                    } else {
 
-                                        if (howNeedAmountLast >= 6) {
 
 
-                                            // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
+                                        for (let i = 0; i < res.length; i++) {
+                                            let deal = res[i]
 
-                                            lastDeal = true
+                                            if (deal.symbol === 'BTCUSDT') {
+                                                allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
+                                            }
 
-                                            amountUsdt = howNeedAmountLast
+                                            if (deal.symbol === 'ETHUSDT') {
+                                                allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
+                                            }
 
-                                            console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+                                            for (let j = 0; j < deal.fills.length; j++) {
+                                                let fill = deal.fills[j]
 
-                                        } else {
 
-                                            stopGame = true
-                                            console.log(`commissionAll in ${account.index} `, commissionAll)
-                                            console.log(`dealsAm in ${account.index} `, dealsAm)
-                                            wsBin.close()
+                                                if (fill.commissionAsset === 'BTC') {
+                                                    commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
+
+
+                                                    commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                }
+
+                                                if (fill.commissionAsset === 'USDT') {
+                                                    commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                    allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                }
+
+                                            }
                                         }
+
+                                        dopComissionBtc = 0
+                                        dopComissionEth = 0
+
+                                        await new Promise((resolve, reject) => {
+                                            (function reRequest() {
+                                                request.get(
+                                                    {
+                                                        url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
+                                                        }
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log(`Change exchangeInfo ${account.index} `, body.code)
+                                                            if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
+
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
+
+                                                            messageBot = `Конечная у ${account.name}
+                            
+                                                            Change exchangeInfo ${body.code}
+                                                            
+                                                            Заплаченная комиссия ${commissionAll}`
+
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+
+                                                            let symbol = body.symbols[0]
+
+                                                            for (let i = 0; i < symbol.filters.length; i++) {
+                                                                let filter = symbol.filters[i]
+
+                                                                if (filter.filterType === "NOTIONAL") {
+                                                                    minNotionalEthbtc = +filter.minNotional
+                                                                }
+
+                                                            }
+
+                                                            resolve()
+                                                        }
+
+                                                    }
+                                                )
+                                            })()
+                                        })
+
+                                        Promise.all([
+                                            new Promise((resolve) => {
+                                                (function reRequest() {
+                                                    let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${(amBuyBtcUsdt - dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
+                                                    let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+
+                                                    request.post(
+                                                        {
+                                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
+                                                            headers: {
+                                                                'X-MBX-APIKEY': publicKey
+                                                            }
+                                                        },
+                                                        (err, response, body) => {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Sell BTC usdtBtcEth notional ${account.index} `, body.code)
+
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
+
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
+
+                                                                messageBot = `Конечная у ${account.name}
+                                
+                                                                Sell BTC usdtBtcEth notional ${body.code}
+                                                                
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                // console.log('4 ', body)
+                                                                resolve(body)
+                                                            }
+                                                        }
+                                                    )
+                                                })()
+                                            }),
+                                            new Promise((resolve) => {
+                                                (function reRequest() {
+                                                    let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
+                                                    let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+
+                                                    request.post(
+                                                        {
+                                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
+                                                            headers: {
+                                                                'X-MBX-APIKEY': publicKey
+                                                            }
+                                                        },
+                                                        (err, response, body) => {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Buy ETH usdtBtcEth notional ${account.index} `, body.code)
+
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
+
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
+
+                                                                messageBot = `Конечная у ${account.name}
+                                
+                                                                Buy ETH usdtBtcEth notional ${body.code}
+                                                                
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                // console.log('6 ', body)
+                                                                resolve(body)
+                                                            }
+                                                        }
+                                                    )
+                                                })()
+                                            }),
+
+                                        ]).then((res) => {
+
+
+                                            for (let i = 0; i < res.length; i++) {
+                                                let deal = res[i]
+
+                                                if (deal.symbol === 'ETHUSDT') {
+                                                    allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
+                                                }
+
+                                                if (deal.symbol === 'BTCUSDT') {
+                                                    allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
+                                                }
+
+                                                for (let j = 0; j < deal.fills.length; j++) {
+                                                    let fill = deal.fills[j]
+
+                                                    if (fill.commissionAsset === 'ETH') {
+                                                        commissionEth = +(commissionEth - +fill.commission).toFixed(8)
+
+
+                                                        commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                    }
+
+                                                    if (fill.commissionAsset === 'USDT') {
+                                                        commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                        allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                    }
+
+
+                                                }
+
+                                            }
+
+                                            dopComissionBtc = 0
+                                            dopComissionEth = 0
+
+                                            dontCom = true
+
+                                            changeNotionalEthBtc = false
+
+                                            generalDeal = false
+                                        })
                                     }
-
-                                    if (commissionBtc - midComissionBtc <= 0) {
-                                        dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
-
-                                    }
-
-                                    if (commissionEth - midComissionEth <= 0) {
-                                        dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
-
-                                    }
-
-                                    generalDeal = false
-
                                 })
                             })()
 
@@ -1047,7 +1337,10 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Buy ETH usdtEthBtc ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -1089,7 +1382,11 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell BTC usdtEthBtc ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -1131,7 +1428,11 @@ process.on('message', (packet) => {
                                                     body = JSON.parse(body)
                                                     if (body.code && indexError <= 5) {
                                                         console.log(`Sell ETH usdtEthBtc ${account.index} `, body.code)
-                                                        if (body.code !== -1021) {
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            resolve()
+                                                        } else if (body.code !== -1021) {
                                                             indexError++
                                                         }
 
@@ -1159,108 +1460,334 @@ process.on('message', (packet) => {
                                     }),
                                 ]).then(async (res) => {
 
-                                    let midComissionBtc = 0
+                                    if (!changeNotionalEthBtc) {
 
-                                    let midComissionEth = 0
+                                        let midComissionBtc = 0
 
-                                    let btcPrice = 0
+                                        let midComissionEth = 0
+
+                                        let btcPrice = 0
 
 
-                                    for (let i = 0; i < res.length; i++) {
-                                        let deal = res[i]
+                                        for (let i = 0; i < res.length; i++) {
+                                            let deal = res[i]
 
-                                        if (deal.symbol === 'ETHUSDT') {
-                                            allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
-                                        }
-
-                                        if (deal.symbol === 'BTCUSDT') {
-                                            allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
-                                        }
-
-                                        for (let j = 0; j < deal.fills.length; j++) {
-                                            let fill = deal.fills[j]
-
-                                            if (fill.commissionAsset === 'ETH') {
-                                                commissionEth = +(commissionEth - +fill.commission).toFixed(8)
-
-                                                midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
-
-                                                commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                            if (deal.symbol === 'ETHUSDT') {
+                                                allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
                                             }
 
-                                            if (fill.commissionAsset === 'USDT') {
-                                                btcPrice = +fill.price
-                                                commissionAll = +(commissionAll + +fill.commission).toFixed(8)
-
-                                                allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                            if (deal.symbol === 'BTCUSDT') {
+                                                allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
                                             }
 
+                                            for (let j = 0; j < deal.fills.length; j++) {
+                                                let fill = deal.fills[j]
 
-                                            if (fill.commissionAsset === 'BTC') {
-                                                commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
+                                                if (fill.commissionAsset === 'ETH') {
+                                                    commissionEth = +(commissionEth - +fill.commission).toFixed(8)
 
-                                                midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
+                                                    midComissionEth = +(midComissionEth + +fill.commission).toFixed(8)
 
-                                                commissionAll = +(commissionAll + +fill.commission * btcPrice).toFixed(8)
+                                                    commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                }
+
+                                                if (fill.commissionAsset === 'USDT') {
+                                                    btcPrice = +fill.price
+                                                    commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                    allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                }
+
+
+                                                if (fill.commissionAsset === 'BTC') {
+                                                    commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
+
+                                                    midComissionBtc = +(midComissionBtc + +fill.commission).toFixed(8)
+
+                                                    commissionAll = +(commissionAll + +fill.commission * btcPrice).toFixed(8)
+                                                }
+                                            }
+
+                                            if (deal.symbol === 'ETHBTC') {
+                                                let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc).toFixed(8)///////////
+
+                                                dirtBtc = +(dirtBtc + diff).toFixed(8)
+
+                                                dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+
+                                                dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+
+                                            }
+
+                                        }
+
+                                        dopComissionBtc = 0
+                                        dopComissionEth = 0
+
+                                        if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
+
+                                            let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+
+                                            if (lastDeal) {
+                                                lastDeal = false
+                                            }
+
+                                            howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+
+                                            if (howNeedAmountLast >= 6) {
+
+                                                // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
+
+                                                lastDeal = true
+
+                                                amountUsdt = howNeedAmountLast
+
+                                                console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+
+                                            } else {
+                                                stopGame = true
+                                                console.log(`commissionAll in ${account.index} `, commissionAll)
+                                                console.log(`dealsAm in ${account.index} `, dealsAm)
+                                                wsBin.close()
                                             }
                                         }
 
-                                        if (deal.symbol === 'ETHBTC') {
-                                            let diff = +(deal.cummulativeQuoteQty - amSellBtcUsdt - dopComissionBtc).toFixed(8)///////////
-
-                                            dirtBtc = +(dirtBtc + diff).toFixed(8)
-
-                                            dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
-
-                                            dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+                                        if (commissionBtc - midComissionBtc <= 0) {
+                                            dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
 
                                         }
 
-                                    }
+                                        if (commissionEth - midComissionEth <= 0) {
+                                            dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
 
-                                    dopComissionBtc = 0
-                                    dopComissionEth = 0
-
-                                    if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
-
-                                        let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
-
-                                        if (lastDeal) {
-                                            lastDeal = false
                                         }
 
-                                        howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+                                        generalDeal = false
 
-                                        if (howNeedAmountLast >= 6) {
+                                    } else {
 
-                                            // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
 
-                                            lastDeal = true
+                                        for (let i = 0; i < res.length; i++) {
+                                            let deal = res[i]
 
-                                            amountUsdt = howNeedAmountLast
+                                            if (deal.symbol === 'ETHUSDT') {
+                                                allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
+                                            }
 
-                                            console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+                                            if (deal.symbol === 'BTCUSDT') {
+                                                allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
+                                            }
 
-                                        } else {
-                                            stopGame = true
-                                            console.log(`commissionAll in ${account.index} `, commissionAll)
-                                            console.log(`dealsAm in ${account.index} `, dealsAm)
-                                            wsBin.close()
+                                            for (let j = 0; j < deal.fills.length; j++) {
+                                                let fill = deal.fills[j]
+
+                                                if (fill.commissionAsset === 'ETH') {
+                                                    commissionEth = +(commissionEth - +fill.commission).toFixed(8)
+
+
+                                                    commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                }
+
+                                                if (fill.commissionAsset === 'USDT') {
+                                                    commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                    allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                }
+
+
+                                            }
+
                                         }
+
+
+
+                                        dopComissionBtc = 0
+                                        dopComissionEth = 0
+
+                                        await new Promise((resolve, reject) => {
+                                            (function reRequest() {
+                                                request.get(
+                                                    {
+                                                        url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
+                                                        }
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log(`Change exchangeInfo ${account.index} `, body.code)
+                                                            if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
+
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
+
+                                                            messageBot = `Конечная у ${account.name}
+                            
+                                                            Change exchangeInfo ${body.code}
+                                                            
+                                                            Заплаченная комиссия ${commissionAll}`
+
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+
+                                                            let symbol = body.symbols[0]
+
+                                                            for (let i = 0; i < symbol.filters.length; i++) {
+                                                                let filter = symbol.filters[i]
+
+                                                                if (filter.filterType === "NOTIONAL") {
+                                                                    minNotionalEthbtc = +filter.minNotional
+                                                                }
+
+                                                            }
+
+                                                            resolve()
+                                                        }
+
+                                                    }
+                                                )
+                                            })()
+                                        })
+
+                                        Promise.all([
+                                            new Promise((resolve) => {
+                                                (function reRequest() {
+                                                    let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${(amBuyBtcUsdt + dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
+                                                    let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
+
+                                                    request.post(
+                                                        {
+                                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
+                                                            headers: {
+                                                                'X-MBX-APIKEY': publicKey
+                                                            }
+                                                        },
+                                                        (err, response, body) => {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Buy BTC usdtBtcEth notional ${account.index} `, body.code)
+
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
+
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
+
+                                                                messageBot = `Конечная у ${account.name}
+                                
+                                                                Buy BTC usdtBtcEth notional ${body.code}
+                                                                
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                // console.log('4 ', body)
+                                                                resolve(body)
+                                                            }
+                                                        }
+                                                    )
+                                                })()
+                                            }),
+                                            new Promise((resolve) => {
+                                                (function reRequest() {
+                                                    let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
+                                                    let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+
+                                                    request.post(
+                                                        {
+                                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
+                                                            headers: {
+                                                                'X-MBX-APIKEY': publicKey
+                                                            }
+                                                        },
+                                                        (err, response, body) => {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Sell ETH usdtBtcEth notional ${account.index} `, body.code)
+
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
+
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
+
+                                                                messageBot = `Конечная у ${account.name}
+                                
+                                                                Sell ETH usdtBtcEth notional ${body.code}
+                                                                
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                // console.log('6 ', body)
+                                                                resolve(body)
+                                                            }
+                                                        }
+                                                    )
+                                                })()
+                                            }),
+
+                                        ]).then((res) => {
+
+
+                                            for (let i = 0; i < res.length; i++) {
+                                                let deal = res[i]
+
+                                                if (deal.symbol === 'BTCUSDT') {
+                                                    allMoney = +(allMoney - deal.cummulativeQuoteQty).toFixed(8)
+                                                }
+
+                                                if (deal.symbol === 'ETHUSDT') {
+                                                    allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
+                                                }
+
+                                                for (let j = 0; j < deal.fills.length; j++) {
+                                                    let fill = deal.fills[j]
+
+
+                                                    if (fill.commissionAsset === 'BTC') {
+                                                        commissionBtc = +(commissionBtc - +fill.commission).toFixed(8)
+
+
+                                                        commissionAll = +(commissionAll + +fill.commission * +fill.price).toFixed(8)
+                                                    }
+
+                                                    if (fill.commissionAsset === 'USDT') {
+                                                        commissionAll = +(commissionAll + +fill.commission).toFixed(8)
+
+                                                        allMoney = +(allMoney - +fill.commission).toFixed(8)
+                                                    }
+
+                                                }
+                                            }
+
+                                            dopComissionBtc = 0
+                                            dopComissionEth = 0
+
+                                            dontCom = true
+                                            
+                                            changeNotionalEthBtc = false
+
+                                            generalDeal = false
+                                        })
                                     }
-
-                                    if (commissionBtc - midComissionBtc <= 0) {
-                                        dopComissionBtc = +((Math.trunc((midComissionBtc - commissionBtc) * 100000) / 100000) + 0.00001).toFixed(5)
-
-                                    }
-
-                                    if (commissionEth - midComissionEth <= 0) {
-                                        dopComissionEth = +((Math.trunc((midComissionEth - commissionEth) * 10000) / 10000) + 0.0001).toFixed(4)
-
-                                    }
-
-                                    generalDeal = false
-
                                 })
                             })()
 
@@ -1610,20 +2137,12 @@ process.on('message', (packet) => {
 
                                                 let factMoney = +body[i].free
 
-
-
-
                                                 if (!stopGame) {
                                                     firstDeal = true
                                                     allMoney = factMoney
 
 
-
-
-
                                                 } else if (stopGame) {
-
-
 
                                                     messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
 
@@ -1633,9 +2152,9 @@ process.on('message', (packet) => {
 
                                                         botMax.sendMessage(userChatId, messageBot);
 
-                                                        setTimeout(() => {
-                                                            process.exit()
-                                                        }, 60000);
+                                                        // setTimeout(() => {
+                                                        //     process.exit()
+                                                        // }, 60000);
                                                     }, account.index * 3000);
 
 
@@ -1650,6 +2169,56 @@ process.on('message', (packet) => {
                                 }
                             )
 
+                        })();
+
+                        (function reRequest() {
+                            request.get(
+                                {
+                                    url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+                                    headers: {
+                                        'X-MBX-APIKEY': publicKey
+                                    }
+                                },
+                                (err, response, body) => {
+                                    body = JSON.parse(body)
+                                    if (body.code && indexError <= 5) {
+                                        console.log(`After day exchangeInfo ${account.index} `, body.code)
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
+
+                                        reRequest()
+                                    } else if (body.code && !fatalError) {
+                                        fatalError = true
+
+                                        messageBot = `Конечная у ${account.name}
+        
+                                        After day exchangeInfo ${body.code}
+                                        
+                                        Заплаченная комиссия ${commissionAll}`
+
+                                        botMax.sendMessage(userChatId, messageBot);
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+
+                                        let symbol = body.symbols[0]
+
+                                        for (let i = 0; i < symbol.filters.length; i++) {
+                                            let filter = symbol.filters[i]
+
+                                            if (filter.filterType === "NOTIONAL") {
+                                                minNotionalEthbtc = +filter.minNotional
+                                            }
+
+                                        }
+
+                                        resolve()
+                                    }
+
+                                }
+                            )
                         })()
                     }, 60000)
                 }
