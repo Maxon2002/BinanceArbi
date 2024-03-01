@@ -6,7 +6,6 @@ const crypto = require('crypto');
 
 const WebSocket = require('ws');
 
-const pm2 = require('pm2')
 
 
 let messageBot = null
@@ -40,40 +39,7 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 
-const accountsObj = {
-    a: {
-        address: "0xff9837e2baa4570e9b71d19bde7279d959c8acfd",
-        secretKey: "BBKsZLYpbealxXH3yLYBaSzz1l3kOJpoowa0eDjntuq6bvrSpsqSrYmL8e3I9YV4",
-        publicKey: "dGI55mC4Y8yBNYhG6jgGgMW4hBaBJjMf8SVuqMX77vlRxGNO1EQd6a4f1LsrY9Ch",
-        id: null,
-        index: 0,
-        name: 'gilangsky'
-    },
-    b: {
-        address: "0x7d41701ab2c42e1b56ad5de3d5591ba9faf8867e",
-        secretKey: "mMspCI4gGKq755PJz0J9vaXUhHDBilPjW1vL3JmMOWroH27mO2jq9kRS6FqNfFG7",
-        publicKey: "epbSzRAF20foJjXgxTQjaGDjaFiR2HERfDXAXWuA8dLeAcehm2IIUR4o1GgD4ugX",
-        id: null,
-        index: 1,
-        name: 'gaskuy'
-    },
-    c: {
-        address: "0x35214ac926d9652afd31c0009d7670eeee02eccd",
-        secretKey: "enuWvg5XZZt52FGhfBIFSaTqYYMTDYsEvrC2r6cvgs9xbTxmYWxyRfmpNxjpHrIE",
-        publicKey: "aoOrf78vZ2YBeXCAtTixdVAPXjJS3xbX7lnwALEk81up2KbXcFzMsZsPYlkGD92c",
-        id: null,
-        index: 2,
-        name: 'adipangestu'
-    },
-    d: {
-        address: "0xd56e80da921ff76583c0fefa95d81dbb3c05f587",
-        secretKey: "wIOLesFaxSq6QxWC2oyn4ErkSVrXq63FVtbceKNghubk8P6kx06YoYmWPJRaR4Fq",
-        publicKey: "Ibex81efMAPPjKO3GjJoCmvR1XHzqjHUJENYaxrRmg13eMLh9wem2cp9vlTjHPGv",
-        id: null,
-        index: 3,
-        name: 'n25'
-    }
-}
+
 
 
 
@@ -84,7 +50,7 @@ let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 let fixAmountUsdt = 200
 
-let maxCommissionAllMaster = 592.85
+let maxCommissionAllMaster = 279.4
 
 let maxCommissionAllSmall = 52.1
 
@@ -95,7 +61,7 @@ let maxChangeProc = 0.1
 
 let amountUsdt = fixAmountUsdt
 
-let howMuchAccounts = Object.keys(accountsObj).length
+let howMuchAccounts = 5
 
 let baseBtc = 0
 let baseEth = 0
@@ -124,124 +90,7 @@ let indexUpdateBigChange = 0
 
 let workerEnds = false
 
-let workerIds = []
 
-pm2.connect((err) => {
-    if (err) {
-        console.error(err);
-        process.exit(2);
-    }
-
-    let workerId = null
-    // Запуск воркера через PM2
-    pm2.start({
-        script: 'workers3.js',
-        instances: howMuchAccounts,  // Указывает количество воркеров
-        name: 'worker' // Уникальное имя для процесса
-    }, (err, apps) => {
-        // workerId = apps[0].pm_id;
-        // pm2.disconnect();
-        if (err) throw err;
-    });
-
-
-
-
-
-    pm2.launchBus((err, bus) => {
-
-        bus.on('process:msg', (packet) => {
-
-            // console.log(packet)
-
-            if (packet.data.type === 'open') {
-                workerIds.push(packet.process.pm_id)
-
-                if (workerIds.length === howMuchAccounts) {
-
-                    for (let i = 0; i < workerIds.length; i++) {
-
-                        let workerId = workerIds[i];
-
-                        let account = accountsObj[Object.keys(accountsObj)[i]]
-
-                        account.id = workerId
-
-                        pm2.sendDataToProcessId({
-                            id: workerId,
-                            type: 'process:msg',
-                            data: {
-                                account,
-                                maxCommissionAllSmall,
-                                fixAmountUsdtSmall,
-                                maxChangeProc
-                            },
-                            topic: 'startWork'
-                        }, (err, res) => {
-                            if (err) console.error(err);
-                            // else console.log(res);
-                        });
-
-                    }
-
-                    startWorkers()
-
-
-                }
-            }
-
-
-
-            if (packet.data.type === 'balanceUp') {
-                countBalanceUp++
-
-                if (countBalanceUp === howMuchAccounts) {
-                    setTimeout(() => {
-                        console.log("Мастер лисен гоу")
-                        startGlobalListen()
-                    }, 5000)
-                }
-            }
-
-
-            if (packet.data.type === 'maxChange') {
-
-                if (!workerSayChange) {
-                    workerSayChange = true
-
-
-
-                    messageBot = `Котировки слишком изменились
-
-                    Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
-
-                    botMax.sendMessage(userChatId, messageBot);
-                }
-            }
-
-
-            if (packet.data.type === 'upAfterChange') {
-
-                countUpAfterChange++
-
-                if (countUpAfterChange === howMuchAccounts) {
-                    countUpAfterChange = 0
-                    indexUpdateBigChange = 0
-                    workerSayChange = false
-                }
-            }
-
-            if (packet.data.type === 'workerEnd') {
-
-                if (!workerEnds) {
-                    workerEnds = true
-                }
-            }
-            // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
-
-        });
-    });
-});
 
 
 
@@ -340,7 +189,7 @@ let firstComEth = 0
 
 let firstDeal = true;
 
-async function startWorkers() {
+(async () => {
 
 
     await Promise.all([
@@ -399,25 +248,7 @@ async function startWorkers() {
 
                             baseBtcSmall = Math.trunc((baseBtc / howMuchAccounts) * 100000000) / 100000000
 
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceBtc,
-                                        baseBtcSmall
-                                    },
-                                    topic: 'startBtc'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
+                        
 
                             resolve()
                         }
@@ -480,25 +311,7 @@ async function startWorkers() {
                             baseEthSmall = Math.trunc((baseEth / howMuchAccounts) * 10000000) / 10000000
 
 
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceEth,
-                                        baseEthSmall
-                                    },
-                                    topic: 'startEth'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
+                            
 
                             resolve()
                         }
@@ -731,261 +544,18 @@ async function startWorkers() {
         })
     ])
 
-    let restBtcSmall = 0
-    let restEthSmall = 0
-
-    await new Promise((resolve, reject) => {
-        setTimeout(() => {
-            (function reRequest() {
-                let queryAsset = `timestamp=${Date.now()}`;
-                let hashAsset = signature(queryAsset);
-
-                request.post(
-                    {
-                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-
-                        if (body.code && indexError <= 5) {
-                            console.log("Check start USDT для запуска ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
     
-                            Check start USDT для запуска  ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
+    setTimeout(() => {
+        global();
+    }, 15000);
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-                            for (let i = 0; i < body.length; i++) {
-                                if (body[i].asset === 'USDT') {
-
-                                    baseUsdt = +body[i].free
-
-                                    baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                                if (body[i].asset === 'BTC') {
-
-                                    restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-                                }
-                                if (body[i].asset === 'ETH') {
-
-                                    restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                            }
-                            resolve()
-                        }
-                    }
-                )
-
-            })()
-        }, 15000)
-    })
-
-
-
-
-    messageBot = `Стартовый перевод
-
-    Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
-
-    botMax.sendMessage(userChatId, messageBot);
-
-};
-
-
-
-
+})()
 
 
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-async function startGlobalListen() {
 
-
-    let listenKey
-
-
-    await new Promise((resolve, reject) => {
-        (function reRequest() {
-            request.post(
-                {
-                    url: `https://api.binance.com/api/v3/userDataStream`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
-
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
-
-                        messageBot = `Конечная у мастера
-
-                        Глобальный listenKey ${body.code}
-                        
-                        Заплаченная комиссия ${commissionAll}`
-
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
-                        }
-                        listenKey = body.listenKey
-                        resolve()
-                    }
-                }
-            )
-        })()
-
-    })
-
-
-    setInterval(() => {
-        (function reRequest() {
-            request.put(
-                {
-                    url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    if (!body || body.code) {
-                        reRequest()
-                    }
-                }
-            )
-        })()
-    }, 3000000)
-
-
-
-    let closeListen = false
-
-    let wsBin = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
-
-
-    wsBin.on('open', () => console.log('Соединение мастер listenKey установлено в ' + new Date().toLocaleTimeString()))
-    wsBin.on('error', (d) => {
-        console.log('Ошибка!' + new Date().toLocaleTimeString())
-        // d = JSON.parse(d.toString())
-        console.log(d)
-
-    })
-    wsBin.on('close', function restart() {
-        if (!closeListen) {
-            console.log('Соединение мастер listenKey закрыто из-за ошибки в ' + new Date().toLocaleTimeString())
-            setTimeout(() => {
-                wsBinUser = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
-
-                wsBinUser.on('error', () => console.log('Ошибка!' + new Date().toLocaleTimeString()))
-
-                wsBinUser.on('open', () => console.log('Соединение мастер listenKey установлено в ' + new Date().toLocaleTimeString()))
-                wsBinUser.on('message', listen)
-                wsBinUser.on('ping', data => {
-                    wsBinUser.pong(data)
-                })
-                wsBinUser.on('close', restart)
-            }, 500)
-        } else {
-            console.log('listenKey мастер закрыт')
-        }
-    })
-
-    wsBin.on('message', listen)
-    wsBin.on('ping', data => {
-        wsBin.pong(data)
-
-    });
-
-    let indexUpdate = 0
-    /////// ПОДУМАТЬ ОБ ЭТОМ
-
-
-    let howNeedIndexUpdate = 3 * howMuchAccounts
-
-    let howNeedIndexUpdateBigChange = 3 * howMuchAccounts
-
-    function listen(data) {
-        data = JSON.parse(data.toString())
-
-
-        if (data.e === "balanceUpdate" && !workerSayChange && workerEnds) {
-            indexUpdate++
-
-
-            // if (data.a === 'BTC') {
-            //     let diff = +(+data.d - baseBtcSmall).toFixed(8)
-
-            //     dirtBtc = +(dirtBtc + diff).toFixed(8)
-            // }
-
-            // if (data.a === 'BNB') {
-            //     amountBnb = +(amountBnb + +data.d).toFixed(8)
-            // }
-
-
-            console.log(data)
-            if (indexUpdate === howNeedIndexUpdate) {
-
-                console.log('баланс пополнен у мастера ', indexUpdate)
-
-
-                // dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
-                // dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
-
-
-                setTimeout(() => {
-                    global();
-                }, 15000);
-
-
-            }
-        }
-
-        if (data.e === "balanceUpdate" && workerSayChange) {
-            indexUpdateBigChange++
-
-            if (indexUpdateBigChange === howNeedIndexUpdateBigChange) {
-                setTimeout(() => {
-                    smoothMoney()
-                }, 5000)
-
-            }
-        }
-
-    }
-}
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 async function global() {
@@ -3620,45 +3190,9 @@ async function smoothMoney(change) {
 
 
 
-        for (let i = 0; i < workerIds.length; i++) {
+        
 
-            let workerId = workerIds[i];
-
-
-            pm2.sendDataToProcessId({
-                id: workerId,
-                type: 'process:msg',
-                data: {
-                    startPriceBtc,
-                    baseBtcSmall
-                },
-                topic: 'startBtc'
-            }, (err, res) => {
-                if (err) console.error(err);
-                // else console.log(res);
-            });
-
-        }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
-
-        for (let i = 0; i < workerIds.length; i++) {
-
-            let workerId = workerIds[i];
-
-
-            pm2.sendDataToProcessId({
-                id: workerId,
-                type: 'process:msg',
-                data: {
-                    startPriceEth,
-                    baseEthSmall
-                },
-                topic: 'startEth'
-            }, (err, res) => {
-                if (err) console.error(err);
-                // else console.log(res);
-            });
-
-        }//\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\\
+        
 
         let restBtcSmall = 0
         let restEthSmall = 0

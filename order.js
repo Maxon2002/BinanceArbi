@@ -43,7 +43,7 @@ function signature(query) {
 
 // console.log('start ', Date.now())
 
-let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.00025&timestamp=${Date.now()}`;
+let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=0.01&timestamp=${Date.now()}`;
 let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
 
 let queryOrderBuyEthBtc = `symbol=ETHBTC&side=BUY&type=MARKET&quantity=0.0049&timestamp=${Date.now()}`;
@@ -130,7 +130,7 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 // request.post(
 //     {
-//         url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
+//         url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
 //         headers: {
 //             'X-MBX-APIKEY': publicKey
 //         }
@@ -185,33 +185,52 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-request.get(
+// request.get(
+//     {
+//         url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+//         // console.log(body)
+//         let symbol = body.symbols[0]
+
+//         for (let i = 0; i < symbol.filters.length; i++) {
+//             let filter = symbol.filters[i]
+
+//             if (filter.filterType === "NOTIONAL") {
+//                 console.log(+filter.minNotional)
+//             }
+
+//         }
+
+//     }
+// )
+
+
+
+
+
+
+let queryAsset = `timestamp=${Date.now()}`;
+let hashAsset = signature(queryAsset);
+
+request.post(
     {
-        url: `https://api.binance.com/api/v3/exchangeInfo?symbol=ETHBTC`,
+        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
         headers: {
             'X-MBX-APIKEY': publicKey
         }
     },
     (err, response, body) => {
         body = JSON.parse(body)
-        // console.log(body)
-        let symbol = body.symbols[0]
 
-        for (let i = 0; i < symbol.filters.length; i++) {
-            let filter = symbol.filters[i]
 
-            if (filter.filterType === "NOTIONAL") {
-                console.log(+filter.minNotional)
-            }
-
-        }
-
+        console.log(body)
     }
 )
-
-
-
-
 
 
 
