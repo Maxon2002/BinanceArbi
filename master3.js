@@ -82,11 +82,11 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 150
+let fixAmountUsdt = 200
 
-let maxCommissionAllMaster = 593
+let maxCommissionAllMaster = 592.85
 
-let maxCommissionAllSmall = 71.43
+let maxCommissionAllSmall = 52.1
 
 let amountFirstActive = fixAmountUsdt * 1.15
 
@@ -1373,6 +1373,12 @@ async function global() {
 
 
                 console.log('Дело сделано ' + new Date().toLocaleTimeString())
+
+                messageBot = `Мастер закончил работу
+                            
+                Заплаченная комиссия ${commissionAll}`
+
+                botMax.sendMessage(userChatId, messageBot);
 
                 // process.exit()
             })()
