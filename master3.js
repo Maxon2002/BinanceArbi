@@ -2736,7 +2736,6 @@ async function global() {
 
                                 }
 
-                                resolve()
                             }
 
                         }
