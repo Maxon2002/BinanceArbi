@@ -48,7 +48,7 @@ process.on('unhandledRejection', (reason, promise) => {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 200
+let fixAmountUsdt = 180
 
 let maxCommissionAllMaster = 279.4
 
