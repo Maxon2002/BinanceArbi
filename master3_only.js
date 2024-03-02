@@ -48,9 +48,9 @@ process.on('unhandledRejection', (reason, promise) => {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 180
+let fixAmountUsdt = 100
 
-let maxCommissionAllMaster = 279.4
+let maxCommissionAllMaster = 261.682
 
 let maxCommissionAllSmall = 52.1
 
@@ -248,7 +248,7 @@ let firstDeal = true;
 
                             baseBtcSmall = Math.trunc((baseBtc / howMuchAccounts) * 100000000) / 100000000
 
-                        
+
 
                             resolve()
                         }
@@ -311,7 +311,7 @@ let firstDeal = true;
                             baseEthSmall = Math.trunc((baseEth / howMuchAccounts) * 10000000) / 10000000
 
 
-                            
+
 
                             resolve()
                         }
@@ -544,7 +544,7 @@ let firstDeal = true;
         })
     ])
 
-    
+
     setTimeout(() => {
         global();
     }, 15000);
@@ -1191,6 +1191,10 @@ async function global() {
                     console.log("dealsAm ", ++dealsAm);
 
 
+
+
+
+
                     if (dopComissionBtc !== 0 && dopComissionEth === 0) {
                         amBuyBtcUsdt = +(amBuyBtcUsdt + dopComissionBtc).toFixed(5)
 
@@ -1713,6 +1717,8 @@ async function global() {
                     console.log("dealsAm ", ++dealsAm);
 
 
+
+
                     if (dopComissionEth !== 0 && dopComissionBtc === 0) {
                         amBuyEthUsdt = +(amBuyEthUsdt + dopComissionEth).toFixed(4)
 
@@ -1927,6 +1933,9 @@ async function global() {
                                     }
 
                                 }
+
+                                dopComissionBtc = 0
+                                dopComissionEth = 0
 
                                 if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
@@ -3190,9 +3199,9 @@ async function smoothMoney(change) {
 
 
 
-        
 
-        
+
+
 
         let restBtcSmall = 0
         let restEthSmall = 0

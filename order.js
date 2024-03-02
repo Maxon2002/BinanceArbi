@@ -214,28 +214,192 @@ let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
 
 
 
-let queryAsset = `timestamp=${Date.now()}`;
-let hashAsset = signature(queryAsset);
+// let queryAsset = `timestamp=${Date.now()}`;
+// let hashAsset = signature(queryAsset);
 
-request.post(
-    {
-        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-        headers: {
-            'X-MBX-APIKEY': publicKey
+// request.post(
+//     {
+//         url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+
+
+//         console.log(body)
+//     }
+// )
+
+
+
+let depositHistory = `startTime=${Date.now()}&timestamp=${Date.now()}`;
+let hashDepositHistory = signature(depositHistory);
+
+
+// request.get(
+//     {
+//         url: `https://api.binance.com/sapi/v1/capital/deposit/hisrec?${depositHistory}&signature=${hashDepositHistory}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+//         console.log(body)
+
+
+//     }
+// )
+
+
+
+
+
+(async () => {
+
+    let dealArr = []
+
+
+    await new Promise((resolve, reject) => {
+        let allOrd = `symbol=ETHBTC&startTime=1709337600000&limit=1000&timestamp=${Date.now()}`;
+        let hashAllOrd = signature(allOrd);
+
+
+        request.get(
+            {
+                url: `https://api.binance.com/api/v3/allOrders?${allOrd}&signature=${hashAllOrd}`,
+                headers: {
+                    'X-MBX-APIKEY': publicKey
+                }
+            },
+            (err, response, body) => {
+                body = JSON.parse(body)
+
+                dealArr = dealArr.concat(body)
+                resolve()
+            }
+        )
+    })
+    await new Promise((resolve, reject) => {
+        let allOrd = `symbol=ETHUSDT&startTime=1709337600000&limit=1000&timestamp=${Date.now()}`;
+        let hashAllOrd = signature(allOrd);
+
+
+        request.get(
+            {
+                url: `https://api.binance.com/api/v3/allOrders?${allOrd}&signature=${hashAllOrd}`,
+                headers: {
+                    'X-MBX-APIKEY': publicKey
+                }
+            },
+            (err, response, body) => {
+                body = JSON.parse(body)
+
+                dealArr = dealArr.concat(body)
+                resolve()
+            }
+        )
+    })
+    await new Promise((resolve, reject) => {
+        let allOrd = `symbol=BTCUSDT&startTime=1709337600000&limit=1000&timestamp=${Date.now()}`;
+        let hashAllOrd = signature(allOrd);
+
+
+        request.get(
+            {
+                url: `https://api.binance.com/api/v3/allOrders?${allOrd}&signature=${hashAllOrd}`,
+                headers: {
+                    'X-MBX-APIKEY': publicKey
+                }
+            },
+            (err, response, body) => {
+                body = JSON.parse(body)
+
+                dealArr = dealArr.concat(body)
+                resolve()
+            }
+        )
+    })
+
+    dealArr.sort((a, b) => a.updateTime - b.updateTime)
+
+    let factDealArr = []
+    let oneDeal = []
+    for (let i = 0; i < dealArr.length; i++) {
+        let deal = dealArr[i]
+        if((i + 1) % 3 !== 0) {
+            oneDeal.push(deal)
+        } else {
+            
+            oneDeal.push(deal)
+            factDealArr.push(oneDeal)
+
+            oneDeal = []
         }
-    },
-    (err, response, body) => {
-        body = JSON.parse(body)
-
-
-        console.log(body)
     }
-)
 
+    
 
+    for (let i = 0; i < factDealArr.length; i++) {
+        let factDeal = factDealArr[i];
+        
 
+        for (let j = 0; j < factDeal.length; j++) {
+            let oneDeal = factDeal[j]
 
+            if(oneDeal.symbol === 'ETHBTC') {
+                let ethbtc = factDeal.splice(j, 1)[0]
+                factDeal.push(ethbtc)
+            }
+        }
+        
+    }
 
+    let commissionAll = 0
+
+    for (let i = 0; i < factDealArr.length; i++) {
+        let factDeal = factDealArr[i];
+        
+
+        for (let j = 0; j < factDeal.length; j++) {
+            let oneDeal = factDeal[j]
+
+            let btcPrice = 0
+
+            if(oneDeal.symbol === 'BTCUSDT') {
+                
+                commissionAll = (commissionAll + +oneDeal.cummulativeQuoteQty * 0.001)
+
+                btcPrice = +oneDeal.cummulativeQuoteQty / +oneDeal.executedQty
+            }
+
+            if(oneDeal.symbol === 'ETHUSDT') {
+                commissionAll = (commissionAll + +oneDeal.cummulativeQuoteQty * 0.001)
+
+            }
+
+            if(oneDeal.symbol === 'ETHBTC') {
+                commissionAll = (commissionAll + +oneDeal.cummulativeQuoteQty * 0.001 * btcPrice)
+
+            }
+
+        }
+        
+    }
+
+    console.log(commissionAll)
+
+    // console.log(factDealArr)
+
+})()
+
+// let aaa = [2, 5, 1, 3]
+// aaa.sort((a, b) => a - b)
+
+// console.log(aaa)
+//1709337600000
 
 
 

@@ -316,27 +316,37 @@ process.on('message', (packet) => {
                         }, 15000);
 
 
-                        (function reRequest() {
-                            request.delete(
-                                {
-                                    url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
-                                    headers: {
-                                        'X-MBX-APIKEY': publicKey
-                                    }
-                                },
-                                (err, response, body) => {
-                                    if (!body || body.code) {
-                                        reRequest()
-                                    } else {
-                                        console.log(body)
-                                        console.log(`first key delete in ${account.index}`)
-                                        closeListen = true
-                                        clearInterval(listenInterval)
-                                        wsBin.close()
-                                    }
-                                }
-                            )
-                        })()
+                        // (function reRequest() {
+                        //     request.delete(
+                        //         {
+                        //             url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
+                        //             headers: {
+                        //                 'X-MBX-APIKEY': publicKey
+                        //             }
+                        //         },
+                        //         (err, response, body) => {
+                        //             if (!body || body.code) {
+                        //                 reRequest()
+                        //             } else {
+                        //                 console.log(body)
+                        //                 console.log(`first key delete in ${account.index}`)
+                        //                 closeListen = true
+                        //                 clearInterval(listenInterval)
+                        //                 wsBin.close()
+                        //             }
+                        //         }
+                        //     )
+                        // })()
+                    } else if (indexUpdate > 3 && !bigChange && !stopGame) {
+                        firstDeal = true
+                        allMoney = +(allMoney + +data.d).toFixed(8)
+                    } else if (indexUpdate > 3 && stopGame) {
+                        messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
+
+                        Баланс ${data.d} USDT`
+
+
+                        botMax.sendMessage(userChatId, messageBot);
                     }
                 }
 
@@ -664,7 +674,7 @@ process.on('message', (packet) => {
                         }
                     }
 
-                    if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
+                    if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0 && !generalDeal) {
 
 
 
@@ -1782,7 +1792,7 @@ process.on('message', (packet) => {
                                             dopComissionEth = 0
 
                                             dontCom = true
-                                            
+
                                             changeNotionalEthBtc = false
 
                                             generalDeal = false
@@ -2214,7 +2224,7 @@ process.on('message', (packet) => {
 
                                         }
 
-                                       
+
                                     }
 
                                 }

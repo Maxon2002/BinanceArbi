@@ -2358,6 +2358,9 @@ async function global() {
 
                                 }
 
+                                dopComissionBtc = 0
+                                dopComissionEth = 0
+
                                 if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
                                     let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
