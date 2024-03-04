@@ -104,7 +104,7 @@ request.get(
 
     })
     wsBin.on('close', function restart() {
-        
+
     })
 
     wsBin.on('message', listen)
@@ -113,7 +113,7 @@ request.get(
 
     });
 
-    
+
 
     function listen(data) {
         data = JSON.parse(data.toString())
@@ -122,8 +122,8 @@ request.get(
         if (data.e === "balanceUpdate") {
             let depositHistory = `startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
             let hashDepositHistory = signature(depositHistory);
-            
-            
+
+
             request.get(
                 {
                     url: `https://api.binance.com/sapi/v1/capital/deposit/hisrec?${depositHistory}&signature=${hashDepositHistory}`,
@@ -134,7 +134,7 @@ request.get(
                 (err, response, body) => {
                     body = JSON.parse(body)
                     console.log(body)
-                    
+
                     let newDepoIndex = 0
 
                     newDepoIndex = body.length
@@ -145,13 +145,16 @@ request.get(
 
 
                     depoIndex = newDepoIndex
-            
-                    
+
+
                 }
             );
         }
 
-        
+
 
     }
 })()
+
+
+

@@ -49,6 +49,9 @@ let baseEth = 0
 let commissionBtc = 0
 let commissionEth = 0
 
+let maxCommissionAll = 0
+let comUpdate = false
+let waitUpdate = false
 
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
@@ -74,6 +77,15 @@ process.on('message', (packet) => {
     if (packet.topic === 'startEth') {
         startPriceEth = +packet.data.startPriceEth
         baseEth = +packet.data.baseEthSmall
+    }
+
+    if (packet.topic === 'comUpdate') {
+        maxCommissionAll += +packet.data.morecom
+        comUpdate = true
+
+        if (waitUpdate) {
+            waitUpdate = false
+        }
     }
 
 
@@ -142,7 +154,7 @@ process.on('message', (packet) => {
 
 
         let commissionAll = 0
-        let maxCommissionAll = packet.data.maxCommissionAllSmall
+        maxCommissionAll = packet.data.maxCommissionAllSmall
         let stopGame = false
 
 
@@ -173,6 +185,15 @@ process.on('message', (packet) => {
 
         let lastDeal = false;
         let howNeedAmountLast = 0;
+
+        let depoIndex = 0
+        let startTimeDepoIndex = Date.now()
+
+        let indexUpdateBigChange = 0
+
+        let globalStart = false
+        let bigChangeStart = false
+
 
         let firstDeal = true;
 
@@ -289,65 +310,118 @@ process.on('message', (packet) => {
 
 
                 if (data.e === "balanceUpdate") {
-                    indexUpdate++
-                    console.log(data)
+                    // indexUpdate++
+                    console.log(data);
 
-                    // if (data.a === 'BTC') {
-                    //     commissionBtc = +(+data.d - baseBtc).toFixed(8)
-                    // }
+                    (function reRequest() {
 
-                    // if (data.a === 'ETH') {
-                    //     commissionEth = +(+data.d - baseEth).toFixed(8)
-                    // }
+                        let depositHistory = `startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                        let hashDepositHistory = signature(depositHistory);
 
-                    if (indexUpdate === 3) {
-                        console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
+                        request.get(
+                            {
+                                url: `https://api.binance.com/sapi/v1/capital/deposit/hisrec?${depositHistory}&signature=${hashDepositHistory}`,
+                                headers: {
+                                    'X-MBX-APIKEY': publicKey
+                                }
+                            },
+                            (err, response, body) => {
+                                body = JSON.parse(body)
+
+                                if (body.code && indexError <= 5) {
+                                    console.log("Balance update depoHistory ", body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
+
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
+
+                                    messageBot = `Конечная у ${account.name}
+            
+                                    Balance update depoHistory ${body.code}
+                                    
+                                    Заплаченная комиссия ${commissionAll}`
+
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+
+                                    let newDepoIndex = body.length
 
 
-                        process.send({
-                            type: 'process:msg',
-                            data: {
-                                type: 'balanceUp'
+                                    if (newDepoIndex === 3 && !globalStart) {
+
+                                        globalStart = true
+
+                                        console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
+
+
+                                        process.send({
+                                            type: 'process:msg',
+                                            data: {
+                                                type: 'balanceUp'
+                                            }
+                                        })
+
+                                        setTimeout(() => {
+                                            global();
+                                        }, 15000);
+
+
+
+                                    }
+
+                                    if (bigChange && !stopGame) {
+
+                                        if (newDepoIndex === indexUpdateBigChange && !bigChangeStart && bigChange) {
+
+                                            bigChangeStart = true
+
+                                            process.send({
+                                                type: 'process:msg',
+                                                data: {
+                                                    type: 'upAfterChange'
+                                                }
+                                            });
+
+                                            checkMoneyAfterBig();
+                                        }
+                                    }
+
+
+                                    if (newDepoIndex === depoIndex) {
+                                        if (!stopGame) {
+                                            if (+data.d > 0) {
+                                                firstDeal = true
+                                                allMoney = +(allMoney + +data.d).toFixed(8)
+                                            }
+                                        } else {
+                                            if (+data.d > 0) {
+                                                messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
+
+                                                Баланс ${data.d} USDT`
+
+
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            }
+                                        }
+                                    }
+
+
+                                    depoIndex = newDepoIndex
+
+                                }
+
                             }
-                        })
-
-                        setTimeout(() => {
-                            global();
-                        }, 15000);
+                        );
+                    })()
 
 
-                        // (function reRequest() {
-                        //     request.delete(
-                        //         {
-                        //             url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
-                        //             headers: {
-                        //                 'X-MBX-APIKEY': publicKey
-                        //             }
-                        //         },
-                        //         (err, response, body) => {
-                        //             if (!body || body.code) {
-                        //                 reRequest()
-                        //             } else {
-                        //                 console.log(body)
-                        //                 console.log(`first key delete in ${account.index}`)
-                        //                 closeListen = true
-                        //                 clearInterval(listenInterval)
-                        //                 wsBin.close()
-                        //             }
-                        //         }
-                        //     )
-                        // })()
-                    } else if (indexUpdate > 3 && !bigChange && !stopGame) {
-                        firstDeal = true
-                        allMoney = +(allMoney + +data.d).toFixed(8)
-                    } else if (indexUpdate > 3 && stopGame) {
-                        messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
 
-                        Баланс ${data.d} USDT`
-
-
-                        botMax.sendMessage(userChatId, messageBot);
-                    }
                 }
 
             }
@@ -759,24 +833,9 @@ process.on('message', (packet) => {
 
                         usdtBtcEthIndex++
 
-                        // let wait = false
+                      
 
-                        // if (amountUsdt > allMoney) {
-                        //     wait = true
-
-                        //     console.log(`amountUsdt > all ${account.index} `, amountUsdt)
-                        //     console.log(`allMoney > all ${account.index} `, allMoney)
-
-                        //     if (allMoney > 5) {
-                        //         amountUsdt = allMoney
-                        //     } else {
-                        //         dontCom = true
-                        //     }
-                        // }
-
-
-
-                        if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom) {
+                        if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom && !waitUpdate) {
                             usdtBtcEthDeal = true
                             // usdtEthBtcDeal = false
                             generalDeal = true
@@ -1008,31 +1067,38 @@ process.on('message', (packet) => {
 
                                         if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
-                                            let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+                                            if (comUpdate) {
 
-                                            if (lastDeal) {
-                                                lastDeal = false
-                                            }
+                                                let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
 
-                                            howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+                                                if (lastDeal) {
+                                                    lastDeal = false
+                                                }
 
-                                            if (howNeedAmountLast >= 6) {
+                                                howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+
+                                                if (howNeedAmountLast >= 6) {
 
 
-                                                // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
+                                                    // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
 
-                                                lastDeal = true
+                                                    lastDeal = true
 
-                                                amountUsdt = howNeedAmountLast
+                                                    amountUsdt = howNeedAmountLast
 
-                                                console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+                                                    console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+
+                                                } else {
+
+                                                    stopGame = true
+                                                    console.log(`commissionAll in ${account.index} `, commissionAll)
+                                                    console.log(`dealsAm in ${account.index} `, dealsAm)
+                                                    wsBin.close()
+
+                                                }
 
                                             } else {
-
-                                                stopGame = true
-                                                console.log(`commissionAll in ${account.index} `, commissionAll)
-                                                console.log(`dealsAm in ${account.index} `, dealsAm)
-                                                wsBin.close()
+                                                waitUpdate = true
                                             }
                                         }
 
@@ -1289,27 +1355,9 @@ process.on('message', (packet) => {
                     if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtEthBtc !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
                         usdtEthBtcIndex++
 
-                        // let wait = false
-
-                        // if (amountUsdt > allMoney) {
-                        //     wait = true
-
-                        //     console.log(`amountUsdt > all in ${account.index} `, amountUsdt)
-                        //     console.log(`allMoney > all in ${account.index} `, allMoney)
-
-                        //     if (allMoney > 5) {
-                        //         amountUsdt = allMoney
-                        //     } else {
-                        //         dontCom = true
-                        //     }
-                        // }
 
 
-
-
-
-
-                        if (usdtEthBtcIndex > 6 && !usdtEthBtcDeal && !generalDeal && !dontCom) {
+                        if (usdtEthBtcIndex > 6 && !usdtEthBtcDeal && !generalDeal && !dontCom && !waitUpdate) {
                             usdtEthBtcDeal = true
                             // usdtBtcEthDeal = false
                             generalDeal = true
@@ -1536,29 +1584,37 @@ process.on('message', (packet) => {
 
                                         if (commissionAll + amountUsdt * 0.003 > maxCommissionAll) {
 
-                                            let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
+                                            if (comUpdate) {
 
-                                            if (lastDeal) {
-                                                lastDeal = false
-                                            }
+                                                let lastCommission = +(maxCommissionAll - commissionAll).toFixed(8)
 
-                                            howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
+                                                if (lastDeal) {
+                                                    lastDeal = false
+                                                }
 
-                                            if (howNeedAmountLast >= 6) {
+                                                howNeedAmountLast = +(lastCommission / 0.003).toFixed(8)
 
-                                                // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
+                                                if (howNeedAmountLast >= 6) {
 
-                                                lastDeal = true
+                                                    // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmount)).toFixed(8)
 
-                                                amountUsdt = howNeedAmountLast
+                                                    lastDeal = true
 
-                                                console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+                                                    amountUsdt = howNeedAmountLast
+
+                                                    console.log(`доп сделка в ${account.index} будет `, amountUsdt)
+
+                                                } else {
+
+                                                    stopGame = true
+                                                    console.log(`commissionAll in ${account.index} `, commissionAll)
+                                                    console.log(`dealsAm in ${account.index} `, dealsAm)
+                                                    wsBin.close()
+
+                                                }
 
                                             } else {
-                                                stopGame = true
-                                                console.log(`commissionAll in ${account.index} `, commissionAll)
-                                                console.log(`dealsAm in ${account.index} `, dealsAm)
-                                                wsBin.close()
+                                                waitUpdate = true
                                             }
                                         }
 
@@ -1825,6 +1881,8 @@ process.on('message', (packet) => {
 
             async function smoothMoney() {
 
+                indexUpdateBigChange = depoIndex + 3
+
                 process.send({
                     type: 'process:msg',
                     data: {
@@ -1833,266 +1891,7 @@ process.on('message', (packet) => {
                 });
 
 
-
-
-
-                let listenKey
-
-
-                await new Promise((resolve, reject) => {
-                    (function reRequest() {
-                        request.post(
-                            {
-                                url: `https://api.binance.com/api/v3/userDataStream`,
-                                headers: {
-                                    'X-MBX-APIKEY': publicKey
-                                }
-                            },
-                            (err, response, body) => {
-                                body = JSON.parse(body)
-                                if (body.code && indexError <= 5) {
-                                    if (body.code !== -1021) {
-                                        indexError++
-                                    }
-
-                                    reRequest()
-                                } else if (body.code && !fatalError) {
-                                    fatalError = true
-
-                                    messageBot = `Конечная у ${account.name}
-    
-                                    Получение listenKey в smoothMoney ${body.code}
-                                    
-                                    Заплаченная комиссия ${commissionAll}`
-
-                                    botMax.sendMessage(userChatId, messageBot);
-                                } else {
-                                    if (indexError !== 0) {
-                                        indexError = 0
-                                    }
-                                    listenKey = body.listenKey
-                                    resolve()
-                                }
-                            }
-                        )
-                    })()
-
-                })
-
-
-                let listenInterval = setInterval(() => {
-                    (function reRequest() {
-                        request.put(
-                            {
-                                url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
-                                headers: {
-                                    'X-MBX-APIKEY': publicKey
-                                }
-                            },
-                            (err, response, body) => {
-                                if (!body || body.code) {
-                                    reRequest()
-                                }
-                            }
-                        )
-                    })()
-                }, 3000000)
-
-
-
-                let closeListen = false
-
-
-                let wsBin = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
-
-
-                wsBin.on('open', () => {
-
-
-
-                    console.log(`Соединение ${account.index} listenKey после bigChange установлено в ` + new Date().toLocaleTimeString())
-
-                })
-                wsBin.on('error', (d) => {
-                    console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString())
-                    // d = JSON.parse(d.toString())
-                    console.log(d)
-
-                })
-                wsBin.on('close', function restart() {
-                    if (!closeListen) {
-                        console.log(`Соединение ${account.index} listenKey bigCnahge закрыто из-за ошибки в ` + new Date().toLocaleTimeString())
-                        setTimeout(() => {
-                            wsBinUser = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
-
-                            wsBinUser.on('error', () => console.log('Ошибка!' + new Date().toLocaleTimeString()))
-
-                            wsBinUser.on('open', () => console.log(`Соединение ${account.index} listenKey после bigChange установлено в ` + new Date().toLocaleTimeString()))
-                            wsBinUser.on('message', listen)
-                            wsBinUser.on('ping', data => {
-                                wsBinUser.pong(data)
-                            })
-                            wsBinUser.on('close', restart)
-                        }, 500)
-                    } else {
-                        console.log(`listenKey ${account.index} закрыт после bigChange`)
-                    }
-                })
-
-                wsBin.on('message', listen)
-                wsBin.on('ping', data => {
-                    wsBin.pong(data)
-
-                });
-
-                let indexUpdate = 0
-
-                function listen(data) {
-                    data = JSON.parse(data.toString())
-
-
-                    if (data.e === "balanceUpdate") {
-                        indexUpdate++
-                        console.log(data)
-                        if (indexUpdate === 6) {
-                            console.log(`баланс пополнен после bigChange ${account.index}`, indexUpdate)
-
-
-
-
-                            setTimeout(() => {
-
-
-                                process.send({
-                                    type: 'process:msg',
-                                    data: {
-                                        type: 'upAfterChange'
-                                    }
-                                });
-
-                                checkMoney();
-                            }, 15000);
-
-
-                            (function reRequest() {
-                                request.delete(
-                                    {
-                                        url: `https://api.binance.com/api/v3/userDataStream?listenKey=${listenKey}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        if (!body || body.code) {
-                                            reRequest()
-                                        } else {
-                                            console.log(body)
-                                            console.log(`key delete after bigCnahge ${account.index}`)
-                                            closeListen = true
-                                            clearInterval(listenInterval)
-                                            wsBin.close()
-                                        }
-                                    }
-                                )
-                            })()
-                        }
-                    }
-
-                }
-
-
-
-                function checkMoney() {
-                    (function reRequest() {
-                        let queryAsset = `timestamp=${Date.now()}`;
-                        let hashAsset = signature(queryAsset);
-
-                        request.post(
-                            {
-                                url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                headers: {
-                                    'X-MBX-APIKEY': publicKey
-                                }
-                            },
-                            (err, response, body) => {
-                                body = JSON.parse(body)
-
-
-
-                                if (body.code && indexError <= 5) {
-                                    console.log(`Check после bigChange USDT ${account.index}`, body.code)
-                                    if (body.code !== -1021) {
-                                        indexError++
-                                    }
-
-                                    reRequest()
-                                } else if (body.code && !fatalError) {
-                                    fatalError = true
-
-                                    messageBot = `Конечная у ${account.name}
-    
-                                    Check после bigChange USDT ${body.code}
-                                    
-                                    Заплаченная комиссия ${commissionAll}`
-
-                                    botMax.sendMessage(userChatId, messageBot);
-                                } else {
-                                    if (indexError !== 0) {
-                                        indexError = 0
-                                    }
-                                    for (let i = 0; i < body.length; i++) {
-                                        if (body[i].asset === 'USDT') {
-
-                                            let factMoney = +body[i].free
-
-                                            firstDeal = true
-                                            allMoney = factMoney
-
-                                            console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
-
-
-                                        }
-                                        if (body[i].asset === 'BTC') {
-
-                                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
-
-                                            console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
-
-                                            console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
-                                            console.log('commissionBtc ', commissionBtc)
-
-
-
-                                        }
-                                        if (body[i].asset === 'ETH') {
-
-                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
-
-                                            console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
-                                            console.log('commissionEth ', commissionEth)
-                                        }
-                                    }
-
-
-                                    bigChange = false
-
-                                }
-                            }
-                        )
-
-                    })()
-                }
-
-
-
             }
-
-
-
-
-
-
-
 
 
 
@@ -2104,82 +1903,6 @@ process.on('message', (packet) => {
                     today = new Date().getUTCDate();
 
                     setTimeout(async () => {
-
-
-                        (function reRequest() {
-                            let queryAsset = `timestamp=${Date.now()}`;
-                            let hashAsset = signature(queryAsset);
-
-                            request.post(
-                                {
-                                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                                    headers: {
-                                        'X-MBX-APIKEY': publicKey
-                                    }
-                                },
-                                (err, response, body) => {
-                                    body = JSON.parse(body)
-
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`Check USDT after day ${account.index}`, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
-
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
-
-                                        messageBot = `Конечная у ${account.name}
-        
-                                        Check USDT after day ${body.code}
-                                        
-                                        Заплаченная комиссия ${commissionAll}`
-
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        }
-                                        for (let i = 0; i < body.length; i++) {
-                                            if (body[i].asset === 'USDT') {
-
-
-                                                let factMoney = +body[i].free
-
-                                                if (!stopGame) {
-                                                    firstDeal = true
-                                                    allMoney = factMoney
-
-
-                                                } else if (stopGame) {
-
-                                                    messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
-
-                                                    Баланс ${factMoney} USDT`
-
-                                                    setTimeout(() => {
-
-                                                        botMax.sendMessage(userChatId, messageBot);
-
-                                                        // setTimeout(() => {
-                                                        //     process.exit()
-                                                        // }, 60000);
-                                                    }, account.index * 3000);
-
-
-
-                                                }
-                                                // moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
-
-                                                break
-                                            }
-                                        }
-                                    }
-                                }
-                            )
-
-                        })();
 
                         (function reRequest() {
                             request.get(
@@ -2239,6 +1962,90 @@ process.on('message', (packet) => {
 
 
         }
+
+
+        function checkMoneyAfterBig() {
+            (function reRequest() {
+                let queryAsset = `timestamp=${Date.now()}`;
+                let hashAsset = signature(queryAsset);
+
+                request.post(
+                    {
+                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                        headers: {
+                            'X-MBX-APIKEY': publicKey
+                        }
+                    },
+                    (err, response, body) => {
+                        body = JSON.parse(body)
+
+
+
+                        if (body.code && indexError <= 5) {
+                            console.log(`Check после bigChange USDT ${account.index}`, body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
+
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у ${account.name}
+
+                            Check после bigChange USDT ${body.code}
+                            
+                            Заплаченная комиссия ${commissionAll}`
+
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            for (let i = 0; i < body.length; i++) {
+                                if (body[i].asset === 'USDT') {
+
+                                    let factMoney = +body[i].free
+
+                                    firstDeal = true
+                                    allMoney = factMoney
+
+                                    console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
+
+
+                                }
+                                if (body[i].asset === 'BTC') {
+
+                                    commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+
+                                    console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
+
+                                    console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
+                                    console.log('commissionBtc ', commissionBtc)
+
+
+
+                                }
+                                if (body[i].asset === 'ETH') {
+
+                                    commissionEth = +(+body[i].free - baseEth).toFixed(8)
+
+                                    console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
+                                    console.log('commissionEth ', commissionEth)
+                                }
+                            }
+
+
+                            bigChange = false
+                            bigChangeStart = false
+
+                        }
+                    }
+                )
+
+            })()
+        }
+
 
 
         setTimeout(() => {

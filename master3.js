@@ -1,4 +1,4 @@
-// const cluster = require('cluster');
+const http = require('http');
 
 const request = require('request')
 
@@ -41,37 +41,85 @@ process.on('unhandledRejection', (reason, promise) => {
 
 
 const accountsObj = {
-    a: {
-        address: "0xff9837e2baa4570e9b71d19bde7279d959c8acfd",
-        secretKey: "BBKsZLYpbealxXH3yLYBaSzz1l3kOJpoowa0eDjntuq6bvrSpsqSrYmL8e3I9YV4",
-        publicKey: "dGI55mC4Y8yBNYhG6jgGgMW4hBaBJjMf8SVuqMX77vlRxGNO1EQd6a4f1LsrY9Ch",
+    a1: {
+        address: "0x40125acedd1dddfb4e1039c137475c6ee866ffd7",
+        secretKey: "9ukk6tY1MZZqHk1AsE4B324Crb3ceXZ0zDieIHYDI5FwnFbQG8WlH813XMKjt29W",
+        publicKey: "ZfHAwd2zV13f3nbzKb4R8suoGmuu5d39NM24E4vlkp7oSbhWNhEBtohfSD6mb0oy",
         id: null,
         index: 0,
-        name: 'gilangsky'
+        name: 'kiks'
     },
-    b: {
-        address: "0x7d41701ab2c42e1b56ad5de3d5591ba9faf8867e",
-        secretKey: "mMspCI4gGKq755PJz0J9vaXUhHDBilPjW1vL3JmMOWroH27mO2jq9kRS6FqNfFG7",
-        publicKey: "epbSzRAF20foJjXgxTQjaGDjaFiR2HERfDXAXWuA8dLeAcehm2IIUR4o1GgD4ugX",
+    a2: {
+        address: "0x74b051df3fcd8a1d955c6fc7dd2111b509ab800d",
+        secretKey: "3uaHzfvRmKCGMM61cDKtPrQL9C6MFnn2U609anBSpAihADTKRqKcDKhtQs6KYEZM",
+        publicKey: "2rCJ4hHXUGKYVCTwK1ImgjIYOe6mane3qAeg0AwRcYD10Fe6dPmm7fXHUU5U7iFH",
         id: null,
         index: 1,
-        name: 'gaskuy'
+        name: 'lula'
     },
-    c: {
-        address: "0x35214ac926d9652afd31c0009d7670eeee02eccd",
-        secretKey: "enuWvg5XZZt52FGhfBIFSaTqYYMTDYsEvrC2r6cvgs9xbTxmYWxyRfmpNxjpHrIE",
-        publicKey: "aoOrf78vZ2YBeXCAtTixdVAPXjJS3xbX7lnwALEk81up2KbXcFzMsZsPYlkGD92c",
+    a3: {
+        address: "0x3981ceb32473d2596d45c4576a4d8cc63edc3aa6",
+        secretKey: "FjjVaBJfR3ZlAfdVB21r1zw9Na8e86qqM97Zyrb6760rUbgbrEfoIjLeH9lAFfTp",
+        publicKey: "HMguASIHtobiQJSN2OaaIibzBedmnbxfkLSvAfZSUcSTMur35eltSUfUjCg073tr",
         id: null,
         index: 2,
-        name: 'adipangestu'
+        name: 'fidor'
     },
-    d: {
-        address: "0xd56e80da921ff76583c0fefa95d81dbb3c05f587",
-        secretKey: "wIOLesFaxSq6QxWC2oyn4ErkSVrXq63FVtbceKNghubk8P6kx06YoYmWPJRaR4Fq",
-        publicKey: "Ibex81efMAPPjKO3GjJoCmvR1XHzqjHUJENYaxrRmg13eMLh9wem2cp9vlTjHPGv",
+    a4: {
+        address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
+        secretKey: "MLGbiPYsqrR6TMoEZtkB4asCSsGfUTYNcFUHVED6XlOCW47eRYSDshp2bEA8YMXg",
+        publicKey: "26tzpAncJjftyyKptZimtjjCoJWg9lDUaV9qMuHltmEBrFayIpbBGZnpqdgSlBdo",
         id: null,
         index: 3,
-        name: 'n25'
+        name: 'kilian'
+    },
+    a5: {
+        address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
+        secretKey: "hFIiOcZzfNeBrkWndZWF2ZtXMo1CJJmB8bfkID2HN91TNz8e5koqAnhvQGE7jEVL",
+        publicKey: "54HDTS0CUJ6e2hEluTqOMrKllgE09NbW2xyKeFWaujE4lkmu7C6UoxTd1rb68qvK",
+        id: null,
+        index: 4,
+        name: 'suron'
+    },
+    a6: {
+        address: "0xafcca28ca27699da3bf6209dc8723bc6ad43b070",
+        secretKey: "sT3C83zKb7jB6lZ42hqQIVx8EvuD3xx9zIvCXFNjMKkXTAgQ6I5H9ExY62iC6N93",
+        publicKey: "Vu71UaAheQtL9Jq3dMm93qgfuEtaok6z6k7a44iH9rIq9X91xYaJdSdTYIGJ7BeI",
+        id: null,
+        index: 5,
+        name: 'hiram'
+    },
+    a7: {
+        address: "0x2b2e8b9d6dfa22533aa103a83603d5cbe395fadf",
+        secretKey: "5XxeMZTZ7XIz5sMQ3WAnpsvQbQeB1NbaAwYjM4wjd6UsOSsp3OP0FTC4jVC00T6E",
+        publicKey: "aLKee5i34VlqJHKdH3NvwWMxwM4EVXus9Pnnq8q8KNY80Bx4ZVkIP8vG7fLdbVLI",
+        id: null,
+        index: 6,
+        name: 'titak'
+    },
+    a8: {
+        address: "0x06b2828f3f92718a308d134839053d17d9770771",
+        secretKey: "XNGOrTEVPVskZsziE5tUC1TyNti7sVWNmjKPwTVuiasM81cEJLJCA4A3xrYPBF2d",
+        publicKey: "lUDydlB8DYbo4aEcprjtnskoseeVC4O7ALW4o9Ho0nQ7VOj4RhT6dHD5oJectc66",
+        id: null,
+        index: 7,
+        name: 'trevor'
+    },
+    a9: {
+        address: "0xf3386c4289e0a56966297e090a590745f0861083",
+        secretKey: "w080rKs9Ihm9hef0NMF23wF3IErpARtxux0oEgyypbt0OjEbor9d4CLHPTi1oZxR",
+        publicKey: "JtVyPaMCwW7QwtvSaY3h5p623XFupCq6Y58T56Okq5tTD4R1Qy4PIpqx2tteUenO",
+        id: null,
+        index: 8,
+        name: 'kira'
+    },
+    a10: {
+        address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
+        secretKey: "3Cftf2O2H0IjmAkbXyKdluYSmYljsf6qSI6x8yPWgBKf0lh56blIUnMGAGBHNkHp",
+        publicKey: "Lh3Y7aE5p9pGGVpvVThWIMgT4hxddKpFUIhCXXwqiOCR8eGgiWBi9cdtE90HeHzz",
+        id: null,
+        index: 9,
+        name: 'jujin'
     }
 }
 
@@ -84,9 +132,9 @@ let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 let fixAmountUsdt = 200
 
-let maxCommissionAllMaster = 592.85
+let maxCommissionAll = 1000
 
-let maxCommissionAllSmall = 52.1
+let maxCommissionAllSmall = 100
 
 let amountFirstActive = fixAmountUsdt * 1.15
 
@@ -115,12 +163,21 @@ let minNotionalEthbtc = 0
 let changeNotionalEthBtc = false
 
 
+
 let countBalanceUp = 0
 
 let workerSayChange = false
 
 let countUpAfterChange = 0
 let indexUpdateBigChange = 0
+
+
+let howNeedIndexUpdate = 0
+
+let howNeedIndexUpdateBigChange = 0
+
+let globalStart = false
+let bigChangeWorkerStart = false
 
 let workerEnds = false
 
@@ -207,10 +264,12 @@ pm2.connect((err) => {
             if (packet.data.type === 'maxChange') {
 
                 if (!workerSayChange) {
+
+                    howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
+
                     workerSayChange = true
 
-
-
+                
                     messageBot = `Котировки слишком изменились
 
                     Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
@@ -228,12 +287,14 @@ pm2.connect((err) => {
                     countUpAfterChange = 0
                     indexUpdateBigChange = 0
                     workerSayChange = false
+                    bigChangeWorkerStart = false
                 }
             }
 
             if (packet.data.type === 'workerEnd') {
 
                 if (!workerEnds) {
+                    howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
                     workerEnds = true
                 }
             }
@@ -243,6 +304,68 @@ pm2.connect((err) => {
     });
 });
 
+
+
+
+const server = http.createServer((req, res) => {
+    if (req.method === 'POST' && req.url === '/') {
+        // Обрабатываем POST запросы на корневом пути
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const postData = JSON.parse(body);
+
+
+            if (postData.comis) {
+                for (let i = 0; i < workerIds.length; i++) {
+
+                    let workerId = workerIds[i];
+
+
+                    pm2.sendDataToProcessId({
+                        id: workerId,
+                        type: 'process:msg',
+                        data: {
+                            morecom: postData.comis
+                        },
+                        topic: 'comUpdate'
+                    }, (err, res) => {
+                        if (err) console.error(err);
+                        // else console.log(res);
+                    });
+
+                }
+            }
+
+            if (postData.deleteAccount) {
+                howMuchAccounts -= +postData.deleteAccount
+            }
+
+            if (postData.comisMain) {
+                maxCommissionAll -= +postData.comisMain
+            }
+
+            console.log(postData)
+
+            res.writeHead(200, { 'Content-Type': 'text/plain' });
+            res.end(`Received data: ${JSON.stringify(postData)}`);
+        });
+    } else {
+        // Возвращаем ошибку 404 для запросов по другим путям
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
+    }
+});
+
+// Задаем порт, на котором сервер будет слушать запросы
+const port = 3000;
+
+// Запускаем сервер на заданном порту
+server.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}/`);
+});
 
 
 
@@ -293,7 +416,7 @@ let amountBnb = 0
 
 
 let commissionAll = 0
-let maxCommissionAll = maxCommissionAllMaster
+// let maxCommissionAll = maxCommissionAllMaster
 let stopGame = false
 
 
@@ -336,6 +459,12 @@ let howNeedAmountLast = 0;
 
 let firstComBtc = 0
 let firstComEth = 0
+
+let depoIndex = 0
+let startTimeDepoIndex = Date.now()
+
+let transferToFutIndex = 1
+let transferToSpotIndex = 0
 
 
 let firstDeal = true;
@@ -929,56 +1058,220 @@ async function startGlobalListen() {
     /////// ПОДУМАТЬ ОБ ЭТОМ
 
 
-    let howNeedIndexUpdate = 3 * howMuchAccounts
+    // let howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
 
-    let howNeedIndexUpdateBigChange = 3 * howMuchAccounts
+    // let howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
 
     function listen(data) {
         data = JSON.parse(data.toString())
 
 
-        if (data.e === "balanceUpdate" && !workerSayChange && workerEnds) {
-            indexUpdate++
+        if (data.e === "balanceUpdate") {
+            // indexUpdate++
+            console.log(data);
+
+            (function reRequest() {
+
+                let depositHistory = `startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                let hashDepositHistory = signature(depositHistory);
+
+                request.get(
+                    {
+                        url: `https://api.binance.com/sapi/v1/capital/deposit/hisrec?${depositHistory}&signature=${hashDepositHistory}`,
+                        headers: {
+                            'X-MBX-APIKEY': publicKey
+                        }
+                    },
+                    (err, response, body) => {
+                        body = JSON.parse(body)
+
+                        if (body.code && indexError <= 5) {
+                            console.log("Start depoHistory ", body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
+
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастера
+    
+                            Start depoHistory ${body.code}
+                            
+                            Заплаченная комиссия ${commissionAll}`
+
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+
+                            let newDepoIndex = body.length
 
 
-            // if (data.a === 'BTC') {
-            //     let diff = +(+data.d - baseBtcSmall).toFixed(8)
+                            if (workerEnds) {
+                                console.log("howNeedIndexUpdate ", howNeedIndexUpdate)
+                                console.log("newDepoIndex ", newDepoIndex)
 
-            //     dirtBtc = +(dirtBtc + diff).toFixed(8)
-            // }
+                                if (newDepoIndex === howNeedIndexUpdate && !globalStart) {
 
-            // if (data.a === 'BNB') {
-            //     amountBnb = +(amountBnb + +data.d).toFixed(8)
-            // }
+                                    globalStart = true
 
+                                    console.log('баланс пополнен у мастера ', depoIndex)
 
-            console.log(data)
-            if (indexUpdate === howNeedIndexUpdate) {
+                                    setTimeout(() => {
+                                        global();
+                                    }, 15000);
 
-                console.log('баланс пополнен у мастера ', indexUpdate)
-
-
-                // dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
-                // dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+                                }
+                            }
 
 
-                setTimeout(() => {
-                    global();
-                }, 15000);
+                            if (workerSayChange && !workerEnds) {
+                                // indexUpdateBigChange++
+                                console.log("howNeedIndexUpdateBigChange ", howNeedIndexUpdateBigChange)
+                                console.log("newDepoIndex ", newDepoIndex)
+                                if (newDepoIndex === howNeedIndexUpdateBigChange && !bigChangeWorkerStart && workerSayChange) {
+
+                                    bigChangeWorkerStart = true
+
+                                    setTimeout(() => {
+                                        smoothMoney()
+                                    }, 5000)
+
+                                }
+                            }
 
 
-            }
-        }
+                            if (newDepoIndex === depoIndex) {
+                                (function reRequest() {
 
-        if (data.e === "balanceUpdate" && workerSayChange) {
-            indexUpdateBigChange++
+                                    let transferToFutHistory = `type=MAIN_UMFUTURE&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                                    let hashtransferToFutHistory = signature(transferToFutHistory);
 
-            if (indexUpdateBigChange === howNeedIndexUpdateBigChange) {
-                setTimeout(() => {
-                    smoothMoney()
-                }, 5000)
 
-            }
+                                    request.get(
+                                        {
+                                            url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToFutHistory}&signature=${hashtransferToFutHistory}`,
+                                            headers: {
+                                                'X-MBX-APIKEY': publicKey
+                                            }
+                                        },
+                                        (err, response, body) => {
+                                            body = JSON.parse(body)
+
+                                            if (body.code && indexError <= 5) {
+                                                console.log("Start depoHistory ", body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
+
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
+
+                                                messageBot = `Конечная у мастера
+                        
+                                                Start depoHistory ${body.code}
+                                                
+                                                Заплаченная комиссия ${commissionAll}`
+
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
+                                                // console.log(body)
+
+                                                // console.log(body.rows.length)
+                                                let newTransferToFutIndex = +body.total
+
+                                                if (newTransferToFutIndex === transferToFutIndex) {
+
+
+
+                                                    (function reRequest() {
+
+                                                        let transferToSpotHistory = `type=UMFUTURE_MAIN&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                                                        let hashtransferToSpotHistory = signature(transferToSpotHistory);
+
+
+                                                        request.get(
+                                                            {
+                                                                url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToSpotHistory}&signature=${hashtransferToSpotHistory}`,
+                                                                headers: {
+                                                                    'X-MBX-APIKEY': publicKey
+                                                                }
+                                                            },
+                                                            (err, response, body) => {
+                                                                body = JSON.parse(body)
+
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log("Start depoHistory ", body.code)
+                                                                    if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
+
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
+
+                                                                    messageBot = `Конечная у мастера
+                                            
+                                                                    Start depoHistory ${body.code}
+                                                                    
+                                                                    Заплаченная комиссия ${commissionAll}`
+
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log(body)
+
+                                                                    // console.log(body.rows.length)
+                                                                    let newTransferToSpotIndex = +body.total
+
+                                                                    if (newTransferToSpotIndex === transferToSpotIndex) {
+                                                                        if (+data.d > 0) {
+                                                                            firstDeal = true
+                                                                            allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                        }
+
+                                                                    }
+
+
+                                                                    transferToSpotIndex = newTransferToSpotIndex
+
+                                                                }
+
+                                                            }
+                                                        )
+                                                    })()
+
+
+                                                }
+
+
+                                                transferToFutIndex = newTransferToFutIndex
+
+                                            }
+
+                                        }
+                                    )
+                                })()
+                            }
+
+
+                            depoIndex = newDepoIndex
+
+                        }
+
+                    }
+                );
+            })()
+
         }
 
     }
@@ -1519,7 +1812,7 @@ async function global() {
                 }
             }
 
-            if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0) {
+            if (firstDeal && pricesAsk.btc.usdt !== 0 && pricesAsk.eth.usdt !== 0 && !generalDeal) {
 
 
 
@@ -2653,61 +2946,6 @@ async function global() {
             today = new Date().getUTCDate();
 
             setTimeout(async () => {
-
-                (function reRequest() {
-                    let queryAsset = `timestamp=${Date.now()}`;
-                    let hashAsset = signature(queryAsset);
-
-                    request.post(
-                        {
-                            url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                            headers: {
-                                'X-MBX-APIKEY': publicKey
-                            }
-                        },
-                        (err, response, body) => {
-                            body = JSON.parse(body)
-
-                            if (body.code && indexError <= 5) {
-                                console.log("Check USDT after day ", body.code)
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
-
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
-
-                                messageBot = `Конечная у мастера
-        
-                                Check USDT after day ${body.code}
-                                
-                                Заплаченная комиссия ${commissionAll}`
-
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
-                                }
-                                for (let i = 0; i < body.length; i++) {
-                                    if (body[i].asset === 'USDT') {
-
-
-                                        let factMoney = +body[i].free
-                                        firstDeal = true
-                                        allMoney = factMoney
-
-
-
-
-                                        break
-                                    }
-                                }
-                            }
-                        }
-                    )
-
-                })();
 
 
                 (function reRequest() {
