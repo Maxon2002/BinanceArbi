@@ -16,7 +16,7 @@ let data = {
 
 
 // Отправка POST запроса
-axios.post('http://localhost:3000/', data)
+axios.post('http://localhost:3000/dataBinArbi', data)
   .then((response) => {
     console.log('Response:', response.data);
   })

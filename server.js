@@ -2,16 +2,25 @@ const http = require('http');
 
 // Создаем HTTP сервер
 const server = http.createServer((req, res) => {
-  if (req.method === 'POST' && req.url === '/') {
+  if (req.method === 'POST' && req.url === '/dataBinArbi') {
     // Обрабатываем POST запросы на корневом пути
     let body = '';
     req.on('data', chunk => {
       body += chunk.toString();
     });
     req.on('end', () => {
-      const postData = JSON.parse(body);
+      let postData = 0 
 
-      console.log(postData.message)
+      try {
+        postData = JSON.parse(body);
+        console.log(postData)
+
+      } catch (error) {
+        console.log(postData)
+      }
+      
+
+      // console.log(postData)
 
       res.writeHead(200, {'Content-Type': 'text/plain'});
       res.end(`Received data: кул`);

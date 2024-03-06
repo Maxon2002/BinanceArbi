@@ -162,11 +162,15 @@ let indexError = 0
 let minNotionalEthbtc = 0
 let changeNotionalEthBtc = false
 
+let depoIndex = 0
+let startTimeDepoIndex = Date.now()
 
+let transferToFutIndex = 1
+let transferToSpotIndex = 0
 
 let countBalanceUp = 0
 
-let workerSayChange = false
+let workerSayChange = true
 
 let countUpAfterChange = 0
 let indexUpdateBigChange = 0
@@ -174,14 +178,14 @@ let indexUpdateBigChange = 0
 
 let howNeedIndexUpdate = 0
 
-let howNeedIndexUpdateBigChange = 0
+let howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
 
 let globalStart = false
 let bigChangeWorkerStart = false
 
 let workerEnds = false
 
-let workerIds = []
+let workerIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 
 pm2.connect((err) => {
     if (err) {
@@ -191,16 +195,7 @@ pm2.connect((err) => {
 
     let workerId = null
     // Запуск воркера через PM2
-    pm2.start({
-        script: 'workers3.js',
-        instances: howMuchAccounts,  // Указывает количество воркеров
-        name: 'worker' // Уникальное имя для процесса
-    }, (err, apps) => {
-        // workerId = apps[0].pm_id;
-        // pm2.disconnect();
-        if (err) throw err;
-    });
-
+  
 
 
 
@@ -211,54 +206,8 @@ pm2.connect((err) => {
 
             // console.log(packet)
 
-            if (packet.data.type === 'open') {
-                workerIds.push(packet.process.pm_id)
+            
 
-                if (workerIds.length === howMuchAccounts) {
-
-                    for (let i = 0; i < workerIds.length; i++) {
-
-                        let workerId = workerIds[i];
-
-                        let account = accountsObj[Object.keys(accountsObj)[i]]
-
-                        account.id = workerId
-
-                        pm2.sendDataToProcessId({
-                            id: workerId,
-                            type: 'process:msg',
-                            data: {
-                                account,
-                                maxCommissionAllSmall,
-                                fixAmountUsdtSmall,
-                                maxChangeProc
-                            },
-                            topic: 'startWork'
-                        }, (err, res) => {
-                            if (err) console.error(err);
-                            // else console.log(res);
-                        });
-
-                    }
-
-                    startWorkers()
-
-
-                }
-            }
-
-
-
-            if (packet.data.type === 'balanceUp') {
-                countBalanceUp++
-
-                if (countBalanceUp === howMuchAccounts) {
-                    setTimeout(() => {
-                        console.log("Мастер лисен гоу")
-                        startGlobalListen()
-                    }, 5000)
-                }
-            }
 
 
             if (packet.data.type === 'maxChange') {
@@ -467,490 +416,10 @@ let howNeedAmountLast = 0;
 let firstComBtc = 0
 let firstComEth = 0
 
-let depoIndex = 0
-let startTimeDepoIndex = Date.now()
 
-let transferToFutIndex = 1
-let transferToSpotIndex = 0
 
 
 let firstDeal = true;
-
-async function startWorkers() {
-
-
-    await Promise.all([
-
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                request.get(
-                    {
-                        url: `https://api.binance.com/api/v3/depth?symbol=BTCUSDT&limit=5`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth BTC ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-
-                            Depth BTC ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-
-                            startPriceBtc = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            baseBtc = +(factAmount + 0.001).toFixed(3)
-
-                            // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-
-                            // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-                            baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
-
-
-                            hedgeForBtc = +(baseBtcInUsdt * 0.15).toFixed(8)
-
-                            baseBtcSmall = Math.trunc((baseBtc / howMuchAccounts) * 100000000) / 100000000
-
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceBtc,
-                                        baseBtcSmall
-                                    },
-                                    topic: 'startBtc'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
-
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        }),
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                request.get(
-                    {
-                        url: `https://api.binance.com/api/v3/depth?symbol=ETHUSDT&limit=5`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth ETH ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-
-                            Depth ETH ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-                            startPriceEth = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            baseEth = +(factAmount + 0.001).toFixed(3)
-
-                            // firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
-
-                            // commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
-
-                            baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
-
-
-                            hedgeForEth = +(baseEthInUsdt * 0.15).toFixed(8)
-
-
-                            baseEthSmall = Math.trunc((baseEth / howMuchAccounts) * 10000000) / 10000000
-
-
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceEth,
-                                        baseEthSmall
-                                    },
-                                    topic: 'startEth'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
-
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        })
-    ])
-
-    await new Promise((resolve, reject) => {
-        (function reRequest() {
-
-            let howTransfer = +(hedgeForBtc + hedgeForEth).toFixed(8)
-
-            let queryTransferFromSpot = `type=MAIN_UMFUTURE&asset=USDT&amount=${howTransfer}&timestamp=${Date.now()}`;
-            let hashTransferFromSpot = signature(queryTransferFromSpot);
-
-            request.post(
-                {
-                    url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromSpot}&signature=${hashTransferFromSpot}`,
-                    headers: {
-                        'X-MBX-APIKEY': publicKey
-                    }
-                },
-                (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        console.log("First transfer to fut ", body.code)
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
-
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
-
-                        messageBot = `Конечная у мастера
-
-                        First transfer to fut ${body.code}
-                        
-                        Заплаченная комиссия ${commissionAll}`
-
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
-                        }
-                        resolve()
-                    }
-                }
-            )
-        })()
-    })
-
-
-
-    await Promise.all([
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                let queryOrderBuyBtcUsdt = `symbol=BTCUSDT&side=BUY&type=MARKET&quantity=${baseBtc}&timestamp=${Date.now()}`;
-                let hashOrderBuyBtcUsdt = signature(queryOrderBuyBtcUsdt);
-
-                request.post(
-                    {
-                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBtcUsdt}&signature=${hashOrderBuyBtcUsdt}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First buy BTC ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-    
-                            First buy BTC ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-
-                            // baseBtcInUsdt = +body.cummulativeQuoteQty
-
-
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        }),
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                let queryOrderSellFutBtc = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${baseBtc}&timestamp=${Date.now()}`
-                let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
-
-                request.post(
-                    {
-                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First sell BTC fut ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-    
-                            First sell BTC fut ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        }),
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=BUY&type=MARKET&quantity=${baseEth}&timestamp=${Date.now()}`;
-                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
-
-                request.post(
-                    {
-                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First buy ETH ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-    
-                            First buy ETH ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-
-                            // baseEthInUsdt = +body.cummulativeQuoteQty
-
-
-
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        }),
-        new Promise((resolve, reject) => {
-            (function reRequest() {
-                let queryOrderSellFutEth = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${baseEth}&timestamp=${Date.now()}`
-                let hashOrderSellFutEth = signature(queryOrderSellFutEth)
-
-                request.post(
-                    {
-                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First sell ETH fut ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-    
-                            First sell ETH fut ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-                            resolve()
-                        }
-                    }
-                )
-            })()
-        })
-    ])
-
-    let restBtcSmall = 0
-    let restEthSmall = 0
-
-    await new Promise((resolve, reject) => {
-        setTimeout(() => {
-            (function reRequest() {
-                let queryAsset = `timestamp=${Date.now()}`;
-                let hashAsset = signature(queryAsset);
-
-                request.post(
-                    {
-                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-
-                        if (body.code && indexError <= 5) {
-                            console.log("Check start USDT для запуска ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
-
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
-
-                            messageBot = `Конечная у мастера
-    
-                            Check start USDT для запуска  ${body.code}
-                            
-                            Заплаченная комиссия ${commissionAll}`
-
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-                            for (let i = 0; i < body.length; i++) {
-                                if (body[i].asset === 'USDT') {
-
-                                    baseUsdt = +body[i].free
-
-                                    baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                                if (body[i].asset === 'BTC') {
-
-                                    restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-                                }
-                                if (body[i].asset === 'ETH') {
-
-                                    restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                            }
-                            resolve()
-                        }
-                    }
-                )
-
-            })()
-        }, 15000)
-    })
-
-
-
-
-    messageBot = `Стартовый перевод
-
-    Перевести по: ${baseUsdtSmall} USDT, ${restBtcSmall} BTC, ${restEthSmall} ETH`
-
-    botMax.sendMessage(userChatId, messageBot);
-
-};
-
-
-
-
 
 
 
@@ -1284,6 +753,7 @@ async function startGlobalListen() {
     }
 }
 
+startGlobalListen();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
