@@ -232,6 +232,8 @@ pm2.connect((err) => {
 
                 countUpAfterChange++
 
+                console.log(countUpAfterChange)
+
                 if (countUpAfterChange === howMuchAccounts) {
                     countUpAfterChange = 0
                     indexUpdateBigChange = 0
