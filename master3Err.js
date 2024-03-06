@@ -178,7 +178,7 @@ let indexUpdateBigChange = 0
 
 let howNeedIndexUpdate = 0
 
-let howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
+let howNeedIndexUpdateBigChange = depoIndex + 3
 
 let globalStart = false
 let bigChangeWorkerStart = false
@@ -195,7 +195,7 @@ pm2.connect((err) => {
 
     let workerId = null
     // Запуск воркера через PM2
-  
+
 
 
 
@@ -206,7 +206,7 @@ pm2.connect((err) => {
 
             // console.log(packet)
 
-            
+
 
 
 
@@ -2684,13 +2684,13 @@ async function smoothMoney(change) {
 
     let changeBtcProc = (startPriceBtc - newStartPriceBtc) / startPriceBtc
 
-    if (changeBtcProc > 0) {
-        sideMinusBtc = 'spot'
-    } else {
-        sideMinusBtc = 'fut'
-    }
+    // if (changeBtcProc > 0) {
+    //     sideMinusBtc = 'spot'
+    // } else {
+    //     sideMinusBtc = 'fut'
+    // }
 
-    let howChangeBtc = Math.abs(baseBtcInUsdt * changeBtcProc)
+    let howChangeBtc = baseBtcInUsdt * changeBtcProc
 
     let diffHedgeBtc = +(hedgeForBtc - newHedgeForBtc).toFixed(8)
 
@@ -2699,15 +2699,18 @@ async function smoothMoney(change) {
 
     let changeEthProc = (startPriceEth - newStartPriceEth) / startPriceEth
 
-    if (changeEthProc > 0) {
-        sideMinusEth = 'spot'
-    } else {
-        sideMinusEth = 'fut'
-    }
+    // if (changeEthProc > 0) {
+    //     sideMinusEth = 'spot'
+    // } else {
+    //     sideMinusEth = 'fut'
+    // }
 
-    let howChangeEth = Math.abs(baseEthInUsdt * changeEthProc)
+    let howChangeEth = baseEthInUsdt * changeEthProc
 
     let diffHedgeEth = +(hedgeForEth - newHedgeForEth).toFixed(8)
+
+
+    
 
 
     let sideDealBtc = null
@@ -2779,59 +2782,72 @@ async function smoothMoney(change) {
     let howTransfer = 0
     let typeTransfer = null
 
-    if (sideMinusBtc === 'spot' && sideMinusEth === 'spot') {
+    let sumChanges = howChangeBtc + howChangeEth + diffHedgeBtc + diffHedgeEth
 
-        howTransfer = +(howChangeBtc + howChangeEth + diffHedgeBtc + diffHedgeEth).toFixed(8);
-
+    if (sumChanges > 0) {
         typeTransfer = 'UMFUTURE_MAIN'
-    } else if (sideMinusBtc === 'fut' && sideMinusEth === 'fut') {
-        howTransfer = +(howChangeBtc + howChangeEth - diffHedgeBtc - diffHedgeEth).toFixed(8);
-
+    } else if(sumChanges < 0) {
         typeTransfer = 'MAIN_UMFUTURE'
-    };
+    }
 
-    (function reRequest() {
-        let queryTransferFromFut = `type=${typeTransfer}&asset=USDT&amount=${howTransfer}&timestamp=${Date.now()}`;
-        let hashTransferFromFut = signature(queryTransferFromFut);
+    howTransfer = Math.abs(sumChanges)
 
-        request.post(
-            {
-                url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromFut}&signature=${hashTransferFromFut}`,
-                headers: {
-                    'X-MBX-APIKEY': publicKey
-                }
-            },
-            (err, response, body) => {
-                body = JSON.parse(body)
-                if (body.code && indexError <= 5) {
-                    console.log(`Trans ${typeTransfer} after bigChange `, body.code)
-                    if (body.code !== -1021) {
-                        indexError++
+    // if (sideMinusBtc === 'spot' && sideMinusEth === 'spot') {
+
+    //     howTransfer = +(howChangeBtc + howChangeEth + diffHedgeBtc + diffHedgeEth).toFixed(8);
+
+    //     typeTransfer = 'UMFUTURE_MAIN'
+    // } else if (sideMinusBtc === 'fut' && sideMinusEth === 'fut') {
+    //     howTransfer = +(howChangeBtc + howChangeEth - diffHedgeBtc - diffHedgeEth).toFixed(8);
+
+    //     typeTransfer = 'MAIN_UMFUTURE'
+    // };
+
+    if (typeTransfer) {
+        (function reRequest() {
+            let queryTransferFromFut = `type=${typeTransfer}&asset=USDT&amount=${howTransfer}&timestamp=${Date.now()}`;
+            let hashTransferFromFut = signature(queryTransferFromFut);
+
+            request.post(
+                {
+                    url: `https://api.binance.com/sapi/v1/asset/transfer?${queryTransferFromFut}&signature=${hashTransferFromFut}`,
+                    headers: {
+                        'X-MBX-APIKEY': publicKey
                     }
+                },
+                (err, response, body) => {
+                    body = JSON.parse(body)
+                    if (body.code && indexError <= 5) {
+                        console.log(`Trans ${typeTransfer} after bigChange `, body.code)
+                        if (body.code !== -1021) {
+                            indexError++
+                        }
 
-                    reRequest()
-                } else if (body.code && !fatalError) {
-                    fatalError = true
+                        reRequest()
+                    } else if (body.code && !fatalError) {
+                        fatalError = true
 
-                    messageBot = `Конечная у мастера
+                        messageBot = `Конечная у мастера
 
                     Trans ${typeTransfer} after bigChange ${body.code}
                     
                     Заплаченная комиссия ${commissionAll}`
 
-                    botMax.sendMessage(userChatId, messageBot);
-                } else {
-                    if (indexError !== 0) {
-                        indexError = 0
+                        botMax.sendMessage(userChatId, messageBot);
+                    } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
+
+                        buyCoinsEnd()
+
                     }
-
-                    buyCoinsEnd()
-
                 }
-            }
-        )
-    })();
-
+            )
+        })();
+    } else {
+        buyCoinsEnd()
+    }
 
 
     // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
