@@ -145,8 +145,8 @@ let amountUsdt = fixAmountUsdt
 
 let howMuchAccounts = Object.keys(accountsObj).length
 
-let baseBtc = 0
-let baseEth = 0
+let baseBtc = 0.004
+let baseEth = 0.065
 let baseUsdt = 0
 
 let fixAmountUsdtSmall = +(fixAmountUsdt / howMuchAccounts).toFixed(8)
@@ -178,7 +178,7 @@ let indexUpdateBigChange = 0
 
 let howNeedIndexUpdate = 0
 
-let howNeedIndexUpdateBigChange = depoIndex + 3
+let howNeedIndexUpdateBigChange = depoIndex + 1
 
 let globalStart = false
 let bigChangeWorkerStart = false
@@ -389,8 +389,8 @@ let usdtEthBtcDeal = false
 
 let dealsAm = 0
 
-let startPriceBtc = 0
-let startPriceEth = 0
+let startPriceBtc = 66475.64
+let startPriceEth = 3559.04
 
 let allMoney = 0
 
@@ -400,11 +400,11 @@ let dontCom = false
 
 let bigChange = false
 
-let baseBtcInUsdt = 0
-let baseEthInUsdt = 0
+let baseBtcInUsdt = 265.90256
+let baseEthInUsdt = 231.3376
 
-let hedgeForBtc = 0
-let hedgeForEth = 0
+let hedgeForBtc = baseBtcInUsdt * 0.15
+let hedgeForEth = baseEthInUsdt * 0.15
 
 let commissionBtc = 0
 let commissionEth = 0
@@ -2790,7 +2790,15 @@ async function smoothMoney(change) {
         typeTransfer = 'MAIN_UMFUTURE'
     }
 
+    console.log(`howChangeBtc ${howChangeBtc} howChangeEth ${howChangeEth}`)
+    console.log(`diffHedgeBtc ${diffHedgeBtc} diffHedgeEth ${diffHedgeEth}`)
+
+    console.log("sumChanges ", sumChanges)
+
     howTransfer = Math.abs(sumChanges)
+
+    console.log("typeTransfer ", typeTransfer)
+    console.log("howTransfer ", howTransfer)
 
     // if (sideMinusBtc === 'spot' && sideMinusEth === 'spot') {
 
