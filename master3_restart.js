@@ -48,7 +48,7 @@ const accountsObj = {
         id: null,
         index: 0,
         name: 'kiks',
-        comAll: 0
+        comAll: 85.87
     },
     a2: {
         address: "0x74b051df3fcd8a1d955c6fc7dd2111b509ab800d",
@@ -57,7 +57,7 @@ const accountsObj = {
         id: null,
         index: 1,
         name: 'lula',
-        comAll: 0
+        comAll: 85.98
     },
     a3: {
         address: "0x3981ceb32473d2596d45c4576a4d8cc63edc3aa6",
@@ -66,7 +66,7 @@ const accountsObj = {
         id: null,
         index: 2,
         name: 'fidor',
-        comAll: 0
+        comAll: 85.87
     },
     a4: {
         address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
@@ -75,7 +75,7 @@ const accountsObj = {
         id: null,
         index: 3,
         name: 'kilian',
-        comAll: 0
+        comAll: 86.21
     },
     a5: {
         address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
@@ -84,7 +84,7 @@ const accountsObj = {
         id: null,
         index: 4,
         name: 'suron',
-        comAll: 0
+        comAll: 85.87
     },
     a6: {
         address: "0xafcca28ca27699da3bf6209dc8723bc6ad43b070",
@@ -93,7 +93,7 @@ const accountsObj = {
         id: null,
         index: 5,
         name: 'hiram',
-        comAll: 0
+        comAll: 86.12
     },
     a7: {
         address: "0x2b2e8b9d6dfa22533aa103a83603d5cbe395fadf",
@@ -102,7 +102,7 @@ const accountsObj = {
         id: null,
         index: 6,
         name: 'titak',
-        comAll: 0
+        comAll: 85.97
     },
     a8: {
         address: "0x06b2828f3f92718a308d134839053d17d9770771",
@@ -111,7 +111,7 @@ const accountsObj = {
         id: null,
         index: 7,
         name: 'trevor',
-        comAll: 0
+        comAll: 85.98
     },
     a9: {
         address: "0xf3386c4289e0a56966297e090a590745f0861083",
@@ -120,7 +120,7 @@ const accountsObj = {
         id: null,
         index: 8,
         name: 'kira',
-        comAll: 0
+        comAll: 85.93
     },
     a10: {
         address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
@@ -129,7 +129,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'jujin',
-        comAll: 0
+        comAll: 86
     }
 }
 
