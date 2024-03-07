@@ -50,7 +50,7 @@ let commissionBtc = 0
 let commissionEth = 0
 
 let maxCommissionAll = 0
-let comUpdate = false
+let comUpdate = true
 let waitUpdate = false
 
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
@@ -98,6 +98,10 @@ process.on('message', (packet) => {
         let publicKey = account.publicKey
 
 
+        startPriceBtc = +packet.data.startPriceBtc
+        baseBtc = +packet.data.baseBtcSmall
+        startPriceEth = +packet.data.startPriceEth
+        baseEth = +packet.data.baseEthSmall
 
 
         function signature(query) {
@@ -191,7 +195,7 @@ process.on('message', (packet) => {
 
         let indexUpdateBigChange = 0
 
-        let globalStart = false
+        let globalStart = true
         let bigChangeStart = false
 
 
@@ -353,27 +357,27 @@ process.on('message', (packet) => {
                                     let newDepoIndex = body.length
 
 
-                                    if (newDepoIndex === 3 && !globalStart) {
+                                    // if (newDepoIndex === 3 && !globalStart) {
 
-                                        globalStart = true
+                                    //     globalStart = true
 
-                                        console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
-
-
-                                        process.send({
-                                            type: 'process:msg',
-                                            data: {
-                                                type: 'balanceUp'
-                                            }
-                                        })
-
-                                        setTimeout(() => {
-                                            global();
-                                        }, 15000);
+                                    //     console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
 
 
+                                    //     process.send({
+                                    //         type: 'process:msg',
+                                    //         data: {
+                                    //             type: 'balanceUp'
+                                    //         }
+                                    //     })
 
-                                    }
+                                    //     setTimeout(() => {
+                                    //         global();
+                                    //     }, 15000);
+
+
+
+                                    // }
 
                                     if (bigChange && !stopGame) {
 
@@ -428,6 +432,17 @@ process.on('message', (packet) => {
         })();
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        process.send({
+            type: 'process:msg',
+            data: {
+                type: 'balanceUp'
+            }
+        })
+
+        setTimeout(() => {
+            global();
+        }, 15000);
 
 
         async function global() {
@@ -766,10 +781,9 @@ process.on('message', (packet) => {
                         if (needComBtc > 0) {
                             dopComissionBtc = +((Math.trunc(needComBtc * 100000) / 100000) + 0.00001).toFixed(5)
                         } else {
-
                             let needMinusComBtc = Math.trunc(needComBtc * 100000) / 100000
-
-                            if (needMinusComBtc < 0) {
+        
+                            if(needMinusComBtc < 0) {
                                 dopComissionBtc = needMinusComBtc
                             }
                         }
@@ -778,8 +792,8 @@ process.on('message', (packet) => {
                             dopComissionEth = +((Math.trunc(needComEth * 10000) / 10000) + 0.0001).toFixed(4)
                         } else {
                             let needMinusComEth = Math.trunc(needComEth * 10000) / 10000
-
-                            if (needMinusComEth < 0) {
+        
+                            if(needMinusComEth < 0) {
                                 dopComissionEth = needMinusComEth
                             }
                         }
@@ -893,7 +907,6 @@ process.on('message', (packet) => {
                             };
 
                             if (currentAmountUsdt === amountUsdt && currentDopComissionBtc === dopComissionBtc && currentDopComissionEth === dopComissionEth) {
-
                                 commissionBtc = +(commissionBtc + currentDopComissionBtc).toFixed(8)
                                 commissionEth = +(commissionEth + currentDopComissionEth).toFixed(8);
 
@@ -1379,8 +1392,8 @@ process.on('message', (packet) => {
                                         }
                                     })
                                 })()
-
                             }
+
                             //заходим в сделку
                         }
                         // console.log("usdtBtcEth ", usdtBtcEth, new Date(Date.now()))

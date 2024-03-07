@@ -261,9 +261,29 @@ let transferToFutHistory = `timestamp=${Date.now()}`;
 let hashtransferToFutHistory = signature(transferToFutHistory);
 
 
+// request.get(
+//     {
+//         url: `https://api.binance.com/sapi/v1/rebate/taxQuery?${transferToFutHistory}&signature=${hashtransferToFutHistory}`,
+//         headers: {
+//             'X-MBX-APIKEY': publicKey
+//         }
+//     },
+//     (err, response, body) => {
+//         body = JSON.parse(body)
+//         console.log(body)
+
+
+//     }
+// )
+
+
+let rebateHistory = `timestamp=${Date.now()}`;
+let hashRebateHistory = signature(rebateHistory);
+
+
 request.get(
     {
-        url: `https://api.binance.com/sapi/v1/rebate/taxQuery?${transferToFutHistory}&signature=${hashtransferToFutHistory}`,
+        url: `https://api.binance.com/sapi/v1/rebate/taxQuery?${rebateHistory}&signature=${hashRebateHistory}`,
         headers: {
             'X-MBX-APIKEY': publicKey
         }
