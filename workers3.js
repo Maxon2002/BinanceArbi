@@ -846,7 +846,7 @@ process.on('message', (packet) => {
 
 
 
-                    if (amountUsdt < 6 || amSellBtcUsdt < minNotionalEthbtc || amBuyBtcUsdt <= minNotionalEthbtc) {
+                    if (amountUsdt < 6.5 || amSellBtcUsdt < minNotionalEthbtc || amBuyBtcUsdt <= minNotionalEthbtc) {
                         dontCom = true
 
                         if (lastDeal) {
