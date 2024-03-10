@@ -132,7 +132,7 @@ let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 let fixAmountUsdt = 200
 
-let maxCommissionAll = 772.354
+let maxCommissionAll = 220.79
 
 let maxCommissionAllSmall = 100
 
@@ -586,7 +586,7 @@ async function startGlobalListen() {
                                                 messageBot = `Конечная у мастера
                         
                                                 Start depoHistory ${body.code}
-                                                
+                                                    
                                                 Заплаченная комиссия ${commissionAll}`
 
                                                 botMax.sendMessage(userChatId, messageBot);
@@ -651,6 +651,12 @@ async function startGlobalListen() {
                                                                             allMoney = +(allMoney + +data.d).toFixed(8)
                                                                         }
 
+                                                                        if (+data.d < 0) {
+                                                                            if (workerEnds && globalStart) {
+                                                                                firstDeal = true
+                                                                                allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                            }
+                                                                        }
                                                                     }
 
 

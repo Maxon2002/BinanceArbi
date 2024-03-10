@@ -298,7 +298,7 @@ let hashRebateHistory = signature(rebateHistory);
 
 
 
-let startD = 1709942400000;
+let startD = +new Date(2024, 2, 11, 5);
 
 (async () => {
 
@@ -438,10 +438,11 @@ let startD = 1709942400000;
 
 })()
 
-// console.log(+new Date(2024, 2, 9, 5))
+// console.log(+new Date(2024, 2, 10, 5))
 
 
-//1709942400000
+//1710028800000
+
 
 
 // let queryFutBal = `timestamp=${Date.now()}`;

@@ -401,6 +401,8 @@ process.on('message', (packet) => {
                                             }
                                         } else {
                                             if (+data.d > 0) {
+
+                                            
                                                 messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
 
                                                 Баланс ${data.d} USDT`
@@ -1925,6 +1927,7 @@ process.on('message', (packet) => {
             async function smoothMoney() {
 
                 indexUpdateBigChange = depoIndex + 3
+
 
                 process.send({
                     type: 'process:msg',

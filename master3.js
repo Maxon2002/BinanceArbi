@@ -171,10 +171,13 @@ let workerSayChange = false
 let countUpAfterChange = 0
 let indexUpdateBigChange = 0
 
+let countWorkerEnds = 0
 
 let howNeedIndexUpdate = 0
 
 let howNeedIndexUpdateBigChange = 0
+
+
 
 let globalStart = false
 let bigChangeWorkerStart = false
@@ -293,11 +296,15 @@ pm2.connect((err) => {
 
             if (packet.data.type === 'workerEnd') {
 
-                if (!workerEnds) {
+                countWorkerEnds++
+
+                if (countWorkerEnds === howMuchAccounts) {
                     howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
                     workerEnds = true
                 }
             }
+
+            
             // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
 
         });
@@ -1132,6 +1139,11 @@ async function startGlobalListen() {
                                     }, 15000);
 
                                 }
+
+                                if (newDepoIndex !== depoIndex && newDepoIndex > howNeedIndexUpdate && globalStart) {
+                                    firstDeal = true
+                                    allMoney = +(allMoney + +data.d).toFixed(8)
+                                }
                             }
 
 
@@ -1149,6 +1161,8 @@ async function startGlobalListen() {
 
                                 }
                             }
+
+
 
 
                             if (newDepoIndex === depoIndex) {
@@ -1244,6 +1258,13 @@ async function startGlobalListen() {
                                                                         if (+data.d > 0) {
                                                                             firstDeal = true
                                                                             allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                        }
+
+                                                                        if (+data.d < 0) {
+                                                                            if (workerEnds && globalStart) {
+                                                                                firstDeal = true
+                                                                                allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                            }
                                                                         }
 
                                                                     }
@@ -1398,6 +1419,9 @@ async function global() {
 
                             }
                         }
+
+                       
+
                         resolve()
                     }
                 }
