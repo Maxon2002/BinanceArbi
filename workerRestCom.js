@@ -27,7 +27,7 @@ process.on('message', (packet) => {
     if (packet.topic === 'startWork') {
 
         setTimeout(() => {
-            console.log(`Воркер ${process.pid} начал работу с аккаунтом: ${account.index}, ${account.name}`);
+            
 
 
 
@@ -37,7 +37,7 @@ process.on('message', (packet) => {
             let publicKey = account.publicKey
 
 
-
+            console.log(`Воркер ${process.pid} начал работу с аккаунтом: ${account.index}, ${account.name}`);
 
             function signature(query) {
                 return crypto
