@@ -88,6 +88,14 @@ process.on('message', (packet) => {
         }
     }
 
+    if (packet.topic === 'updateComis') {
+        maxCommissionAll += +packet.data.smallCom
+
+        if (waitUpdate) {
+            waitUpdate = false
+        }
+    }
+
 
 
     if (packet.topic === 'startWork') {
@@ -1142,6 +1150,12 @@ process.on('message', (packet) => {
 
                                                 } else {
                                                     waitUpdate = true
+
+                                                    messageBot = `${account.name} ждёт комиссию
+                                
+                                                    Заплаченная комиссия ${commissionAll}`
+
+                                                    botMax.sendMessage(userChatId, messageBot);
                                                 }
                                             }
 

@@ -359,6 +359,27 @@ const server = http.createServer((req, res) => {
                     }
                 }
 
+                if (postData.smallComis) {
+                    for (let i = 0; i < postData.workers.length; i++) {
+
+                        let workerId = postData.workers[i];
+
+
+                        pm2.sendDataToProcessId({
+                            id: workerId,
+                            type: 'process:msg',
+                            data: {
+                                smallCom: postData.smallComis
+                            },
+                            topic: 'updateComis'
+                        }, (err, res) => {
+                            if (err) console.error(err);
+                            // else console.log(res);
+                        });
+
+                    }
+                }
+
                 if (postData.deleteAccount) {
                     howMuchAccounts -= +postData.deleteAccount
                 }
