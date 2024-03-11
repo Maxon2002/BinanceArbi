@@ -184,6 +184,9 @@ process.on('message', (packet) => {
 
                 console.log(commissionAll)
 
+                console.log(account.comAll - commissionAll)
+
+
                 console.log(factDealArr.length)
 
             })()
