@@ -1151,7 +1151,7 @@ process.on('message', (packet) => {
                                                 } else {
                                                     waitUpdate = true
 
-                                                    messageBot = `${account.name} ждёт комиссию
+                                                    messageBot = `${account.name} workerId ${account.id} ждёт комиссию
                                 
                                                     Заплаченная комиссия ${commissionAll}`
 
@@ -1674,6 +1674,13 @@ process.on('message', (packet) => {
 
                                                 } else {
                                                     waitUpdate = true
+
+
+                                                    messageBot = `${account.name} workerId ${account.id} ждёт комиссию
+                                
+                                                    Заплаченная комиссия ${commissionAll}`
+
+                                                    botMax.sendMessage(userChatId, messageBot);
                                                 }
                                             }
 

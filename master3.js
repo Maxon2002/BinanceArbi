@@ -48,7 +48,7 @@ const accountsObj = {
         id: null,
         index: 0,
         name: 'filimon',
-        comAll: 50
+        comAll: 45.462427
     },
     a2: {
         address: "0x74b051df3fcd8a1d955c6fc7dd2111b509ab800d",
@@ -57,7 +57,7 @@ const accountsObj = {
         id: null,
         index: 1,
         name: 'kiril',
-        comAll: 50
+        comAll: 45.436853
     },
     a3: {
         address: "0x3981ceb32473d2596d45c4576a4d8cc63edc3aa6",
@@ -66,7 +66,7 @@ const accountsObj = {
         id: null,
         index: 2,
         name: 'ginger',
-        comAll: 50
+        comAll: 45.455736
     },
     a4: {
         address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
@@ -75,7 +75,7 @@ const accountsObj = {
         id: null,
         index: 3,
         name: 'bronson',
-        comAll: 80
+        comAll: 75.307289
     },
     a5: {
         address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
@@ -84,7 +84,7 @@ const accountsObj = {
         id: null,
         index: 4,
         name: 'roman',
-        comAll: 30
+        comAll: 25.349158
     },
     a6: {
         address: "0xafcca28ca27699da3bf6209dc8723bc6ad43b070",
@@ -93,7 +93,7 @@ const accountsObj = {
         id: null,
         index: 5,
         name: 'robert',
-        comAll: 50
+        comAll: 45.349715
     },
     a7: {
         address: "0x2b2e8b9d6dfa22533aa103a83603d5cbe395fadf",
@@ -102,7 +102,7 @@ const accountsObj = {
         id: null,
         index: 6,
         name: 'philip',
-        comAll: 50
+        comAll: 45.383108
     },
     a8: {
         address: "0x06b2828f3f92718a308d134839053d17d9770771",
@@ -111,7 +111,7 @@ const accountsObj = {
         id: null,
         index: 7,
         name: 'luisio',
-        comAll: 50
+        comAll: 45.289916
     },
     a9: {
         address: "0xf3386c4289e0a56966297e090a590745f0861083",
@@ -120,7 +120,7 @@ const accountsObj = {
         id: null,
         index: 8,
         name: 'wiliam',
-        comAll: 50
+        comAll: 45.291391
     },
     a10: {
         address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
@@ -129,7 +129,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'timati',
-        comAll: 50
+        comAll: 45.327822
     }
 }
 
