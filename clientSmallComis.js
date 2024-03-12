@@ -3,7 +3,7 @@ const axios = require('axios');
 // Данные для отправки
 let data = {
   smallComis: 50,
-  workers: [5]
+  workers: [1, 2, 3, 6, 7, 8, 9, 10]
 };
 
 // data = {
