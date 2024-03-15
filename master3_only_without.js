@@ -130,9 +130,9 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 200
+let fixAmountUsdt = 100
 
-let maxCommissionAll = 220.79
+let maxCommissionAll = 1000
 
 let maxCommissionAllSmall = 100
 
@@ -145,8 +145,8 @@ let amountUsdt = fixAmountUsdt
 
 let howMuchAccounts = Object.keys(accountsObj).length
 
-let baseBtc = 0.004
-let baseEth = 0.062
+let baseBtc = 0.002
+let baseEth = 0.029
 let baseUsdt = 0
 
 let fixAmountUsdtSmall = +(fixAmountUsdt / howMuchAccounts).toFixed(8)
@@ -170,25 +170,94 @@ let transferToSpotIndex = 0
 
 let countBalanceUp = 0
 
-let workerSayChange = false
+let workerSayChange = true
 
 let countUpAfterChange = 0
 let indexUpdateBigChange = 0
 
+let countWorkerEnds = 4
 
 let howNeedIndexUpdate = 0
 
-let howNeedIndexUpdateBigChange = 0
+let howNeedIndexUpdateBigChange = 30
 
-let globalStart = true
+let globalStart = false
 let bigChangeWorkerStart = false
 
-let workerEnds = true
+let workerEnds = false
 
-let workerIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+let workerIds = [1, 2, 3, 5, 6, 7, 8, 9, 10, 13]
+
+
+pm2.connect((err) => {
+    if (err) {
+        console.error(err);
+        process.exit(2);
+    }
+
+    let workerId = null
+    // Запуск воркера через PM2
+    
 
 
 
+
+
+    pm2.launchBus((err, bus) => {
+
+        bus.on('process:msg', (packet) => {
+
+            // console.log(packet)
+
+            
+
+
+            if (packet.data.type === 'maxChange') {
+
+                if (!workerSayChange) {
+
+                    howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
+
+                    workerSayChange = true
+
+
+                    messageBot = `Котировки слишком изменились
+
+                    Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
+
+                    botMax.sendMessage(userChatId, messageBot);
+                }
+            }
+
+
+            if (packet.data.type === 'upAfterChange') {
+
+                countUpAfterChange++
+
+                if (countUpAfterChange === howMuchAccounts) {
+                    countUpAfterChange = 0
+                    indexUpdateBigChange = 0
+                    workerSayChange = false
+                    bigChangeWorkerStart = false
+                }
+            }
+
+            if (packet.data.type === 'workerEnd') {
+
+                countWorkerEnds++
+
+                if (countWorkerEnds === howMuchAccounts) {
+                    howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
+                    workerEnds = true
+                }
+            }
+
+            
+            // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
+
+        });
+    });
+});
 
 
 
@@ -219,6 +288,27 @@ const server = http.createServer((req, res) => {
                                 morecom: postData.comis
                             },
                             topic: 'comUpdate'
+                        }, (err, res) => {
+                            if (err) console.error(err);
+                            // else console.log(res);
+                        });
+
+                    }
+                }
+
+                if (postData.smallComis) {
+                    for (let i = 0; i < postData.workers.length; i++) {
+
+                        let workerId = postData.workers[i];
+
+
+                        pm2.sendDataToProcessId({
+                            id: workerId,
+                            type: 'process:msg',
+                            data: {
+                                smallCom: postData.smallComis
+                            },
+                            topic: 'updateComis'
                         }, (err, res) => {
                             if (err) console.error(err);
                             // else console.log(res);
@@ -323,8 +413,8 @@ let usdtEthBtcDeal = false
 
 let dealsAm = 0
 
-let startPriceBtc = 65956
-let startPriceEth = 3763.09
+let startPriceBtc = 72109.11
+let startPriceEth = 4032.93
 
 let allMoney = 0
 
@@ -334,8 +424,8 @@ let dontCom = false
 
 let bigChange = false
 
-let baseBtcInUsdt = 263.824
-let baseEthInUsdt = 233.31158
+let baseBtcInUsdt = 144.21822
+let baseEthInUsdt = 116.95497
 
 let hedgeForBtc = baseBtcInUsdt * 0.15
 let hedgeForEth = baseEthInUsdt * 0.15
@@ -537,6 +627,11 @@ async function startGlobalListen() {
                                     }, 15000);
 
                                 }
+
+                                if (newDepoIndex !== depoIndex && newDepoIndex > howNeedIndexUpdate && globalStart) {
+                                    firstDeal = true
+                                    allMoney = +(allMoney + +data.d).toFixed(8)
+                                }
                             }
 
 
@@ -699,9 +794,7 @@ startGlobalListen();
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-setTimeout(() => {
-    global();
-}, 15000);
+
 
 async function global() {
 
@@ -2850,35 +2943,7 @@ async function smoothMoney(change) {
     }
 
 
-    // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
 
-    // let smallDopComBtc = 0
-    // let smallDopComEth = 0
-
-    // if (sideDealBtc === 'BUY') {
-    //     if (diffBaseBtc * 0.001 < commissionBtc) {
-    //         commissionBtc = +(commissionBtc - diffBaseBtc * 0.001).toFixed(8)///////////////////////////////
-    //     } else {
-    //         smallDopComBtc = +((Math.trunc(diffBaseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-    //         // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-    //         let restDopComBtc = +(smallDopComBtc - (+(diffBaseBtc + smallDopComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-    //         commissionBtc = +(commissionBtc + restDopComBtc).toFixed(8)////////////////////////////////////
-    //     }
-    // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // if (sideDealEth === 'BUY') {
-    //     if (diffBaseEth * 0.001 < commissionEth) {
-    //         commissionEth = +(commissionEth - diffBaseEth * 0.001).toFixed(8)//////////////
-    //     } else {
-    //         smallDopComEth = +((Math.trunc(diffBaseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
-
-    //         let restDopComEth = +(smallDopComEth - (+(diffBaseEth + smallDopComEth).toFixed(4) * 0.001)).toFixed(8)
-
-    //         commissionEth = +(commissionEth + restDopComEth).toFixed(8)//////////////////////////
-    //     }
-    // }////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     async function buyCoinsEnd() {
 
