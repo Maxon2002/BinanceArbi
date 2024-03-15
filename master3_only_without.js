@@ -146,7 +146,7 @@ let amountUsdt = fixAmountUsdt
 let howMuchAccounts = Object.keys(accountsObj).length
 
 let baseBtc = 0.002
-let baseEth = 0.029
+let baseEth = 0.032
 let baseUsdt = 0
 
 let fixAmountUsdtSmall = +(fixAmountUsdt / howMuchAccounts).toFixed(8)
@@ -170,21 +170,21 @@ let transferToSpotIndex = 0
 
 let countBalanceUp = 0
 
-let workerSayChange = true
+let workerSayChange = false
 
 let countUpAfterChange = 0
 let indexUpdateBigChange = 0
 
-let countWorkerEnds = 4
+let countWorkerEnds = 10
 
-let howNeedIndexUpdate = 0
+let howNeedIndexUpdate = 30
 
-let howNeedIndexUpdateBigChange = 30
+let howNeedIndexUpdateBigChange = 0
 
 let globalStart = false
 let bigChangeWorkerStart = false
 
-let workerEnds = false
+let workerEnds = true
 
 let workerIds = [1, 2, 3, 5, 6, 7, 8, 9, 10, 13]
 
@@ -413,8 +413,8 @@ let usdtEthBtcDeal = false
 
 let dealsAm = 0
 
-let startPriceBtc = 72109.11
-let startPriceEth = 4032.93
+let startPriceBtc = 67592.67
+let startPriceEth = 3682.04
 
 let allMoney = 0
 
@@ -424,8 +424,8 @@ let dontCom = false
 
 let bigChange = false
 
-let baseBtcInUsdt = 144.21822
-let baseEthInUsdt = 116.95497
+let baseBtcInUsdt = 135.18534
+let baseEthInUsdt = 117.82528
 
 let hedgeForBtc = baseBtcInUsdt * 0.15
 let hedgeForEth = baseEthInUsdt * 0.15
