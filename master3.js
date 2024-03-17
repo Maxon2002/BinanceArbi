@@ -425,6 +425,17 @@ const server = http.createServer((req, res) => {
                     maxCommissionAll -= +postData.comisMain
                 }
 
+                if(postData.changeWorkersArr) {
+                    for (let i = 0; i < workerIds.length; i++) {
+                        let workerId = workerIds[i];
+                        
+                        if(workerId === +postData.deleteWork) {
+                            workerId.splice(i, 1, workerId.addWork)
+                            break
+                        }
+                    }
+                }
+
                 console.log(postData)
 
             } catch (error) {

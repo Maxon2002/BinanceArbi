@@ -50,8 +50,8 @@ let commissionBtc = 0
 let commissionEth = 0
 
 let maxCommissionAll = 0
-let comUpdate = true
-let waitUpdate = false
+let comUpdate = false
+let waitUpdate = true
 
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
@@ -176,7 +176,7 @@ let minNotionalEthbtc = 0
 let changeNotionalEthBtc = false
 
 
-let commissionAll = 0
+let commissionAll = 20
 maxCommissionAll = 20
 let stopGame = false
 
@@ -290,39 +290,39 @@ let firstDeal = true;
     let closeListen = false
 
 
-    let wsBin = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
+    let wsBinListen = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
 
 
-    wsBin.on('open', () => console.log(`Соединение ${account.index} listenKey установлено в ` + new Date().toLocaleTimeString()))
-    wsBin.on('error', (d) => {
+    wsBinListen.on('open', () => console.log(`Соединение ${account.index} listenKey установлено в ` + new Date().toLocaleTimeString()))
+    wsBinListen.on('error', (d) => {
         console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString())
         // d = JSON.parse(d.toString())
         console.log(d)
 
     })
-    wsBin.on('close', function restart() {
+    wsBinListen.on('close', function restart() {
         if (!closeListen) {
             console.log(`Соединение ${account.index} listenKey закрыто из-за ошибки в ` + new Date().toLocaleTimeString())
             setTimeout(() => {
-                wsBinUser = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
+                wsBinListen = new WebSocket(`wss://stream.binance.com:9443/ws/${listenKey}`)
 
-                wsBinUser.on('error', () => console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString()))
+                wsBinListen.on('error', () => console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString()))
 
-                wsBinUser.on('open', () => console.log(`Соединение ${account.index} listenKey установлено в ` + new Date().toLocaleTimeString()))
-                wsBinUser.on('message', listen)
-                wsBinUser.on('ping', data => {
-                    wsBinUser.pong(data)
+                wsBinListen.on('open', () => console.log(`Соединение ${account.index} listenKey установлено в ` + new Date().toLocaleTimeString()))
+                wsBinListen.on('message', listen)
+                wsBinListen.on('ping', data => {
+                    wsBinListen.pong(data)
                 })
-                wsBinUser.on('close', restart)
+                wsBinListen.on('close', restart)
             }, 500)
         } else {
             console.log(`начальный listenKey ${account.index} закрыт`)
         }
     })
 
-    wsBin.on('message', listen)
-    wsBin.on('ping', data => {
-        wsBin.pong(data)
+    wsBinListen.on('message', listen)
+    wsBinListen.on('ping', data => {
+        wsBinListen.pong(data)
 
     });
 
@@ -596,16 +596,16 @@ async function global() {
         if (!stopGame) {
             console.log(`Соединение ${account.index} Binance закрыто из-за ошибки в ` + new Date().toLocaleTimeString())
             setTimeout(() => {
-                wsBinUser = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms/ethusdt@depth5@100ms/ethbtc@depth5@100ms/bnbusdt@depth5@100ms`)
+                wsBin = new WebSocket(`wss://stream.binance.com:9443/stream?streams=btcusdt@depth5@100ms/ethusdt@depth5@100ms/ethbtc@depth5@100ms/bnbusdt@depth5@100ms`)
 
-                wsBinUser.on('error', () => console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString()))
+                wsBin.on('error', () => console.log(`Ошибка! ${account.index}` + new Date().toLocaleTimeString()))
 
-                wsBinUser.on('open', () => console.log(`Соединение ${account.index} Binance установлено в ` + new Date().toLocaleTimeString()))
-                wsBinUser.on('message', whyNotYou)
-                wsBinUser.on('ping', data => {
-                    wsBinUser.pong(data)
+                wsBin.on('open', () => console.log(`Соединение ${account.index} Binance установлено в ` + new Date().toLocaleTimeString()))
+                wsBin.on('message', whyNotYou)
+                wsBin.on('ping', data => {
+                    wsBin.pong(data)
                 })
-                wsBinUser.on('close', restart)
+                wsBin.on('close', restart)
             }, 1000)
         } else {
 
