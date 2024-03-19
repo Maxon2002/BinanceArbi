@@ -18,10 +18,10 @@ pm2.connect((err) => {
 
 
     pm2.sendDataToProcessId({
-        id: 15,
+        id: 11,
         type: 'process:msg',
         data: {
-            smallCom: 30
+            smallCom: 50
         },
         topic: 'updateComis'
     }, (err, res) => {
