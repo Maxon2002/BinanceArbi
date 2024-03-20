@@ -35,7 +35,7 @@ pm2.connect((err) => {
         id: 16,
         type: 'process:msg',
         data: {
-            startPriceBtc: 61448,
+            startPriceBtc: 66945,
             baseBtcSmall: 0.00021429
         },
         topic: 'startBtc'
@@ -51,8 +51,8 @@ pm2.connect((err) => {
         id: 16,
         type: 'process:msg',
         data: {
-            startPriceEth: 3096.6,
-            baseEthSmall: 0.00378571
+            startPriceEth: 3455.98,
+            baseEthSmall: 0.00335714
         },
         topic: 'startEth'
     }, (err, res) => {
