@@ -2,7 +2,7 @@ const axios = require('axios');
 
 // Данные для отправки
 let data = {
-  comisMain: 100
+  comisMain: -400
 };
 
 // data = {
