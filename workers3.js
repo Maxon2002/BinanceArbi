@@ -221,29 +221,33 @@ process.on('message', (packet) => {
                             }
                         },
                         (err, response, body) => {
-                            body = JSON.parse(body)
-                            if (body.code && indexError <= 5) {
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
+                            try {
+                                body = JSON.parse(body)
+                                if (body.code && indexError <= 5) {
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
 
-                                messageBot = `Конечная у ${account.name}
+                                    messageBot = `Конечная у ${account.name}
 
                                 Получение начального listenKey ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
 
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+                                    listenKey = body.listenKey
+                                    resolve()
                                 }
-                                listenKey = body.listenKey
-                                resolve()
+                            } catch (error) {
+                                reRequest()
                             }
                         }
                     )
@@ -262,7 +266,13 @@ process.on('message', (packet) => {
                             }
                         },
                         (err, response, body) => {
-                            if (!body || body.code) {
+                            try {
+                                body = JSON.parse(body)
+
+                                if (!body || body.code) {
+                                    reRequest()
+                                }
+                            } catch (error) {
                                 reRequest()
                             }
                         }
@@ -334,96 +344,100 @@ process.on('message', (packet) => {
                                 }
                             },
                             (err, response, body) => {
-                                body = JSON.parse(body)
+                                try {
+                                    body = JSON.parse(body)
 
-                                if (body.code && indexError <= 5) {
-                                    console.log("Balance update depoHistory ", body.code)
-                                    if (body.code !== -1021) {
-                                        indexError++
-                                    }
+                                    if (body.code && indexError <= 5) {
+                                        console.log("Balance update depoHistory ", body.code)
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
-                                    reRequest()
-                                } else if (body.code && !fatalError) {
-                                    fatalError = true
+                                        reRequest()
+                                    } else if (body.code && !fatalError) {
+                                        fatalError = true
 
-                                    messageBot = `Конечная у ${account.name}
+                                        messageBot = `Конечная у ${account.name}
             
                                     Balance update depoHistory ${body.code}
                                     
                                     Заплаченная комиссия ${commissionAll}`
 
-                                    botMax.sendMessage(userChatId, messageBot);
-                                } else {
-                                    if (indexError !== 0) {
-                                        indexError = 0
-                                    }
+                                        botMax.sendMessage(userChatId, messageBot);
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
 
-                                    let newDepoIndex = body.length
-
-
-                                    if (newDepoIndex === 3 && !globalStart) {
-
-                                        globalStart = true
-
-                                        console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
+                                        let newDepoIndex = body.length
 
 
-                                        process.send({
-                                            type: 'process:msg',
-                                            data: {
-                                                type: 'balanceUp'
-                                            }
-                                        })
+                                        if (newDepoIndex === 3 && !globalStart) {
 
-                                        setTimeout(() => {
-                                            global();
-                                        }, 15000);
+                                            globalStart = true
 
+                                            console.log(`начальный баланс пополнен у ${account.index} `, indexUpdate)
 
-
-                                    }
-
-                                    if (bigChange && !stopGame) {
-
-                                        if (newDepoIndex === indexUpdateBigChange && !bigChangeStart && bigChange) {
-
-                                            bigChangeStart = true
 
                                             process.send({
                                                 type: 'process:msg',
                                                 data: {
-                                                    type: 'upAfterChange'
+                                                    type: 'balanceUp'
                                                 }
-                                            });
+                                            })
 
-                                            checkMoneyAfterBig();
+                                            setTimeout(() => {
+                                                global();
+                                            }, 15000);
+
+
+
                                         }
-                                    }
 
+                                        if (bigChange && !stopGame) {
 
-                                    if (newDepoIndex === depoIndex) {
-                                        if (!stopGame) {
-                                            if (+data.d > 0) {
-                                                firstDeal = true
-                                                allMoney = +(allMoney + +data.d).toFixed(8)
+                                            if (newDepoIndex === indexUpdateBigChange && !bigChangeStart && bigChange) {
+
+                                                bigChangeStart = true
+
+                                                process.send({
+                                                    type: 'process:msg',
+                                                    data: {
+                                                        type: 'upAfterChange'
+                                                    }
+                                                });
+
+                                                checkMoneyAfterBig();
                                             }
-                                        } else {
-                                            if (+data.d > 0) {
+                                        }
 
 
-                                                messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
+                                        if (newDepoIndex === depoIndex) {
+                                            if (!stopGame) {
+                                                if (+data.d > 0) {
+                                                    firstDeal = true
+                                                    allMoney = +(allMoney + +data.d).toFixed(8)
+                                                }
+                                            } else {
+                                                if (+data.d > 0) {
+
+
+                                                    messageBot = `Перевод из аккаунта ${account.name} на следующий день после конца
 
                                                 Баланс ${data.d} USDT`
 
 
-                                                botMax.sendMessage(userChatId, messageBot);
+                                                    botMax.sendMessage(userChatId, messageBot);
+                                                }
                                             }
                                         }
+
+
+                                        depoIndex = newDepoIndex
+
                                     }
-
-
-                                    depoIndex = newDepoIndex
-
+                                } catch (error) {
+                                    reRequest()
                                 }
 
                             }
@@ -453,41 +467,45 @@ process.on('message', (packet) => {
                             }
                         },
                         (err, response, body) => {
-                            body = JSON.parse(body)
-                            if (body.code && indexError <= 5) {
-                                console.log(`Старт exchangeInfo ${account.index} `, body.code)
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
+                            try {
+                                body = JSON.parse(body)
+                                if (body.code && indexError <= 5) {
+                                    console.log(`Старт exchangeInfo ${account.index} `, body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
 
-                                messageBot = `Конечная у ${account.name}
+                                    messageBot = `Конечная у ${account.name}
 
                                 Старт exchangeInfo ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
 
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
-                                }
-
-                                let symbol = body.symbols[0]
-
-                                for (let i = 0; i < symbol.filters.length; i++) {
-                                    let filter = symbol.filters[i]
-
-                                    if (filter.filterType === "NOTIONAL") {
-                                        minNotionalEthbtc = +filter.minNotional
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
                                     }
 
-                                }
+                                    let symbol = body.symbols[0]
 
-                                resolve()
+                                    for (let i = 0; i < symbol.filters.length; i++) {
+                                        let filter = symbol.filters[i]
+
+                                        if (filter.filterType === "NOTIONAL") {
+                                            minNotionalEthbtc = +filter.minNotional
+                                        }
+
+                                    }
+
+                                    resolve()
+                                }
+                            } catch (error) {
+                                reRequest()
                             }
 
                         }
@@ -508,55 +526,59 @@ process.on('message', (packet) => {
                             }
                         },
                         (err, response, body) => {
-                            body = JSON.parse(body)
+                            try {
+                                body = JSON.parse(body)
 
-                            // console.log('Body asset ', body)
+                                // console.log('Body asset ', body)
 
 
-                            if (body.code && indexError <= 5) {
-                                console.log(`Check start USDT in ${account.index} `, body.code)
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
+                                if (body.code && indexError <= 5) {
+                                    console.log(`Check start USDT in ${account.index} `, body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
 
-                                messageBot = `Конечная у ${account.name}
+                                    messageBot = `Конечная у ${account.name}
 
                                 Check start USDT ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
 
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+                                    for (let i = 0; i < body.length; i++) {
+                                        if (body[i].asset === 'USDT') {
+
+                                            allMoney = +body[i].free
+
+                                            console.log(`allMoney в ${account.index} после чека `, allMoney)
+
+                                            // moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
+                                        }
+
+                                        if (body[i].asset === 'BTC') {
+
+                                            commissionBtc = +(+body[i].free - baseBtc).toFixed(8)
+
+                                        }
+                                        if (body[i].asset === 'ETH') {
+
+                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
+
+                                        }
+
+                                    }
+                                    resolve()
                                 }
-                                for (let i = 0; i < body.length; i++) {
-                                    if (body[i].asset === 'USDT') {
-
-                                        allMoney = +body[i].free
-
-                                        console.log(`allMoney в ${account.index} после чека `, allMoney)
-
-                                        // moneyForCommission = +(+body[i].free - amountUsdt).toFixed(8)
-                                    }
-
-                                    if (body[i].asset === 'BTC') {
-
-                                        commissionBtc = +(+body[i].free - baseBtc).toFixed(8)
-
-                                    }
-                                    if (body[i].asset === 'ETH') {
-
-                                        commissionEth = +(+body[i].free - baseEth).toFixed(8)
-
-                                    }
-
-                                }
-                                resolve()
+                            } catch (error) {
+                                reRequest()
                             }
                         }
                     )
@@ -592,7 +614,7 @@ process.on('message', (packet) => {
                     }, 1000)
                 } else {
 
-                    
+
                     console.log(`Вебсокет успешно закрыт у ${account.name} ` + new Date().toLocaleTimeString())
 
                 }
@@ -904,34 +926,38 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Buy BTC usdtBtcEth ${account.index} `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Buy BTC usdtBtcEth ${account.index} `, body.code)
 
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Buy BTC usdtBtcEth ${body.code}
+                                                                    Buy BTC usdtBtcEth ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('4 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('4 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -950,34 +976,38 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Sell ETH usdtBtcEth ${account.index} `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Sell ETH usdtBtcEth ${account.index} `, body.code)
 
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Sell ETH usdtBtcEth ${body.code}
+                                                                    Sell ETH usdtBtcEth ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('6 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('6 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -996,34 +1026,38 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Buy ETH usdtBtcEth ${account.index} `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Buy ETH usdtBtcEth ${account.index} `, body.code)
 
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Buy ETH usdtBtcEth ${body.code}
+                                                                    Buy ETH usdtBtcEth ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('5 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('5 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -1123,7 +1157,7 @@ process.on('message', (packet) => {
                                                         } else {
 
                                                             stopGame = true
-                                                            
+
 
                                                         }
 
@@ -1197,41 +1231,45 @@ process.on('message', (packet) => {
                                                                 }
                                                             },
                                                             (err, response, body) => {
-                                                                body = JSON.parse(body)
-                                                                if (body.code && indexError <= 5) {
-                                                                    console.log(`Change exchangeInfo ${account.index} `, body.code)
-                                                                    if (body.code !== -1021) {
-                                                                        indexError++
-                                                                    }
-
-                                                                    reRequest()
-                                                                } else if (body.code && !fatalError) {
-                                                                    fatalError = true
-
-                                                                    messageBot = `Конечная у ${account.name}
-                            
-                                                            Change exchangeInfo ${body.code}
-                                                            
-                                                            Заплаченная комиссия ${commissionAll}`
-
-                                                                    botMax.sendMessage(userChatId, messageBot);
-                                                                } else {
-                                                                    if (indexError !== 0) {
-                                                                        indexError = 0
-                                                                    }
-
-                                                                    let symbol = body.symbols[0]
-
-                                                                    for (let i = 0; i < symbol.filters.length; i++) {
-                                                                        let filter = symbol.filters[i]
-
-                                                                        if (filter.filterType === "NOTIONAL") {
-                                                                            minNotionalEthbtc = +filter.minNotional
+                                                                try {
+                                                                    body = JSON.parse(body)
+                                                                    if (body.code && indexError <= 5) {
+                                                                        console.log(`Change exchangeInfo ${account.index} `, body.code)
+                                                                        if (body.code !== -1021) {
+                                                                            indexError++
                                                                         }
 
-                                                                    }
+                                                                        reRequest()
+                                                                    } else if (body.code && !fatalError) {
+                                                                        fatalError = true
 
-                                                                    resolve()
+                                                                        messageBot = `Конечная у ${account.name}
+                            
+                                                                        Change exchangeInfo ${body.code}
+                                                            
+                                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                                        botMax.sendMessage(userChatId, messageBot);
+                                                                    } else {
+                                                                        if (indexError !== 0) {
+                                                                            indexError = 0
+                                                                        }
+
+                                                                        let symbol = body.symbols[0]
+
+                                                                        for (let i = 0; i < symbol.filters.length; i++) {
+                                                                            let filter = symbol.filters[i]
+
+                                                                            if (filter.filterType === "NOTIONAL") {
+                                                                                minNotionalEthbtc = +filter.minNotional
+                                                                            }
+
+                                                                        }
+
+                                                                        resolve()
+                                                                    }
+                                                                } catch (error) {
+                                                                    reRequest()
                                                                 }
 
                                                             }
@@ -1253,31 +1291,35 @@ process.on('message', (packet) => {
                                                                     }
                                                                 },
                                                                 (err, response, body) => {
-                                                                    body = JSON.parse(body)
-                                                                    if (body.code && indexError <= 5) {
-                                                                        console.log(`Sell BTC usdtBtcEth notional ${account.index} `, body.code)
+                                                                    try {
+                                                                        body = JSON.parse(body)
+                                                                        if (body.code && indexError <= 5) {
+                                                                            console.log(`Sell BTC usdtBtcEth notional ${account.index} `, body.code)
 
-                                                                        if (body.code !== -1021) {
-                                                                            indexError++
-                                                                        }
+                                                                            if (body.code !== -1021) {
+                                                                                indexError++
+                                                                            }
 
-                                                                        reRequest()
-                                                                    } else if (body.code && !fatalError) {
-                                                                        fatalError = true
+                                                                            reRequest()
+                                                                        } else if (body.code && !fatalError) {
+                                                                            fatalError = true
 
-                                                                        messageBot = `Конечная у ${account.name}
+                                                                            messageBot = `Конечная у ${account.name}
                                 
-                                                                Sell BTC usdtBtcEth notional ${body.code}
+                                                                            Sell BTC usdtBtcEth notional ${body.code}
                                                                 
-                                                                Заплаченная комиссия ${commissionAll}`
+                                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                                        botMax.sendMessage(userChatId, messageBot);
-                                                                    } else {
-                                                                        if (indexError !== 0) {
-                                                                            indexError = 0
+                                                                            botMax.sendMessage(userChatId, messageBot);
+                                                                        } else {
+                                                                            if (indexError !== 0) {
+                                                                                indexError = 0
+                                                                            }
+                                                                            // console.log('4 ', body)
+                                                                            resolve(body)
                                                                         }
-                                                                        // console.log('4 ', body)
-                                                                        resolve(body)
+                                                                    } catch (error) {
+                                                                        reRequest()
                                                                     }
                                                                 }
                                                             )
@@ -1296,31 +1338,35 @@ process.on('message', (packet) => {
                                                                     }
                                                                 },
                                                                 (err, response, body) => {
-                                                                    body = JSON.parse(body)
-                                                                    if (body.code && indexError <= 5) {
-                                                                        console.log(`Buy ETH usdtBtcEth notional ${account.index} `, body.code)
+                                                                    try {
+                                                                        body = JSON.parse(body)
+                                                                        if (body.code && indexError <= 5) {
+                                                                            console.log(`Buy ETH usdtBtcEth notional ${account.index} `, body.code)
 
-                                                                        if (body.code !== -1021) {
-                                                                            indexError++
-                                                                        }
+                                                                            if (body.code !== -1021) {
+                                                                                indexError++
+                                                                            }
 
-                                                                        reRequest()
-                                                                    } else if (body.code && !fatalError) {
-                                                                        fatalError = true
+                                                                            reRequest()
+                                                                        } else if (body.code && !fatalError) {
+                                                                            fatalError = true
 
-                                                                        messageBot = `Конечная у ${account.name}
+                                                                            messageBot = `Конечная у ${account.name}
                                 
-                                                                Buy ETH usdtBtcEth notional ${body.code}
+                                                                            Buy ETH usdtBtcEth notional ${body.code}
                                                                 
-                                                                Заплаченная комиссия ${commissionAll}`
+                                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                                        botMax.sendMessage(userChatId, messageBot);
-                                                                    } else {
-                                                                        if (indexError !== 0) {
-                                                                            indexError = 0
+                                                                            botMax.sendMessage(userChatId, messageBot);
+                                                                        } else {
+                                                                            if (indexError !== 0) {
+                                                                                indexError = 0
+                                                                            }
+                                                                            // console.log('6 ', body)
+                                                                            resolve(body)
                                                                         }
-                                                                        // console.log('6 ', body)
-                                                                        resolve(body)
+                                                                    } catch (error) {
+                                                                        reRequest()
                                                                     }
                                                                 }
                                                             )
@@ -1430,33 +1476,37 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Buy ETH usdtEthBtc ${account.index} `, body.code)
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Buy ETH usdtEthBtc ${account.index} `, body.code)
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Buy ETH usdtEthBtc ${body.code}
+                                                                    Buy ETH usdtEthBtc ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('1 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('1 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -1475,34 +1525,38 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Sell BTC usdtEthBtc ${account.index} `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Sell BTC usdtEthBtc ${account.index} `, body.code)
 
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Sell BTC usdtEthBtc ${body.code}
+                                                                    Sell BTC usdtEthBtc ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('3 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('3 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -1521,34 +1575,38 @@ process.on('message', (packet) => {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Sell ETH usdtEthBtc ${account.index} `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Sell ETH usdtEthBtc ${account.index} `, body.code)
 
-                                                                if (body.code === -1013) {
-                                                                    changeNotionalEthBtc = true
-                                                                    resolve()
-                                                                } else if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code === -1013) {
+                                                                        changeNotionalEthBtc = true
+                                                                        resolve()
+                                                                    } else if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у ${account.name}
+                                                                    messageBot = `Конечная у ${account.name}
                         
-                                                        Sell ETH usdtEthBtc ${body.code}
+                                                                    Sell ETH usdtEthBtc ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('2 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('2 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -1723,43 +1781,46 @@ process.on('message', (packet) => {
                                                                 }
                                                             },
                                                             (err, response, body) => {
-                                                                body = JSON.parse(body)
-                                                                if (body.code && indexError <= 5) {
-                                                                    console.log(`Change exchangeInfo ${account.index} `, body.code)
-                                                                    if (body.code !== -1021) {
-                                                                        indexError++
-                                                                    }
-
-                                                                    reRequest()
-                                                                } else if (body.code && !fatalError) {
-                                                                    fatalError = true
-
-                                                                    messageBot = `Конечная у ${account.name}
-                            
-                                                            Change exchangeInfo ${body.code}
-                                                            
-                                                            Заплаченная комиссия ${commissionAll}`
-
-                                                                    botMax.sendMessage(userChatId, messageBot);
-                                                                } else {
-                                                                    if (indexError !== 0) {
-                                                                        indexError = 0
-                                                                    }
-
-                                                                    let symbol = body.symbols[0]
-
-                                                                    for (let i = 0; i < symbol.filters.length; i++) {
-                                                                        let filter = symbol.filters[i]
-
-                                                                        if (filter.filterType === "NOTIONAL") {
-                                                                            minNotionalEthbtc = +filter.minNotional
+                                                                try {
+                                                                    body = JSON.parse(body)
+                                                                    if (body.code && indexError <= 5) {
+                                                                        console.log(`Change exchangeInfo ${account.index} `, body.code)
+                                                                        if (body.code !== -1021) {
+                                                                            indexError++
                                                                         }
 
+                                                                        reRequest()
+                                                                    } else if (body.code && !fatalError) {
+                                                                        fatalError = true
+
+                                                                        messageBot = `Конечная у ${account.name}
+                            
+                                                                        Change exchangeInfo ${body.code}
+                                                            
+                                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                                        botMax.sendMessage(userChatId, messageBot);
+                                                                    } else {
+                                                                        if (indexError !== 0) {
+                                                                            indexError = 0
+                                                                        }
+
+                                                                        let symbol = body.symbols[0]
+
+                                                                        for (let i = 0; i < symbol.filters.length; i++) {
+                                                                            let filter = symbol.filters[i]
+
+                                                                            if (filter.filterType === "NOTIONAL") {
+                                                                                minNotionalEthbtc = +filter.minNotional
+                                                                            }
+
+                                                                        }
+
+                                                                        resolve()
                                                                     }
-
-                                                                    resolve()
+                                                                } catch (error) {
+                                                                    reRequest()
                                                                 }
-
                                                             }
                                                         )
                                                     })()
@@ -1779,31 +1840,35 @@ process.on('message', (packet) => {
                                                                     }
                                                                 },
                                                                 (err, response, body) => {
-                                                                    body = JSON.parse(body)
-                                                                    if (body.code && indexError <= 5) {
-                                                                        console.log(`Buy BTC usdtBtcEth notional ${account.index} `, body.code)
+                                                                    try {
+                                                                        body = JSON.parse(body)
+                                                                        if (body.code && indexError <= 5) {
+                                                                            console.log(`Buy BTC usdtBtcEth notional ${account.index} `, body.code)
 
-                                                                        if (body.code !== -1021) {
-                                                                            indexError++
-                                                                        }
+                                                                            if (body.code !== -1021) {
+                                                                                indexError++
+                                                                            }
 
-                                                                        reRequest()
-                                                                    } else if (body.code && !fatalError) {
-                                                                        fatalError = true
+                                                                            reRequest()
+                                                                        } else if (body.code && !fatalError) {
+                                                                            fatalError = true
 
-                                                                        messageBot = `Конечная у ${account.name}
+                                                                            messageBot = `Конечная у ${account.name}
                                 
-                                                                Buy BTC usdtBtcEth notional ${body.code}
+                                                                            Buy BTC usdtBtcEth notional ${body.code}
                                                                 
-                                                                Заплаченная комиссия ${commissionAll}`
+                                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                                        botMax.sendMessage(userChatId, messageBot);
-                                                                    } else {
-                                                                        if (indexError !== 0) {
-                                                                            indexError = 0
+                                                                            botMax.sendMessage(userChatId, messageBot);
+                                                                        } else {
+                                                                            if (indexError !== 0) {
+                                                                                indexError = 0
+                                                                            }
+                                                                            // console.log('4 ', body)
+                                                                            resolve(body)
                                                                         }
-                                                                        // console.log('4 ', body)
-                                                                        resolve(body)
+                                                                    } catch (error) {
+                                                                        reRequest()
                                                                     }
                                                                 }
                                                             )
@@ -1822,31 +1887,35 @@ process.on('message', (packet) => {
                                                                     }
                                                                 },
                                                                 (err, response, body) => {
-                                                                    body = JSON.parse(body)
-                                                                    if (body.code && indexError <= 5) {
-                                                                        console.log(`Sell ETH usdtBtcEth notional ${account.index} `, body.code)
+                                                                    try {
+                                                                        body = JSON.parse(body)
+                                                                        if (body.code && indexError <= 5) {
+                                                                            console.log(`Sell ETH usdtBtcEth notional ${account.index} `, body.code)
 
-                                                                        if (body.code !== -1021) {
-                                                                            indexError++
-                                                                        }
+                                                                            if (body.code !== -1021) {
+                                                                                indexError++
+                                                                            }
 
-                                                                        reRequest()
-                                                                    } else if (body.code && !fatalError) {
-                                                                        fatalError = true
+                                                                            reRequest()
+                                                                        } else if (body.code && !fatalError) {
+                                                                            fatalError = true
 
-                                                                        messageBot = `Конечная у ${account.name}
+                                                                            messageBot = `Конечная у ${account.name}
                                 
-                                                                Sell ETH usdtBtcEth notional ${body.code}
+                                                                            Sell ETH usdtBtcEth notional ${body.code}
                                                                 
-                                                                Заплаченная комиссия ${commissionAll}`
+                                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                                        botMax.sendMessage(userChatId, messageBot);
-                                                                    } else {
-                                                                        if (indexError !== 0) {
-                                                                            indexError = 0
+                                                                            botMax.sendMessage(userChatId, messageBot);
+                                                                        } else {
+                                                                            if (indexError !== 0) {
+                                                                                indexError = 0
+                                                                            }
+                                                                            // console.log('6 ', body)
+                                                                            resolve(body)
                                                                         }
-                                                                        // console.log('6 ', body)
-                                                                        resolve(body)
+                                                                    } catch (error) {
+                                                                        reRequest()
                                                                     }
                                                                 }
                                                             )
@@ -1991,41 +2060,45 @@ process.on('message', (packet) => {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`After day exchangeInfo ${account.index} `, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log(`After day exchangeInfo ${account.index} `, body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у ${account.name}
+                                            messageBot = `Конечная у ${account.name}
         
                                         After day exchangeInfo ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        }
-
-                                        let symbol = body.symbols[0]
-
-                                        for (let i = 0; i < symbol.filters.length; i++) {
-                                            let filter = symbol.filters[i]
-
-                                            if (filter.filterType === "NOTIONAL") {
-                                                minNotionalEthbtc = +filter.minNotional
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
                                             }
 
+                                            let symbol = body.symbols[0]
+
+                                            for (let i = 0; i < symbol.filters.length; i++) {
+                                                let filter = symbol.filters[i]
+
+                                                if (filter.filterType === "NOTIONAL") {
+                                                    minNotionalEthbtc = +filter.minNotional
+                                                }
+
+                                            }
+
+
                                         }
-
-
+                                    } catch (error) {
+                                        reRequest()
                                     }
 
                                 }
@@ -2043,85 +2116,91 @@ process.on('message', (packet) => {
 
 
         function checkMoneyAfterBig() {
-            (function reRequest() {
-                let queryAsset = `timestamp=${Date.now()}`;
-                let hashAsset = signature(queryAsset);
+            setTimeout(() => {
+                (function reRequest() {
+                    let queryAsset = `timestamp=${Date.now()}`;
+                    let hashAsset = signature(queryAsset);
 
-                request.post(
-                    {
-                        url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                        headers: {
-                            'X-MBX-APIKEY': publicKey
-                        }
-                    },
-                    (err, response, body) => {
-                        body = JSON.parse(body)
-
-
-
-                        if (body.code && indexError <= 5) {
-                            console.log(`Check после bigChange USDT ${account.index}`, body.code)
-                            if (body.code !== -1021) {
-                                indexError++
+                    request.post(
+                        {
+                            url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                            headers: {
+                                'X-MBX-APIKEY': publicKey
                             }
+                        },
+                        (err, response, body) => {
+                            try {
+                                body = JSON.parse(body)
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
 
-                            messageBot = `Конечная у ${account.name}
 
-                            Check после bigChange USDT ${body.code}
+                                if (body.code && indexError <= 5) {
+                                    console.log(`Check после bigChange USDT ${account.index}`, body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
+
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
+
+                                    messageBot = `Конечная у ${account.name}
+
+                                    Check после bigChange USDT ${body.code}
                             
-                            Заплаченная комиссия ${commissionAll}`
+                                    Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+                                    for (let i = 0; i < body.length; i++) {
+                                        if (body[i].asset === 'USDT') {
+
+                                            let factMoney = +body[i].free
+
+                                            firstDeal = true
+                                            allMoney = factMoney
+
+                                            console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
+
+
+                                        }
+                                        if (body[i].asset === 'BTC') {
+
+                                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+
+                                            console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
+
+                                            console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
+                                            console.log('commissionBtc ', commissionBtc)
+
+
+
+                                        }
+                                        if (body[i].asset === 'ETH') {
+
+                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
+
+                                            console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
+                                            console.log('commissionEth ', commissionEth)
+                                        }
+                                    }
+
+
+                                    bigChange = false
+                                    bigChangeStart = false
+
+                                }
+                            } catch (error) {
+                                reRequest()
                             }
-                            for (let i = 0; i < body.length; i++) {
-                                if (body[i].asset === 'USDT') {
-
-                                    let factMoney = +body[i].free
-
-                                    firstDeal = true
-                                    allMoney = factMoney
-
-                                    console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
-
-
-                                }
-                                if (body[i].asset === 'BTC') {
-
-                                    commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
-
-                                    console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
-
-                                    console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
-                                    console.log('commissionBtc ', commissionBtc)
-
-
-
-                                }
-                                if (body[i].asset === 'ETH') {
-
-                                    commissionEth = +(+body[i].free - baseEth).toFixed(8)
-
-                                    console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
-                                    console.log('commissionEth ', commissionEth)
-                                }
-                            }
-
-
-                            bigChange = false
-                            bigChangeStart = false
-
                         }
-                    }
-                )
+                    )
 
-            })()
+                })()
+            }, 15000)
         }
 
 

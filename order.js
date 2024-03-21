@@ -379,7 +379,7 @@ let startD = +new Date(2024, 2, 14, 5);
 //         if((i + 1) % 3 !== 0) {
 //             oneDeal.push(deal)
 //         } else {
-            
+
 //             oneDeal.push(deal)
 //             factDealArr.push(oneDeal)
 
@@ -387,11 +387,11 @@ let startD = +new Date(2024, 2, 14, 5);
 //         }
 //     }
 
-    
+
 
 //     for (let i = 0; i < factDealArr.length; i++) {
 //         let factDeal = factDealArr[i];
-        
+
 
 //         for (let j = 0; j < factDeal.length; j++) {
 //             let oneDeal = factDeal[j]
@@ -401,14 +401,14 @@ let startD = +new Date(2024, 2, 14, 5);
 //                 factDeal.push(ethbtc)
 //             }
 //         }
-        
+
 //     }
 
 //     let commissionAll = 0
 
 //     for (let i = 0; i < factDealArr.length; i++) {
 //         let factDeal = factDealArr[i];
-        
+
 
 //         for (let j = 0; j < factDeal.length; j++) {
 //             let oneDeal = factDeal[j]
@@ -416,7 +416,7 @@ let startD = +new Date(2024, 2, 14, 5);
 //             let btcPrice = 0
 
 //             if(oneDeal.symbol === 'BTCUSDT') {
-                
+
 //                 commissionAll = (commissionAll + +oneDeal.cummulativeQuoteQty * 0.001)
 
 //                 btcPrice = +oneDeal.cummulativeQuoteQty / +oneDeal.executedQty
@@ -433,7 +433,7 @@ let startD = +new Date(2024, 2, 14, 5);
 //             }
 
 //         }
-        
+
 //     }
 
 //     console.log(commissionAll)
@@ -445,14 +445,31 @@ let startD = +new Date(2024, 2, 14, 5);
 // console.log(+new Date(2024, 2, 10, 5))
 
 
+let allOrd = `symbol=ETHBTC&startTime=${startD}&limit=1000&timestamp=${Date.now()}`;
+let hashAllOrd = signature(allOrd);
+
+
+request.get(
+    {
+        url: `https://api.binance.com/api/v3/allOrders?${allOrd}&signature=${hashAllOrd}`,
+        headers: {
+            'X-MBX-APIKEY': publicKey
+        }
+    },
+    (err, response, body) => {
+        
+        
+            body = JSON.parse(body)
+        
+        
+    }
+)
+
+
 //1710028800000
 
 
-let trim = [1,2,3,4]
 
-trim.splice(1, 1, 5)
-
-console.log(trim)
 
 
 // let queryFutBal = `timestamp=${Date.now()}`;

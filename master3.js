@@ -167,7 +167,7 @@ const accountsObj = {
         name: 'nedro',
         comAll: 20
     }
-    
+
 }
 
 
@@ -425,11 +425,11 @@ const server = http.createServer((req, res) => {
                     maxCommissionAll -= +postData.comisMain
                 }
 
-                if(postData.changeWorkersArr) {
+                if (postData.changeWorkersArr) {
                     for (let i = 0; i < workerIds.length; i++) {
                         let workerId = workerIds[i];
-                        
-                        if(workerId === +postData.deleteWork) {
+
+                        if (workerId === +postData.deleteWork) {
                             workerId.splice(i, 1, workerId.addWork)
                             break
                         }
@@ -577,71 +577,77 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth BTC ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("Depth BTC ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            messageBot = `Конечная у мастера
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
+
+                                messageBot = `Конечная у мастера
 
                             Depth BTC ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                startPriceBtc = +body.asks[0][0]
+
+
+
+                                let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                                baseBtc = +(factAmount + 0.001).toFixed(3)
+
+                                // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
+
+                                // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
+
+                                baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
+
+
+                                hedgeForBtc = +(baseBtcInUsdt * 0.15).toFixed(8)
+
+                                baseBtcSmall = Math.trunc((baseBtc / howMuchAccounts) * 100000000) / 100000000
+
+                                for (let i = 0; i < workerIds.length; i++) {
+
+                                    let workerId = workerIds[i];
+
+
+                                    pm2.sendDataToProcessId({
+                                        id: workerId,
+                                        type: 'process:msg',
+                                        data: {
+                                            startPriceBtc,
+                                            baseBtcSmall
+                                        },
+                                        topic: 'startBtc'
+                                    }, (err, res) => {
+                                        if (err) console.error(err);
+                                        // else console.log(res);
+                                    });
+
+                                }
+
+                                resolve()
                             }
 
-                            startPriceBtc = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            baseBtc = +(factAmount + 0.001).toFixed(3)
-
-                            // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-
-                            // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
-
-                            baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
-
-
-                            hedgeForBtc = +(baseBtcInUsdt * 0.15).toFixed(8)
-
-                            baseBtcSmall = Math.trunc((baseBtc / howMuchAccounts) * 100000000) / 100000000
-
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceBtc,
-                                        baseBtcSmall
-                                    },
-                                    topic: 'startBtc'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -657,72 +663,77 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth ETH ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("Depth ETH ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            messageBot = `Конечная у мастера
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
+
+                                messageBot = `Конечная у мастера
 
                             Depth ETH ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+                                startPriceEth = +body.asks[0][0]
+
+
+
+                                let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                                baseEth = +(factAmount + 0.001).toFixed(3)
+
+                                // firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
+
+                                // commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
+
+                                baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
+
+
+                                hedgeForEth = +(baseEthInUsdt * 0.15).toFixed(8)
+
+
+                                baseEthSmall = Math.trunc((baseEth / howMuchAccounts) * 10000000) / 10000000
+
+
+                                for (let i = 0; i < workerIds.length; i++) {
+
+                                    let workerId = workerIds[i];
+
+
+                                    pm2.sendDataToProcessId({
+                                        id: workerId,
+                                        type: 'process:msg',
+                                        data: {
+                                            startPriceEth,
+                                            baseEthSmall
+                                        },
+                                        topic: 'startEth'
+                                    }, (err, res) => {
+                                        if (err) console.error(err);
+                                        // else console.log(res);
+                                    });
+
+                                }
+
+                                resolve()
                             }
-                            startPriceEth = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            baseEth = +(factAmount + 0.001).toFixed(3)
-
-                            // firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
-
-                            // commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
-
-                            baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
-
-
-                            hedgeForEth = +(baseEthInUsdt * 0.15).toFixed(8)
-
-
-                            baseEthSmall = Math.trunc((baseEth / howMuchAccounts) * 10000000) / 10000000
-
-
-                            for (let i = 0; i < workerIds.length; i++) {
-
-                                let workerId = workerIds[i];
-
-
-                                pm2.sendDataToProcessId({
-                                    id: workerId,
-                                    type: 'process:msg',
-                                    data: {
-                                        startPriceEth,
-                                        baseEthSmall
-                                    },
-                                    topic: 'startEth'
-                                }, (err, res) => {
-                                    if (err) console.error(err);
-                                    // else console.log(res);
-                                });
-
-                            }
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -746,29 +757,35 @@ async function startWorkers() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        console.log("First transfer to fut ", body.code)
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
 
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
+                    try {
 
-                        messageBot = `Конечная у мастера
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            console.log("First transfer to fut ", body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
+
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастера
 
                         First transfer to fut ${body.code}
                         
                         Заплаченная комиссия ${commissionAll}`
 
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            resolve()
                         }
-                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -791,33 +808,39 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First buy BTC ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                        try {
 
-                            messageBot = `Конечная у мастера
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("First buy BTC ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
+
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
+
+                                messageBot = `Конечная у мастера
     
                             First buy BTC ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                // baseBtcInUsdt = +body.cummulativeQuoteQty
+
+
+                                resolve()
                             }
-
-                            // baseBtcInUsdt = +body.cummulativeQuoteQty
-
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -836,29 +859,34 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First sell BTC fut ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("First sell BTC fut ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            messageBot = `Конечная у мастера
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
+
+                                messageBot = `Конечная у мастера
     
                             First sell BTC fut ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+                                resolve()
                             }
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -877,34 +905,38 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First buy ETH ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("First buy ETH ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             First buy ETH ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                // baseEthInUsdt = +body.cummulativeQuoteQty
+
+
+
+                                resolve()
                             }
-
-                            // baseEthInUsdt = +body.cummulativeQuoteQty
-
-
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -923,29 +955,33 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("First sell ETH fut ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("First sell ETH fut ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             First sell ETH fut ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+                                resolve()
                             }
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -970,51 +1006,55 @@ async function startWorkers() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
+                        try {
+                            body = JSON.parse(body)
 
-                        if (body.code && indexError <= 5) {
-                            console.log("Check start USDT для запуска ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                            if (body.code && indexError <= 5) {
+                                console.log("Check start USDT для запуска ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             Check start USDT для запуска  ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+                                for (let i = 0; i < body.length; i++) {
+                                    if (body[i].asset === 'USDT') {
+
+                                        baseUsdt = +body[i].free
+
+                                        baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
+
+
+                                    }
+                                    if (body[i].asset === 'BTC') {
+
+                                        restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+
+                                    }
+                                    if (body[i].asset === 'ETH') {
+
+                                        restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+
+
+                                    }
+                                }
+                                resolve()
                             }
-                            for (let i = 0; i < body.length; i++) {
-                                if (body[i].asset === 'USDT') {
-
-                                    baseUsdt = +body[i].free
-
-                                    baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                                if (body[i].asset === 'BTC') {
-
-                                    restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-                                }
-                                if (body[i].asset === 'ETH') {
-
-                                    restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-
-
-                                }
-                            }
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -1058,29 +1098,34 @@ async function startGlobalListen() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
+                    try {
 
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
-                        messageBot = `Конечная у мастера
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастера
 
                         Глобальный listenKey ${body.code}
                         
                         Заплаченная комиссия ${commissionAll}`
 
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            listenKey = body.listenKey
+                            resolve()
                         }
-                        listenKey = body.listenKey
-                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -1099,7 +1144,13 @@ async function startGlobalListen() {
                     }
                 },
                 (err, response, body) => {
-                    if (!body || body.code) {
+                    try {
+                        body = JSON.parse(body)
+
+                        if (!body || body.code) {
+                            reRequest()
+                        }
+                    } catch (error) {
                         reRequest()
                     }
                 }
@@ -1176,205 +1227,214 @@ async function startGlobalListen() {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
+                        try {
+                            body = JSON.parse(body)
 
-                        if (body.code && indexError <= 5) {
-                            console.log("Start depoHistory ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                            if (body.code && indexError <= 5) {
+                                console.log("Start depoHistory ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             Start depoHistory ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
-                            }
-
-                            let newDepoIndex = body.length
-
-
-                            if (workerEnds) {
-                                console.log("howNeedIndexUpdate ", howNeedIndexUpdate)
-                                console.log("newDepoIndex ", newDepoIndex)
-
-                                if (newDepoIndex === howNeedIndexUpdate && !globalStart) {
-
-                                    globalStart = true
-
-                                    console.log('баланс пополнен у мастера ', depoIndex)
-
-                                    setTimeout(() => {
-                                        global();
-                                    }, 15000);
-
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
                                 }
 
-                                if (newDepoIndex !== depoIndex && newDepoIndex > howNeedIndexUpdate && globalStart) {
-                                    firstDeal = true
-                                    allMoney = +(allMoney + +data.d).toFixed(8)
+                                let newDepoIndex = body.length
+
+
+                                if (workerEnds) {
+                                    console.log("howNeedIndexUpdate ", howNeedIndexUpdate)
+                                    console.log("newDepoIndex ", newDepoIndex)
+
+                                    if (newDepoIndex === howNeedIndexUpdate && !globalStart) {
+
+                                        globalStart = true
+
+                                        console.log('баланс пополнен у мастера ', depoIndex)
+
+                                        setTimeout(() => {
+                                            global();
+                                        }, 15000);
+
+                                    }
+
+                                    if (newDepoIndex !== depoIndex && newDepoIndex > howNeedIndexUpdate && globalStart) {
+                                        firstDeal = true
+                                        allMoney = +(allMoney + +data.d).toFixed(8)
+                                    }
                                 }
-                            }
 
 
-                            if (workerSayChange && !workerEnds) {
-                                // indexUpdateBigChange++
-                                console.log("howNeedIndexUpdateBigChange ", howNeedIndexUpdateBigChange)
-                                console.log("newDepoIndex ", newDepoIndex)
-                                if (newDepoIndex === howNeedIndexUpdateBigChange && !bigChangeWorkerStart && workerSayChange) {
+                                if (workerSayChange && !workerEnds) {
+                                    // indexUpdateBigChange++
+                                    console.log("howNeedIndexUpdateBigChange ", howNeedIndexUpdateBigChange)
+                                    console.log("newDepoIndex ", newDepoIndex)
+                                    if (newDepoIndex === howNeedIndexUpdateBigChange && !bigChangeWorkerStart && workerSayChange) {
 
-                                    bigChangeWorkerStart = true
+                                        bigChangeWorkerStart = true
 
-                                    setTimeout(() => {
-                                        smoothMoney()
-                                    }, 5000)
+                                        setTimeout(() => {
+                                            smoothMoney()
+                                        }, 5000)
 
+                                    }
                                 }
-                            }
 
 
 
 
-                            if (newDepoIndex === depoIndex) {
-                                (function reRequest() {
+                                if (newDepoIndex === depoIndex) {
+                                    (function reRequest() {
 
-                                    let transferToFutHistory = `type=MAIN_UMFUTURE&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
-                                    let hashtransferToFutHistory = signature(transferToFutHistory);
+                                        let transferToFutHistory = `type=MAIN_UMFUTURE&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                                        let hashtransferToFutHistory = signature(transferToFutHistory);
 
 
-                                    request.get(
-                                        {
-                                            url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToFutHistory}&signature=${hashtransferToFutHistory}`,
-                                            headers: {
-                                                'X-MBX-APIKEY': publicKey
-                                            }
-                                        },
-                                        (err, response, body) => {
-                                            body = JSON.parse(body)
-
-                                            if (body.code && indexError <= 5) {
-                                                console.log("Start depoHistory ", body.code)
-                                                if (body.code !== -1021) {
-                                                    indexError++
+                                        request.get(
+                                            {
+                                                url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToFutHistory}&signature=${hashtransferToFutHistory}`,
+                                                headers: {
+                                                    'X-MBX-APIKEY': publicKey
                                                 }
+                                            },
+                                            (err, response, body) => {
+                                                try {
+                                                    body = JSON.parse(body)
 
-                                                reRequest()
-                                            } else if (body.code && !fatalError) {
-                                                fatalError = true
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Start depoHistory ", body.code)
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
 
-                                                messageBot = `Конечная у мастера
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
                         
-                                                Start depoHistory ${body.code}
+                                                        Start depoHistory ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                        Заплаченная комиссия ${commissionAll}`
 
-                                                botMax.sendMessage(userChatId, messageBot);
-                                            } else {
-                                                if (indexError !== 0) {
-                                                    indexError = 0
-                                                }
-                                                // console.log(body)
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log(body)
 
-                                                // console.log(body.rows.length)
-                                                let newTransferToFutIndex = +body.total
+                                                        // console.log(body.rows.length)
+                                                        let newTransferToFutIndex = +body.total
 
-                                                if (newTransferToFutIndex === transferToFutIndex) {
-
-
-
-                                                    (function reRequest() {
-
-                                                        let transferToSpotHistory = `type=UMFUTURE_MAIN&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
-                                                        let hashtransferToSpotHistory = signature(transferToSpotHistory);
+                                                        if (newTransferToFutIndex === transferToFutIndex) {
 
 
-                                                        request.get(
-                                                            {
-                                                                url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToSpotHistory}&signature=${hashtransferToSpotHistory}`,
-                                                                headers: {
-                                                                    'X-MBX-APIKEY': publicKey
-                                                                }
-                                                            },
-                                                            (err, response, body) => {
-                                                                body = JSON.parse(body)
 
-                                                                if (body.code && indexError <= 5) {
-                                                                    console.log("Start depoHistory ", body.code)
-                                                                    if (body.code !== -1021) {
-                                                                        indexError++
-                                                                    }
+                                                            (function reRequest() {
 
-                                                                    reRequest()
-                                                                } else if (body.code && !fatalError) {
-                                                                    fatalError = true
+                                                                let transferToSpotHistory = `type=UMFUTURE_MAIN&startTime=${startTimeDepoIndex}&timestamp=${Date.now()}`;
+                                                                let hashtransferToSpotHistory = signature(transferToSpotHistory);
 
-                                                                    messageBot = `Конечная у мастера
+
+                                                                request.get(
+                                                                    {
+                                                                        url: `https://api.binance.com/sapi/v1/asset/transfer?${transferToSpotHistory}&signature=${hashtransferToSpotHistory}`,
+                                                                        headers: {
+                                                                            'X-MBX-APIKEY': publicKey
+                                                                        }
+                                                                    },
+                                                                    (err, response, body) => {
+                                                                        try {
+                                                                            body = JSON.parse(body)
+
+                                                                            if (body.code && indexError <= 5) {
+                                                                                console.log("Start depoHistory ", body.code)
+                                                                                if (body.code !== -1021) {
+                                                                                    indexError++
+                                                                                }
+
+                                                                                reRequest()
+                                                                            } else if (body.code && !fatalError) {
+                                                                                fatalError = true
+
+                                                                                messageBot = `Конечная у мастера
                                             
-                                                                    Start depoHistory ${body.code}
+                                                                            Start depoHistory ${body.code}
                                                                     
-                                                                    Заплаченная комиссия ${commissionAll}`
+                                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                                    botMax.sendMessage(userChatId, messageBot);
-                                                                } else {
-                                                                    if (indexError !== 0) {
-                                                                        indexError = 0
-                                                                    }
-                                                                    // console.log(body)
+                                                                                botMax.sendMessage(userChatId, messageBot);
+                                                                            } else {
+                                                                                if (indexError !== 0) {
+                                                                                    indexError = 0
+                                                                                }
+                                                                                // console.log(body)
 
-                                                                    // console.log(body.rows.length)
-                                                                    let newTransferToSpotIndex = +body.total
+                                                                                // console.log(body.rows.length)
+                                                                                let newTransferToSpotIndex = +body.total
 
-                                                                    if (newTransferToSpotIndex === transferToSpotIndex) {
-                                                                        if (+data.d > 0) {
-                                                                            firstDeal = true
-                                                                            allMoney = +(allMoney + +data.d).toFixed(8)
-                                                                        }
+                                                                                if (newTransferToSpotIndex === transferToSpotIndex) {
+                                                                                    if (+data.d > 0) {
+                                                                                        firstDeal = true
+                                                                                        allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                                    }
 
-                                                                        if (+data.d < 0) {
-                                                                            if (workerEnds && globalStart) {
-                                                                                firstDeal = true
-                                                                                allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                                    if (+data.d < 0) {
+                                                                                        if (workerEnds && globalStart) {
+                                                                                            firstDeal = true
+                                                                                            allMoney = +(allMoney + +data.d).toFixed(8)
+                                                                                        }
+                                                                                    }
+
+                                                                                }
+
+
+                                                                                transferToSpotIndex = newTransferToSpotIndex
+
                                                                             }
+                                                                        } catch (error) {
+                                                                            reRequest()
                                                                         }
-
                                                                     }
+                                                                )
+                                                            })()
 
 
-                                                                    transferToSpotIndex = newTransferToSpotIndex
-
-                                                                }
-
-                                                            }
-                                                        )
-                                                    })()
+                                                        }
 
 
+                                                        transferToFutIndex = newTransferToFutIndex
+
+                                                    }
+                                                } catch (error) {
+                                                    reRequest()
                                                 }
-
-
-                                                transferToFutIndex = newTransferToFutIndex
-
                                             }
+                                        )
+                                    })()
+                                }
 
-                                        }
-                                    )
-                                })()
+
+                                depoIndex = newDepoIndex
+
                             }
-
-
-                            depoIndex = newDepoIndex
-
+                        } catch (error) {
+                            reRequest()
                         }
-
                     }
                 );
             })()
@@ -1400,43 +1460,47 @@ async function global() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        console.log(`Старт exchangeInfo мастер `, body.code)
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
+                    try {
 
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            console.log(`Старт exchangeInfo мастер `, body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
-                        messageBot = `Конечная у мастер
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастер
 
                         Старт exchangeInfo ${body.code}
                         
                         Заплаченная комиссия ${commissionAll}`
 
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
-                        }
-
-                        let symbol = body.symbols[0]
-
-                        for (let i = 0; i < symbol.filters.length; i++) {
-                            let filter = symbol.filters[i]
-
-                            if (filter.filterType === "NOTIONAL") {
-                                minNotionalEthbtc = +filter.minNotional
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
                             }
 
+                            let symbol = body.symbols[0]
+
+                            for (let i = 0; i < symbol.filters.length; i++) {
+                                let filter = symbol.filters[i]
+
+                                if (filter.filterType === "NOTIONAL") {
+                                    minNotionalEthbtc = +filter.minNotional
+                                }
+
+                            }
+
+                            resolve()
                         }
-
-                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
-
                 }
             )
         })()
@@ -1456,52 +1520,56 @@ async function global() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
+                    try {
+                        body = JSON.parse(body)
 
-                    if (body.code && indexError <= 5) {
-                        console.log("Check start USDT ", body.code)
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
+                        if (body.code && indexError <= 5) {
+                            console.log("Check start USDT ", body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
 
-                        messageBot = `Конечная у мастера
+                            messageBot = `Конечная у мастера
 
                         Check start USDT ${body.code}
                         
                         Заплаченная комиссия ${commissionAll}`
 
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            for (let i = 0; i < body.length; i++) {
+                                if (body[i].asset === 'USDT') {
+
+                                    let factMoney = +body[i].free
+
+                                    allMoney = factMoney
+
+                                }
+                                if (body[i].asset === 'BTC') {
+
+                                    commissionBtc = +(+body[i].free - baseBtc).toFixed(8)
+
+                                }
+                                if (body[i].asset === 'ETH') {
+
+                                    commissionEth = +(+body[i].free - baseEth).toFixed(8)
+
+                                }
+                            }
+
+
+
+                            resolve()
                         }
-                        for (let i = 0; i < body.length; i++) {
-                            if (body[i].asset === 'USDT') {
-
-                                let factMoney = +body[i].free
-
-                                allMoney = factMoney
-
-                            }
-                            if (body[i].asset === 'BTC') {
-
-                                commissionBtc = +(+body[i].free - baseBtc).toFixed(8)
-
-                            }
-                            if (body[i].asset === 'ETH') {
-
-                                commissionEth = +(+body[i].free - baseEth).toFixed(8)
-
-                            }
-                        }
-
-
-
-                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -1536,7 +1604,7 @@ async function global() {
                 wsBin.on('close', restart)
             }, 1000)
         } else {
-            
+
 
             console.log(`Вебсокет успешно закрыт у мастера ` + new Date().toLocaleTimeString())
         }
@@ -1850,34 +1918,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Buy BTC usdtBtcEth ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Buy BTC usdtBtcEth ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Buy BTC usdtBtcEth ${body.code}
+                                                        Buy BTC usdtBtcEth ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                        Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('4 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('4 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -1897,34 +1969,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Sell ETH usdtBtcEth ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Sell ETH usdtBtcEth ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Sell ETH usdtBtcEth ${body.code}
+                                                            Sell ETH usdtBtcEth ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('6 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('6 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -1943,34 +2019,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Buy ETH usdtBtcEth ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Buy ETH usdtBtcEth ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Buy ETH usdtBtcEth ${body.code}
+                                                            Buy ETH usdtBtcEth ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('5 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('5 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -2126,41 +2206,45 @@ async function global() {
                                                         }
                                                     },
                                                     (err, response, body) => {
-                                                        body = JSON.parse(body)
-                                                        if (body.code && indexError <= 5) {
-                                                            console.log(`Change exchangeInfo мастер `, body.code)
-                                                            if (body.code !== -1021) {
-                                                                indexError++
-                                                            }
-
-                                                            reRequest()
-                                                        } else if (body.code && !fatalError) {
-                                                            fatalError = true
-
-                                                            messageBot = `Конечная у мастер
-                    
-                                                    Change exchangeInfo ${body.code}
-                                                    
-                                                    Заплаченная комиссия ${commissionAll}`
-
-                                                            botMax.sendMessage(userChatId, messageBot);
-                                                        } else {
-                                                            if (indexError !== 0) {
-                                                                indexError = 0
-                                                            }
-
-                                                            let symbol = body.symbols[0]
-
-                                                            for (let i = 0; i < symbol.filters.length; i++) {
-                                                                let filter = symbol.filters[i]
-
-                                                                if (filter.filterType === "NOTIONAL") {
-                                                                    minNotionalEthbtc = +filter.minNotional
+                                                        try {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Change exchangeInfo мастер `, body.code)
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
                                                                 }
 
-                                                            }
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
 
-                                                            resolve()
+                                                                messageBot = `Конечная у мастер
+                    
+                                                                Change exchangeInfo ${body.code}
+                                                    
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+
+                                                                let symbol = body.symbols[0]
+
+                                                                for (let i = 0; i < symbol.filters.length; i++) {
+                                                                    let filter = symbol.filters[i]
+
+                                                                    if (filter.filterType === "NOTIONAL") {
+                                                                        minNotionalEthbtc = +filter.minNotional
+                                                                    }
+
+                                                                }
+
+                                                                resolve()
+                                                            }
+                                                        } catch (error) {
+                                                            reRequest()
                                                         }
 
                                                     }
@@ -2182,31 +2266,35 @@ async function global() {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Sell BTC usdtBtcEth notional мастер `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Sell BTC usdtBtcEth notional мастер `, body.code)
 
-                                                                if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у мастер
+                                                                    messageBot = `Конечная у мастер
                         
-                                                        Sell BTC usdtBtcEth notional ${body.code}
+                                                                    Sell BTC usdtBtcEth notional ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('4 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('4 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -2225,31 +2313,35 @@ async function global() {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Buy ETH usdtBtcEth notional мастер `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Buy ETH usdtBtcEth notional мастер `, body.code)
 
-                                                                if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у мастер
+                                                                    messageBot = `Конечная у мастер
                         
-                                                        Buy ETH usdtBtcEth notional ${body.code}
+                                                                    Buy ETH usdtBtcEth notional ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('6 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('6 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -2373,34 +2465,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Buy ETH usdtEthBtc ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Buy ETH usdtEthBtc ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Buy ETH usdtEthBtc ${body.code}
+                                                            Buy ETH usdtEthBtc ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('1 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('1 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -2420,34 +2516,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Sell BTC usdtEthBtc ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Sell BTC usdtEthBtc ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Sell BTC usdtEthBtc ${body.code}
+                                                            Sell BTC usdtEthBtc ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('3 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('3 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -2466,34 +2566,38 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Sell ETH usdtEthBtc ", body.code)
+                                                    try {
+                                                        body = JSON.parse(body)
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Sell ETH usdtEthBtc ", body.code)
 
-                                                        if (body.code === -1013) {
-                                                            changeNotionalEthBtc = true
-                                                            resolve()
-                                                        } else if (body.code !== -1021) {
-                                                            indexError++
-                                                        }
+                                                            if (body.code === -1013) {
+                                                                changeNotionalEthBtc = true
+                                                                resolve()
+                                                            } else if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                            messageBot = `Конечная у мастера
                         
-                                                Sell ETH usdtEthBtc ${body.code}
+                                                            Sell ETH usdtEthBtc ${body.code}
                                                 
-                                                Заплаченная комиссия ${commissionAll}`
+                                                            Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            // console.log('2 ', body)
+                                                            resolve(body)
                                                         }
-                                                        // console.log('2 ', body)
-                                                        resolve(body)
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
                                                 }
                                             )
@@ -2649,41 +2753,45 @@ async function global() {
                                                         }
                                                     },
                                                     (err, response, body) => {
-                                                        body = JSON.parse(body)
-                                                        if (body.code && indexError <= 5) {
-                                                            console.log(`Change exchangeInfo мастер `, body.code)
-                                                            if (body.code !== -1021) {
-                                                                indexError++
-                                                            }
-
-                                                            reRequest()
-                                                        } else if (body.code && !fatalError) {
-                                                            fatalError = true
-
-                                                            messageBot = `Конечная у мастер
-                    
-                                                    Change exchangeInfo ${body.code}
-                                                    
-                                                    Заплаченная комиссия ${commissionAll}`
-
-                                                            botMax.sendMessage(userChatId, messageBot);
-                                                        } else {
-                                                            if (indexError !== 0) {
-                                                                indexError = 0
-                                                            }
-
-                                                            let symbol = body.symbols[0]
-
-                                                            for (let i = 0; i < symbol.filters.length; i++) {
-                                                                let filter = symbol.filters[i]
-
-                                                                if (filter.filterType === "NOTIONAL") {
-                                                                    minNotionalEthbtc = +filter.minNotional
+                                                        try {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`Change exchangeInfo мастер `, body.code)
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
                                                                 }
 
-                                                            }
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
 
-                                                            resolve()
+                                                                messageBot = `Конечная у мастер
+                    
+                                                                Change exchangeInfo ${body.code}
+                                                    
+                                                                Заплаченная комиссия ${commissionAll}`
+
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+
+                                                                let symbol = body.symbols[0]
+
+                                                                for (let i = 0; i < symbol.filters.length; i++) {
+                                                                    let filter = symbol.filters[i]
+
+                                                                    if (filter.filterType === "NOTIONAL") {
+                                                                        minNotionalEthbtc = +filter.minNotional
+                                                                    }
+
+                                                                }
+
+                                                                resolve()
+                                                            }
+                                                        } catch (error) {
+                                                            reRequest()
                                                         }
 
                                                     }
@@ -2705,31 +2813,35 @@ async function global() {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Buy BTC usdtBtcEth notional мастер `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Buy BTC usdtBtcEth notional мастер `, body.code)
 
-                                                                if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у мастер
+                                                                    messageBot = `Конечная у мастер
                         
-                                                        Buy BTC usdtBtcEth notional ${body.code}
+                                                                    Buy BTC usdtBtcEth notional ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('4 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('4 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -2748,31 +2860,35 @@ async function global() {
                                                             }
                                                         },
                                                         (err, response, body) => {
-                                                            body = JSON.parse(body)
-                                                            if (body.code && indexError <= 5) {
-                                                                console.log(`Sell ETH usdtBtcEth notional мастер `, body.code)
+                                                            try {
+                                                                body = JSON.parse(body)
+                                                                if (body.code && indexError <= 5) {
+                                                                    console.log(`Sell ETH usdtBtcEth notional мастер `, body.code)
 
-                                                                if (body.code !== -1021) {
-                                                                    indexError++
-                                                                }
+                                                                    if (body.code !== -1021) {
+                                                                        indexError++
+                                                                    }
 
-                                                                reRequest()
-                                                            } else if (body.code && !fatalError) {
-                                                                fatalError = true
+                                                                    reRequest()
+                                                                } else if (body.code && !fatalError) {
+                                                                    fatalError = true
 
-                                                                messageBot = `Конечная у мастер
+                                                                    messageBot = `Конечная у мастер
                         
-                                                        Sell ETH usdtBtcEth notional ${body.code}
+                                                                    Sell ETH usdtBtcEth notional ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                                botMax.sendMessage(userChatId, messageBot);
-                                                            } else {
-                                                                if (indexError !== 0) {
-                                                                    indexError = 0
+                                                                    botMax.sendMessage(userChatId, messageBot);
+                                                                } else {
+                                                                    if (indexError !== 0) {
+                                                                        indexError = 0
+                                                                    }
+                                                                    // console.log('6 ', body)
+                                                                    resolve(body)
                                                                 }
-                                                                // console.log('6 ', body)
-                                                                resolve(body)
+                                                            } catch (error) {
+                                                                reRequest()
                                                             }
                                                         }
                                                     )
@@ -2871,40 +2987,44 @@ async function global() {
                                         }
                                     },
                                     (err, response, body) => {
-                                        body = JSON.parse(body)
+                                        try {
+                                            body = JSON.parse(body)
 
-                                        if (body.code && indexError <= 5) {
-                                            console.log(`Check end assets in master `, body.code)
-                                            if (body.code !== -1021) {
-                                                indexError++
-                                            }
+                                            if (body.code && indexError <= 5) {
+                                                console.log(`Check end assets in master `, body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
-                                            reRequest()
-                                        } else if (body.code && !fatalError) {
-                                            fatalError = true
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
 
-                                            messageBot = `Конечная у мастера
+                                                messageBot = `Конечная у мастера
                         
                                                 Check end assets ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
 
-                                            botMax.sendMessage(userChatId, messageBot);
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
-                                            for (let i = 0; i < body.length; i++) {
-                                                if (body[i].asset === 'BTC') {
-
-                                                    restBTC = +body[i].free
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
                                                 }
-                                                if (body[i].asset === 'ETH') {
+                                                for (let i = 0; i < body.length; i++) {
+                                                    if (body[i].asset === 'BTC') {
 
-                                                    restETH = +body[i].free
+                                                        restBTC = +body[i].free
+                                                    }
+                                                    if (body[i].asset === 'ETH') {
+
+                                                        restETH = +body[i].free
+                                                    }
                                                 }
+                                                resolve()
                                             }
-                                            resolve()
+                                        } catch (error) {
+                                            reRequest()
                                         }
                                     }
                                 )
@@ -2931,30 +3051,34 @@ async function global() {
                                         }
                                     },
                                     (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code && indexError <= 5) {
-                                            console.log("End sell BTC ", body.code)
-                                            if (body.code !== -1021) {
-                                                indexError++
-                                            }
+                                        try {
+                                            body = JSON.parse(body)
+                                            if (body.code && indexError <= 5) {
+                                                console.log("End sell BTC ", body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
-                                            reRequest()
-                                        } else if (body.code && !fatalError) {
-                                            fatalError = true
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
 
-                                            messageBot = `Конечная у мастера
+                                                messageBot = `Конечная у мастера
                         
                                                 End sell BTC ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
 
-                                            botMax.sendMessage(userChatId, messageBot);
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
 
-                                            resolve()
+                                                resolve()
+                                            }
+                                        } catch (error) {
+                                            reRequest()
                                         }
                                     }
                                 )
@@ -2973,29 +3097,33 @@ async function global() {
                                         }
                                     },
                                     (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code && indexError <= 5) {
-                                            console.log("End buy BTC fut ", body.code)
-                                            if (body.code !== -1021) {
-                                                indexError++
-                                            }
+                                        try {
+                                            body = JSON.parse(body)
+                                            if (body.code && indexError <= 5) {
+                                                console.log("End buy BTC fut ", body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
-                                            reRequest()
-                                        } else if (body.code && !fatalError) {
-                                            fatalError = true
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
 
-                                            messageBot = `Конечная у мастера
+                                                messageBot = `Конечная у мастера
                         
                                                 End buy BTC fut ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
 
-                                            botMax.sendMessage(userChatId, messageBot);
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
+                                                resolve()
                                             }
-                                            resolve()
+                                        } catch (error) {
+                                            reRequest()
                                         }
                                     }
                                 )
@@ -3014,30 +3142,34 @@ async function global() {
                                         }
                                     },
                                     (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code && indexError <= 5) {
-                                            console.log("End sell ETH ", body.code)
-                                            if (body.code !== -1021) {
-                                                indexError++
-                                            }
+                                        try {
+                                            body = JSON.parse(body)
+                                            if (body.code && indexError <= 5) {
+                                                console.log("End sell ETH ", body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
-                                            reRequest()
-                                        } else if (body.code && !fatalError) {
-                                            fatalError = true
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
 
-                                            messageBot = `Конечная у мастера
+                                                messageBot = `Конечная у мастера
                         
                                                 End sell ETH ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
 
-                                            botMax.sendMessage(userChatId, messageBot);
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
-                                            }
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
 
-                                            resolve()
+                                                resolve()
+                                            }
+                                        } catch (error) {
+                                            reRequest()
                                         }
                                     }
                                 )
@@ -3056,29 +3188,33 @@ async function global() {
                                         }
                                     },
                                     (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code && indexError <= 5) {
-                                            console.log("End buy ETH fut ", body.code)
-                                            if (body.code !== -1021) {
-                                                indexError++
-                                            }
+                                        try {
+                                            body = JSON.parse(body)
+                                            if (body.code && indexError <= 5) {
+                                                console.log("End buy ETH fut ", body.code)
+                                                if (body.code !== -1021) {
+                                                    indexError++
+                                                }
 
-                                            reRequest()
-                                        } else if (body.code && !fatalError) {
-                                            fatalError = true
+                                                reRequest()
+                                            } else if (body.code && !fatalError) {
+                                                fatalError = true
 
-                                            messageBot = `Конечная у мастера
+                                                messageBot = `Конечная у мастера
                         
                                                 End buy ETH fut ${body.code}
                                                 
                                                 Заплаченная комиссия ${commissionAll}`
 
-                                            botMax.sendMessage(userChatId, messageBot);
-                                        } else {
-                                            if (indexError !== 0) {
-                                                indexError = 0
+                                                botMax.sendMessage(userChatId, messageBot);
+                                            } else {
+                                                if (indexError !== 0) {
+                                                    indexError = 0
+                                                }
+                                                resolve()
                                             }
-                                            resolve()
+                                        } catch (error) {
+                                            reRequest()
                                         }
                                     }
                                 )
@@ -3136,40 +3272,44 @@ async function global() {
                             }
                         },
                         (err, response, body) => {
-                            body = JSON.parse(body)
-                            if (body.code && indexError <= 5) {
-                                console.log(`After day exchangeInfo мастер `, body.code)
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
+                            try {
+                                body = JSON.parse(body)
+                                if (body.code && indexError <= 5) {
+                                    console.log(`After day exchangeInfo мастер `, body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
 
-                                messageBot = `Конечная у мастер
+                                    messageBot = `Конечная у мастер
 
                                 After day exchangeInfo ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
 
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
-                                }
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
 
-                                let symbol = body.symbols[0]
+                                    let symbol = body.symbols[0]
 
-                                for (let i = 0; i < symbol.filters.length; i++) {
-                                    let filter = symbol.filters[i]
+                                    for (let i = 0; i < symbol.filters.length; i++) {
+                                        let filter = symbol.filters[i]
 
-                                    if (filter.filterType === "NOTIONAL") {
-                                        minNotionalEthbtc = +filter.minNotional
+                                        if (filter.filterType === "NOTIONAL") {
+                                            minNotionalEthbtc = +filter.minNotional
+                                        }
+
                                     }
 
                                 }
-
+                            } catch (error) {
+                                reRequest()
                             }
 
                         }
@@ -3225,21 +3365,26 @@ async function smoothMoney(change) {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
+                    try {
+                        body = JSON.parse(body)
 
-                    for (let i = 0; i < body.symbols.length; i++) {
-                        let element = body.symbols[i];
+                        for (let i = 0; i < body.symbols.length; i++) {
+                            let element = body.symbols[i];
 
-                        if (element.symbol === 'BTCUSDT') {
-                            notionalBtc = +element.filters[5].notional ? +element.filters[5].notional : 100
+                            if (element.symbol === 'BTCUSDT') {
+                                notionalBtc = +element.filters[5].notional ? +element.filters[5].notional : 100
+                            }
+
+                            if (element.symbol === 'ETHUSDT') {
+                                notionalEth = +element.filters[5].notional ? +element.filters[5].notional : 20
+                            }
+
                         }
-
-                        if (element.symbol === 'ETHUSDT') {
-                            notionalEth = +element.filters[5].notional ? +element.filters[5].notional : 20
-                        }
-
+                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
-                    resolve()
+
                 }
             )
         })()
@@ -3258,53 +3403,57 @@ async function smoothMoney(change) {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth BTC after bigChange ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("Depth BTC after bigChange ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             Depth BTC after bigChange ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                newStartPriceBtc = +body.asks[0][0]
+
+
+
+                                let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                                newBaseBtc = +(factAmount + 0.001).toFixed(3)
+
+                                newBaseBtcSmall = Math.trunc((newBaseBtc / howMuchAccounts) * 100000000) / 100000000
+
+
+                                newBaseBtcInUsdt = +(newBaseBtc * newStartPriceBtc).toFixed(8)
+
+                                let minimumPossibleAmount = notionalBtc / +body.asks[0][0]
+
+                                minimumBuyBtc = Math.trunc((minimumPossibleAmount + 0.001) * 1000) / 1000
+
+                                newHedgeForBtc = +(newBaseBtcInUsdt * 0.15).toFixed(8)
+
+
+
+                                resolve()
                             }
-
-                            newStartPriceBtc = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            newBaseBtc = +(factAmount + 0.001).toFixed(3)
-
-                            newBaseBtcSmall = Math.trunc((newBaseBtc / howMuchAccounts) * 100000000) / 100000000
-
-
-                            newBaseBtcInUsdt = +(newBaseBtc * newStartPriceBtc).toFixed(8)
-
-                            let minimumPossibleAmount = notionalBtc / +body.asks[0][0]
-
-                            minimumBuyBtc = Math.trunc((minimumPossibleAmount + 0.001) * 1000) / 1000
-
-                            newHedgeForBtc = +(newBaseBtcInUsdt * 0.15).toFixed(8)
-
-
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -3320,58 +3469,62 @@ async function smoothMoney(change) {
                         }
                     },
                     (err, response, body) => {
-                        body = JSON.parse(body)
-                        if (body.code && indexError <= 5) {
-                            console.log("Depth ETH after bigChange ", body.code)
-                            if (body.code !== -1021) {
-                                indexError++
-                            }
+                        try {
+                            body = JSON.parse(body)
+                            if (body.code && indexError <= 5) {
+                                console.log("Depth ETH after bigChange ", body.code)
+                                if (body.code !== -1021) {
+                                    indexError++
+                                }
 
-                            reRequest()
-                        } else if (body.code && !fatalError) {
-                            fatalError = true
+                                reRequest()
+                            } else if (body.code && !fatalError) {
+                                fatalError = true
 
-                            messageBot = `Конечная у мастера
+                                messageBot = `Конечная у мастера
     
                             Depth ETH after bigChange ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                            botMax.sendMessage(userChatId, messageBot);
-                        } else {
-                            if (indexError !== 0) {
-                                indexError = 0
+                                botMax.sendMessage(userChatId, messageBot);
+                            } else {
+                                if (indexError !== 0) {
+                                    indexError = 0
+                                }
+
+                                newStartPriceEth = +body.asks[0][0]
+
+
+
+                                let possibleAmount = amountFirstActive / +body.asks[0][0]
+
+                                let factAmount = Math.trunc(possibleAmount * 1000) / 1000
+
+                                newBaseEth = +(factAmount + 0.001).toFixed(3)
+
+                                newBaseEthSmall = Math.trunc((newBaseEth / howMuchAccounts) * 10000000) / 10000000
+
+
+                                newBaseEthInUsdt = +(newBaseEth * newStartPriceEth).toFixed(8)
+
+
+                                let minimumPossibleAmount = notionalEth / +body.asks[0][0]
+
+                                minimumBuyEth = Math.trunc((minimumPossibleAmount + 0.002) * 1000) / 1000
+
+                                let minimumPossibleAmountSpot = 5 / +body.asks[0][0]
+
+                                minimumSpotEth = Math.trunc((minimumPossibleAmountSpot + 0.0002) * 10000) / 10000
+
+                                newHedgeForEth = +(newBaseEthInUsdt * 0.15).toFixed(8)
+
+
+
+                                resolve()
                             }
-
-                            newStartPriceEth = +body.asks[0][0]
-
-
-
-                            let possibleAmount = amountFirstActive / +body.asks[0][0]
-
-                            let factAmount = Math.trunc(possibleAmount * 1000) / 1000
-
-                            newBaseEth = +(factAmount + 0.001).toFixed(3)
-
-                            newBaseEthSmall = Math.trunc((newBaseEth / howMuchAccounts) * 10000000) / 10000000
-
-
-                            newBaseEthInUsdt = +(newBaseEth * newStartPriceEth).toFixed(8)
-
-
-                            let minimumPossibleAmount = notionalEth / +body.asks[0][0]
-
-                            minimumBuyEth = Math.trunc((minimumPossibleAmount + 0.002) * 1000) / 1000
-
-                            let minimumPossibleAmountSpot = 5 / +body.asks[0][0]
-
-                            minimumSpotEth = Math.trunc((minimumPossibleAmountSpot + 0.0002) * 10000) / 10000
-
-                            newHedgeForEth = +(newBaseEthInUsdt * 0.15).toFixed(8)
-
-
-
-                            resolve()
+                        } catch (error) {
+                            reRequest()
                         }
                     }
                 )
@@ -3511,31 +3664,35 @@ async function smoothMoney(change) {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code && indexError <= 5) {
-                        console.log(`Trans ${typeTransfer} after bigChange `, body.code)
-                        if (body.code !== -1021) {
-                            indexError++
-                        }
+                    try {
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            console.log(`Trans ${typeTransfer} after bigChange `, body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
-                        reRequest()
-                    } else if (body.code && !fatalError) {
-                        fatalError = true
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
 
-                        messageBot = `Конечная у мастера
+                            messageBot = `Конечная у мастера
 
-                    Trans ${typeTransfer} after bigChange ${body.code}
+                            Trans ${typeTransfer} after bigChange ${body.code}
                     
-                    Заплаченная комиссия ${commissionAll}`
+                            Заплаченная комиссия ${commissionAll}`
 
-                        botMax.sendMessage(userChatId, messageBot);
-                    } else {
-                        if (indexError !== 0) {
-                            indexError = 0
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+
+                            buyCoinsEnd()
+
                         }
-
-                        buyCoinsEnd()
-
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -3569,31 +3726,35 @@ async function smoothMoney(change) {
                                 }
                             },
                             (err, response, body) => {
-                                body = JSON.parse(body)
-                                if (body.code && indexError <= 5) {
-                                    console.log(`${sideDealBtc} BTC bigChange `, body.code)
-                                    if (body.code !== -1021) {
-                                        indexError++
-                                    }
+                                try {
+                                    body = JSON.parse(body)
+                                    if (body.code && indexError <= 5) {
+                                        console.log(`${sideDealBtc} BTC bigChange `, body.code)
+                                        if (body.code !== -1021) {
+                                            indexError++
+                                        }
 
-                                    reRequest()
-                                } else if (body.code && !fatalError) {
-                                    fatalError = true
+                                        reRequest()
+                                    } else if (body.code && !fatalError) {
+                                        fatalError = true
 
-                                    messageBot = `Конечная у мастера
+                                        messageBot = `Конечная у мастера
                 
                                     ${sideDealBtc} BTC bigChange ${body.code}
                                     
                                     Заплаченная комиссия ${commissionAll}`
 
-                                    botMax.sendMessage(userChatId, messageBot);
-                                } else {
-                                    if (indexError !== 0) {
-                                        indexError = 0
+                                        botMax.sendMessage(userChatId, messageBot);
+                                    } else {
+                                        if (indexError !== 0) {
+                                            indexError = 0
+                                        }
+
+
+                                        resolve()
                                     }
-
-
-                                    resolve()
+                                } catch (error) {
+                                    reRequest()
                                 }
                             }
                         )
@@ -3625,29 +3786,33 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log(`${sideDealBtcFut} BTC fut bigChange `, body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         ${sideDealBtcFut} BTC fut bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+                                            resolve()
                                         }
-                                        resolve()
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -3665,67 +3830,75 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log("Buy BTC fut for dopMinus ", body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log("Buy BTC fut for dopMinus ", body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         Buy BTC fut for dopMinus ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        }
-                                        (function reRequest() {
-                                            let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${minimumBuyBtc}&timestamp=${Date.now()}`
-                                            let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+                                            (function reRequest() {
+                                                let queryOrderSellFutBtc = `symbol=BTCUSDT&side=${sideDealBtcFut}&type=MARKET&quantity=${minimumBuyBtc}&timestamp=${Date.now()}`
+                                                let hashOrderSellFutBtc = signature(queryOrderSellFutBtc)
 
-                                            request.post(
-                                                {
-                                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
-                                                    headers: {
-                                                        'X-MBX-APIKEY': publicKey
-                                                    }
-                                                },
-                                                (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Sell BTC fut after dopMinus ", body.code)
-                                                        if (body.code !== -1021) {
-                                                            indexError++
+                                                request.post(
+                                                    {
+                                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutBtc}&signature=${hashOrderSellFutBtc}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
                                                         }
+                                                    },
+                                                    (err, response, body) => {
+                                                        try {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log("Sell BTC fut after dopMinus ", body.code)
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                                messageBot = `Конечная у мастера
                                     
-                                                        Sell BTC fut after dopMinus ${body.code}
+                                                                Sell BTC fut after dopMinus ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                resolve()
+                                                            }
+                                                        } catch (error) {
+                                                            reRequest()
                                                         }
-                                                        resolve()
                                                     }
-                                                }
-                                            )
-                                        })()
+                                                )
+                                            })()
+                                        }
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -3752,32 +3925,36 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`${sideDealEth} ETH bigChange `, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log(`${sideDealEth} ETH bigChange `, body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         ${sideDealEth} ETH bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+
+
+
+                                            resolve()
                                         }
-
-
-
-                                        resolve()
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -3795,72 +3972,80 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`${sideDealEth} 1 ETH bigChange dopMinimumSpotEth `, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log(`${sideDealEth} 1 ETH bigChange dopMinimumSpotEth `, body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         ${sideDealEth} 1 ETH bigChange dopMinimumSpotEth ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        };
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            };
 
-                                        (function reRequest() {
-                                            let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumSpotEth}&timestamp=${Date.now()}`;
-                                            let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
+                                            (function reRequest() {
+                                                let queryOrderBuyEthUsdt = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumSpotEth}&timestamp=${Date.now()}`;
+                                                let hashOrderBuyEthUsdt = signature(queryOrderBuyEthUsdt);
 
-                                            request.post(
-                                                {
-                                                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
-                                                    headers: {
-                                                        'X-MBX-APIKEY': publicKey
-                                                    }
-                                                },
-                                                (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log(`${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth `, body.code)
-                                                        if (body.code !== -1021) {
-                                                            indexError++
+                                                request.post(
+                                                    {
+                                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyEthUsdt}&signature=${hashOrderBuyEthUsdt}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
                                                         }
+                                                    },
+                                                    (err, response, body) => {
+                                                        try {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log(`${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth `, body.code)
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                                messageBot = `Конечная у мастера
                                     
-                                                        ${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth ${body.code}
+                                                                ${sideDealEthFut} 2 ETH bigChange dopMinimumSpotEth ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+
+
+
+                                                                resolve()
+                                                            }
+                                                        } catch (error) {
+                                                            reRequest()
                                                         }
-
-
-
-                                                        resolve()
                                                     }
-                                                }
-                                            )
-                                        })()
+                                                )
+                                            })()
 
+                                        }
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -3893,29 +4078,33 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log(`${sideDealEthFut} ETH fut bigChange `, body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         ${sideDealEthFut} ETH fut bigChange ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+                                            resolve()
                                         }
-                                        resolve()
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -3933,67 +4122,75 @@ async function smoothMoney(change) {
                                     }
                                 },
                                 (err, response, body) => {
-                                    body = JSON.parse(body)
-                                    if (body.code && indexError <= 5) {
-                                        console.log("Buy ETH fut for dopMinus ", body.code)
-                                        if (body.code !== -1021) {
-                                            indexError++
-                                        }
+                                    try {
+                                        body = JSON.parse(body)
+                                        if (body.code && indexError <= 5) {
+                                            console.log("Buy ETH fut for dopMinus ", body.code)
+                                            if (body.code !== -1021) {
+                                                indexError++
+                                            }
 
-                                        reRequest()
-                                    } else if (body.code && !fatalError) {
-                                        fatalError = true
+                                            reRequest()
+                                        } else if (body.code && !fatalError) {
+                                            fatalError = true
 
-                                        messageBot = `Конечная у мастера
+                                            messageBot = `Конечная у мастера
                     
                                         Buy ETH fut for dopMinus ${body.code}
                                         
                                         Заплаченная комиссия ${commissionAll}`
 
-                                        botMax.sendMessage(userChatId, messageBot);
-                                    } else {
-                                        if (indexError !== 0) {
-                                            indexError = 0
-                                        }
-                                        (function reRequest() {
-                                            let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumBuyEth}&timestamp=${Date.now()}`
-                                            let hashOrderSellFutEth = signature(queryOrderSellFutEth)
+                                            botMax.sendMessage(userChatId, messageBot);
+                                        } else {
+                                            if (indexError !== 0) {
+                                                indexError = 0
+                                            }
+                                            (function reRequest() {
+                                                let queryOrderSellFutEth = `symbol=ETHUSDT&side=${sideDealEthFut}&type=MARKET&quantity=${minimumBuyEth}&timestamp=${Date.now()}`
+                                                let hashOrderSellFutEth = signature(queryOrderSellFutEth)
 
-                                            request.post(
-                                                {
-                                                    url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
-                                                    headers: {
-                                                        'X-MBX-APIKEY': publicKey
-                                                    }
-                                                },
-                                                (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code && indexError <= 5) {
-                                                        console.log("Sell ETH fut after dopMinus ", body.code)
-                                                        if (body.code !== -1021) {
-                                                            indexError++
+                                                request.post(
+                                                    {
+                                                        url: `https://fapi.binance.com/fapi/v1/order?${queryOrderSellFutEth}&signature=${hashOrderSellFutEth}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
                                                         }
+                                                    },
+                                                    (err, response, body) => {
+                                                        try {
+                                                            body = JSON.parse(body)
+                                                            if (body.code && indexError <= 5) {
+                                                                console.log("Sell ETH fut after dopMinus ", body.code)
+                                                                if (body.code !== -1021) {
+                                                                    indexError++
+                                                                }
 
-                                                        reRequest()
-                                                    } else if (body.code && !fatalError) {
-                                                        fatalError = true
+                                                                reRequest()
+                                                            } else if (body.code && !fatalError) {
+                                                                fatalError = true
 
-                                                        messageBot = `Конечная у мастера
+                                                                messageBot = `Конечная у мастера
                                     
-                                                        Sell ETH fut after dopMinus ${body.code}
+                                                                Sell ETH fut after dopMinus ${body.code}
                                                         
-                                                        Заплаченная комиссия ${commissionAll}`
+                                                                Заплаченная комиссия ${commissionAll}`
 
-                                                        botMax.sendMessage(userChatId, messageBot);
-                                                    } else {
-                                                        if (indexError !== 0) {
-                                                            indexError = 0
+                                                                botMax.sendMessage(userChatId, messageBot);
+                                                            } else {
+                                                                if (indexError !== 0) {
+                                                                    indexError = 0
+                                                                }
+                                                                resolve()
+                                                            }
+                                                        } catch (error) {
+                                                            reRequest()
                                                         }
-                                                        resolve()
                                                     }
-                                                }
-                                            )
-                                        })()
+                                                )
+                                            })()
+                                        }
+                                    } catch (error) {
+                                        reRequest()
                                     }
                                 }
                             )
@@ -4081,65 +4278,69 @@ async function smoothMoney(change) {
                             }
                         },
                         (err, response, body) => {
-                            body = JSON.parse(body)
+                            try {
+                                body = JSON.parse(body)
 
-                            if (body.code && indexError <= 5) {
-                                console.log("Check bigChange USDT ", body.code)
-                                if (body.code !== -1021) {
-                                    indexError++
-                                }
+                                if (body.code && indexError <= 5) {
+                                    console.log("Check bigChange USDT ", body.code)
+                                    if (body.code !== -1021) {
+                                        indexError++
+                                    }
 
-                                reRequest()
-                            } else if (body.code && !fatalError) {
-                                fatalError = true
+                                    reRequest()
+                                } else if (body.code && !fatalError) {
+                                    fatalError = true
 
-                                messageBot = `Конечная у мастера
+                                    messageBot = `Конечная у мастера
             
                                 Check bigChange USDT ${body.code}
                                 
                                 Заплаченная комиссия ${commissionAll}`
 
-                                botMax.sendMessage(userChatId, messageBot);
-                            } else {
-                                if (indexError !== 0) {
-                                    indexError = 0
+                                    botMax.sendMessage(userChatId, messageBot);
+                                } else {
+                                    if (indexError !== 0) {
+                                        indexError = 0
+                                    }
+                                    for (let i = 0; i < body.length; i++) {
+                                        if (body[i].asset === 'USDT') {
+
+                                            if (bigChange) {
+                                                let factMoney = +body[i].free
+                                                firstDeal = true
+                                                allMoney = factMoney
+
+
+
+
+                                            } else if (workerSayChange) {
+
+                                                baseUsdt = +body[i].free
+
+                                                baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
+                                            }
+
+
+                                        }
+                                        if (body[i].asset === 'BTC') {
+                                            if (bigChange) {
+                                                commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+                                            } else if (workerSayChange) {
+                                                restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                            }
+                                        }
+                                        if (body[i].asset === 'ETH') {
+                                            if (bigChange) {
+                                                commissionEth = +(+body[i].free - baseEth).toFixed(8)
+                                            } else if (workerSayChange) {
+                                                restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
+                                            }
+                                        }
+                                    }
+                                    resolve()
                                 }
-                                for (let i = 0; i < body.length; i++) {
-                                    if (body[i].asset === 'USDT') {
-
-                                        if (bigChange) {
-                                            let factMoney = +body[i].free
-                                            firstDeal = true
-                                            allMoney = factMoney
-
-
-
-
-                                        } else if (workerSayChange) {
-
-                                            baseUsdt = +body[i].free
-
-                                            baseUsdtSmall = Math.trunc((baseUsdt / howMuchAccounts) * 100000000) / 100000000
-                                        }
-
-
-                                    }
-                                    if (body[i].asset === 'BTC') {
-                                        if (bigChange) {
-                                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
-                                        } else if (workerSayChange) {
-                                            restBtcSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-                                        }
-                                    }
-                                    if (body[i].asset === 'ETH') {
-                                        if (bigChange) {
-                                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
-                                        } else if (workerSayChange) {
-                                            restEthSmall = Math.trunc((+body[i].free / howMuchAccounts) * 100000000) / 100000000
-                                        }
-                                    }
-                                }
-                                resolve()
+                            } catch (error) {
+                                reRequest()
                             }
                         }
                     )

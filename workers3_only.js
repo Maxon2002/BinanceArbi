@@ -1139,7 +1139,7 @@ async function global() {
                                                 } else {
 
                                                     stopGame = true
-                                                   
+
 
                                                 }
 
@@ -1661,7 +1661,7 @@ async function global() {
                                                 } else {
 
                                                     stopGame = true
-                                                   
+
 
                                                 }
 
@@ -2059,85 +2059,87 @@ async function global() {
 
 
 function checkMoneyAfterBig() {
-    (function reRequest() {
-        let queryAsset = `timestamp=${Date.now()}`;
-        let hashAsset = signature(queryAsset);
+    setTimeout(() => {
+        (function reRequest() {
+            let queryAsset = `timestamp=${Date.now()}`;
+            let hashAsset = signature(queryAsset);
 
-        request.post(
-            {
-                url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
-                headers: {
-                    'X-MBX-APIKEY': publicKey
-                }
-            },
-            (err, response, body) => {
-                body = JSON.parse(body)
-
-
-
-                if (body.code && indexError <= 5) {
-                    console.log(`Check после bigChange USDT ${account.index}`, body.code)
-                    if (body.code !== -1021) {
-                        indexError++
+            request.post(
+                {
+                    url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+                    headers: {
+                        'X-MBX-APIKEY': publicKey
                     }
+                },
+                (err, response, body) => {
+                    body = JSON.parse(body)
 
-                    reRequest()
-                } else if (body.code && !fatalError) {
-                    fatalError = true
 
-                    messageBot = `Конечная у ${account.name}
+
+                    if (body.code && indexError <= 5) {
+                        console.log(`Check после bigChange USDT ${account.index}`, body.code)
+                        if (body.code !== -1021) {
+                            indexError++
+                        }
+
+                        reRequest()
+                    } else if (body.code && !fatalError) {
+                        fatalError = true
+
+                        messageBot = `Конечная у ${account.name}
 
                             Check после bigChange USDT ${body.code}
                             
                             Заплаченная комиссия ${commissionAll}`
 
-                    botMax.sendMessage(userChatId, messageBot);
-                } else {
-                    if (indexError !== 0) {
-                        indexError = 0
+                        botMax.sendMessage(userChatId, messageBot);
+                    } else {
+                        if (indexError !== 0) {
+                            indexError = 0
+                        }
+                        for (let i = 0; i < body.length; i++) {
+                            if (body[i].asset === 'USDT') {
+
+                                let factMoney = +body[i].free
+
+                                firstDeal = true
+                                allMoney = factMoney
+
+                                console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
+
+
+                            }
+                            if (body[i].asset === 'BTC') {
+
+                                commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
+
+                                console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
+
+                                console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
+                                console.log('commissionBtc ', commissionBtc)
+
+
+
+                            }
+                            if (body[i].asset === 'ETH') {
+
+                                commissionEth = +(+body[i].free - baseEth).toFixed(8)
+
+                                console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
+                                console.log('commissionEth ', commissionEth)
+                            }
+                        }
+
+
+                        bigChange = false
+                        bigChangeStart = false
+
                     }
-                    for (let i = 0; i < body.length; i++) {
-                        if (body[i].asset === 'USDT') {
-
-                            let factMoney = +body[i].free
-
-                            firstDeal = true
-                            allMoney = factMoney
-
-                            console.log(`allMoney после чека после bigChange ${account.index}`, allMoney)
-
-
-                        }
-                        if (body[i].asset === 'BTC') {
-
-                            commissionBtc = +(+body[i].free - baseBtc - (dirtBtc + dirtAmountGo)).toFixed(8)
-
-                            console.log(`All btc ${+body[i].free}, baseBtc ${baseBtc}`)
-
-                            console.log(`DirtBtc ${dirtBtc}, dirtAmountGo ${dirtAmountGo}`)
-                            console.log('commissionBtc ', commissionBtc)
-
-
-
-                        }
-                        if (body[i].asset === 'ETH') {
-
-                            commissionEth = +(+body[i].free - baseEth).toFixed(8)
-
-                            console.log(`All eth ${+body[i].free}, baseEth ${baseEth}`)
-                            console.log('commissionEth ', commissionEth)
-                        }
-                    }
-
-
-                    bigChange = false
-                    bigChangeStart = false
-
                 }
-            }
-        )
+            )
 
-    })()
+        })()
+    }, 15000)
 }
 
 
