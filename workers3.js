@@ -105,7 +105,7 @@ process.on('message', (packet) => {
         let secretKey = account.secretKey
         let publicKey = account.publicKey
 
-
+        waitUpdate = account.waitUpdate
 
 
         function signature(query) {
@@ -408,6 +408,15 @@ process.on('message', (packet) => {
                                                 });
 
                                                 checkMoneyAfterBig();
+                                            }
+                                        }
+
+                                        if(!bigChange && !stopGame) {
+                                            if (newDepoIndex !== depoIndex && newDepoIndex > 3 && globalStart) {
+    
+                                                firstDeal = true
+                                                allMoney = +(allMoney + +data.d).toFixed(8)
+    
                                             }
                                         }
 
