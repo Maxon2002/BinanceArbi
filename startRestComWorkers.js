@@ -11,93 +11,143 @@ const pm2 = require('pm2')
 const accountsObj = {
     a1: {
         address: "0x40125acedd1dddfb4e1039c137475c6ee866ffd7",
-        secretKey: "I7Vi2AvDHANOZcQHQTFXD2iF0kgixds06wxke7JX5IHirTqLC8OO5z4AM6gBrfNp",
-        publicKey: "snqsC85xakRLvAfSbgBOgVRe1Ke005JVCfEdP9hZLD1PwSfTq52BZg400sFDKebW",
+        secretKey: "kVSvIuMc9OlyLNNwczXX0ATJwOMjleFGFe3AL2CFcUzpd4hlKQ7hzbaxlWqLiqfa",
+        publicKey: "tX0dI7xejbDJWIvP2v5wfSgfru0MtxuSQluyCIjjqvPmzgXFgHugVkl4z3eB41B1",
         id: null,
         index: 0,
-        name: 'filimon',
-        comAll: 50
+        name: 'brusco',
+        comAll: 91.36,
+        waitUpdate: false
     },
     a2: {
         address: "0x74b051df3fcd8a1d955c6fc7dd2111b509ab800d",
-        secretKey: "SDNJwmYi7B5pCGGX3LixkmZ1ra7brkfZg3ZqgQZuFAjtNIs2sEAop2HAB5PCB4b3",
-        publicKey: "uLI3b77nXb5HRM1VrF9BZlBLPJ5wGiFdbOjceTMjBWb2NcmkdW4GRYimq9bIzO11",
+        secretKey: "Jb5SCKEvmdNvdD44455g3H7o8EmbchFHZ3iq99R0RM5zJ14130NAAwvT6MVz6JZM",
+        publicKey: "rdVcK8yA6AIjRe6XbZrtc6LZ75rs0hWDwdlzKskBAvbrO5N1dDmaddoHJuJ0VhbF",
         id: null,
         index: 1,
-        name: 'kiril',
-        comAll: 50
+        name: 'vanek',
+        comAll: 91.35,
+        waitUpdate: false
     },
     a3: {
         address: "0x3981ceb32473d2596d45c4576a4d8cc63edc3aa6",
-        secretKey: "lMDlG9tUorQw6guCdr8WbG0hxlH2yLDylQDoSVNQ8HwCHyFr7iVdBQhctxWOgG5g",
-        publicKey: "LrLcedUKH8spAemCZ5PRl1pIFLAmRGN15amnTaUmC801JeEWxDasdnpXWE49ALh5",
+        secretKey: "GzNpwTVhVCTapVhj3JPQlS0p8caFZzxN2f1Ph1mWbotRlX9luryPIOH4bZp98oYq",
+        publicKey: "WPCsCp8SUWXNEbBKJwEi0p2flJafoMRaVW5eBTvp2HY1HLPS4OteqanulJoHtLYt",
         id: null,
         index: 2,
-        name: 'ginger',
-        comAll: 50
+        name: 'boris',
+        comAll: 91.13,
+        waitUpdate: true
     },
     a4: {
         address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
-        secretKey: "Fl4b0hn09twPokXAV9VjhysSM3fOgrKBOGPufBUETyFm39zQs9x1vCYqNk9HMzBi",
-        publicKey: "5j84ZxdtbplIh410dNd7KNK5VF66LyVUlewcHvn8Z1YSG71b2J4C2ANXBKVq2xTM",
+        secretKey: "0aYSlQqEoSeJ4d61m0SkcJXmsUJqyrOu1laE04H2AG4snjlMj7yAGgPQ2PmcMTjk",
+        publicKey: "3xJ8yuG5tU0mrY4iKQsjUIGOUdTGmvYgcbtgGDRTxSzOIPYir5e0tSDtPBbIVnkf",
         id: null,
         index: 3,
-        name: 'bronson',
-        comAll: 80
+        name: 'paul',
+        comAll: 91.32,
+        waitUpdate: false
     },
     a5: {
         address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
-        secretKey: "DNYWcnHJIb5K2aWmsrVrx7pXk4svFj4owzts1xTacXxveiqUGZhBN5mjg0NNOews",
-        publicKey: "HWJBtOwXS7LBHaqm0yjnkb8SD4dR16VgJWeuybgQjuC3v8JKahVemVNoVLFDkw3l",
+        secretKey: "yAuEYmAVvOZoVwGk4KO80Ec1Ck9cMmEAidfwT3fkgVs9mlDNbId73bcehxpoDDqE",
+        publicKey: "XPnTSmnKjyaJTpfu19rcOHnobnHWqN6am0dqhVFwLFBKCrAOTjyWPL91pnaxyjFh",
         id: null,
         index: 4,
-        name: 'roman',
-        comAll: 30
+        name: 'vinsent',
+        comAll: 91.28,
+        waitUpdate: true
     },
     a6: {
         address: "0xafcca28ca27699da3bf6209dc8723bc6ad43b070",
-        secretKey: "fldf97H4svHzpL5IEbiovY6RS5M3vVMjwF3aKR9q2IeeKo9ezuwDGBfgTG3nwReF",
-        publicKey: "zc9SbJOLvfiamR8Y2I3y2S0q9JYdb0qIltwX4KYs9wZqcaisUaVayocE48FDnqSL",
+        secretKey: "KLgjbUF6npQPTBQVdidLgw19GFTZg1c8KTEc3mnDC8EUrvBZwIveeiNSaoNEfqIL",
+        publicKey: "kKpq6xwa356p8nPSrKL5vdSmmpiMdBpnZyqT4HeKwa8UuGLa6RNYh7vaMRmHVskj",
         id: null,
         index: 5,
-        name: 'robert',
-        comAll: 50
+        name: 'rando',
+        comAll: 91.39,
+        waitUpdate: false
     },
     a7: {
         address: "0x2b2e8b9d6dfa22533aa103a83603d5cbe395fadf",
-        secretKey: "d8vq1FkiWrK2ULnEmRdpZSBQaieGzlJJYqXpQwBTooGj47lAKTIwMKbPciHUkHOp",
-        publicKey: "aw50JlBVPxgFxjQYyAJNO52qqSOFcoCOm3kTzFW7PhyM52CQrHfn7H5mvcJ8PyWL",
+        secretKey: "9EAStqmgGLZJ49eVTTdI2V1VEwZNZztwTgR5tc8eZVY5QsEsdYWRiLJojbg5TkXQ",
+        publicKey: "3pPx0nsdcZruqCDUJmdm9TOibZVAj5itZh1MlzB1dHep7Xmb4w5yZy78ARO2OSij",
         id: null,
         index: 6,
-        name: 'philip',
-        comAll: 50
+        name: 'kihat',
+        comAll: 91.46,
+        waitUpdate: false
     },
     a8: {
         address: "0x06b2828f3f92718a308d134839053d17d9770771",
-        secretKey: "7BQa8Xc2PuQN7DzU066jWkLTS1pAfRm2JOrNyZK8AuRMMf3EZ6mGRH8HV7RBODah",
-        publicKey: "y6nm84UziXPXXvrN1WliGvi9xjoTQwJW9r2MAP8b3SedhJWGFdXtM10EHwzaDs0o",
+        secretKey: "59eYPoWUeL94BHfJR81CYz22fPFBfPh5jQlVqG01E5Po63klXcLpe1SwICA9Kpjl",
+        publicKey: "pbrDcx9cedbBNXiRvgt3qSI4tNr7RCGlI3j3kSFN2gFq8hSw04KJJoxvjO7C3p2E",
         id: null,
         index: 7,
-        name: 'luisio',
-        comAll: 50
+        name: 'hank',
+        comAll: 91.09,
+        waitUpdate: false
     },
     a9: {
         address: "0xf3386c4289e0a56966297e090a590745f0861083",
-        secretKey: "55cWFhvQkZ328JgSdxzIs24d4jr0my11Niu59qi3ogEqR1zNXPhp1Pa8RcX7fC8u",
-        publicKey: "O1YnA4OC0cr0VIAsJvaq4sLfOxz7STyv9XUidKufFlWHVJuAXwbbMnBEZggCW3Y7",
+        secretKey: "rPUKuHOiFkvy4K4fI67jbVCuYGiP6qcwiLhhLWFxgjiFxXB7RXODtnJJ7t4z47dt",
+        publicKey: "MlPfT59J0LVQVXfbWk46sItd8eUhhsOC2RtOK7GkQtixNnOMTF0DxsTBKLTCdmj2",
         id: null,
         index: 8,
-        name: 'wiliam',
-        comAll: 50
+        name: 'tron',
+        comAll: 91.18,
+        waitUpdate: false
     },
     a10: {
         address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
-        secretKey: "XQyWWQIskGL1HiaYnMmXVjfoyexUdVyGVXcIb9GtnRzqovx8jsoAa0JWGo4SuSfX",
-        publicKey: "PzDaktX88krW98Kd09QYUdiDe0NcDg0YZGqMtvZcuzSYwMntrLiFcZjLis7MyJTb",
+        secretKey: "nJpW6eisNu4ANNq0Xn4cH7UTVIQX4lUkTxaAprHHICOjFVxVdHhlgKFz5yAadLij",
+        publicKey: "msklQDczEqVQ1ab6wcTnM2YpK1ppWcwOLBqU8XB2L1KYdQ5byRcQJK7xVC6X0vXg",
         id: null,
         index: 9,
-        name: 'timati',
-        comAll: 50
+        name: 'lonson',
+        comAll: 91.14,
+        waitUpdate: false
+    },
+    a11: {
+        address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
+        secretKey: "8VMNyDSgUjViMkzoeQrg8dPpIzsTiZP5GJgRaGWk3g3wdheOq4nVPlOvF2LsfktG",
+        publicKey: "CAwA4cC1Ohray1hcg0p7Jou3ZQWFvn0WwrXZhJY9IQA23i44rx9yu8XVm8FuXpMc",
+        id: null,
+        index: 9,
+        name: 'klaus',
+        comAll: 91.14,
+        waitUpdate: false
+    },
+    a12: {
+        address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
+        secretKey: "o48YmTkoKe36mG801X8EyBpVx1aFNtSkHr9q2VSXlmXCekIE7MXBKEO29c120Dxt",
+        publicKey: "MauL5WB8rQwdUOuY112ov23xSaTcsgV907YFlqrOn5y7raw0sdYx3fYzilGXyFlU",
+        id: null,
+        index: 9,
+        name: 'dado',
+        comAll: 91.13,
+        waitUpdate: false
+    },
+    a13: {
+        address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
+        secretKey: "ylvT6NQ67IvXQTeFeHcU44GW2j5SWQxWJy1m9LaowLgJ98gpqBpDDlS2LZkwoI4e",
+        publicKey: "xeKM97KgegG44NfoIGMxn5XCrR6fz4CcKKIpLa2MsFCyXdjwu4Qzqzg0C6iRbvrd",
+        id: null,
+        index: 9,
+        name: 'malmo',
+        comAll: 91.34,
+        waitUpdate: false
+    },
+    a14: {
+        address: "0x9a247d4c46343aaeab117067cbb4f107ccf549d2",
+        secretKey: "psAsVQbDmOARIXIgaSzVAUqnuyqqdbOl6cgiRIKsCtdaHssMQbEBUeVHVZF195RT",
+        publicKey: "r3pxoa0PXzIXkeg9iYU2MybaHNKzrPWJ5V7z7eeNAdDL4OEA2VmiuwrQIIMa2ocD",
+        id: null,
+        index: 9,
+        name: 'emelin',
+        comAll: 91.41,
+        waitUpdate: false
     }
 }
 

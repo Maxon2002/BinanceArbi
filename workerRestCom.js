@@ -6,6 +6,35 @@ const WebSocket = require('ws');
 
 const pm2 = require('pm2')
 
+let messageBot = null
+
+let botKey = "7176718080:AAHk5RzYR7uL9BmeqQNrJ3B_sxA6Ucnu_aM"
+
+const TelegramBot = require('node-telegram-bot-api');
+
+const botMax = new TelegramBot(botKey, { polling: true });
+
+
+const userChatId = 647607874;
+
+botMax.on('polling_error', (error) => {
+    // console.error('Ошибка опроса:', error.code); // Логируем ошибку
+    if (error.code === 'ECONNRESET') {
+        console.error('Соединение было неожиданно разорвано'); // Дополнительные действия для этой ошибки
+
+        setTimeout(() => {
+            botMax.sendMessage(userChatId, messageBot);
+
+        }, 5000);
+    }
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    setTimeout(() => {
+        botMax.sendMessage(userChatId, messageBot);
+
+    }, 5000);
+});
 
 
 
@@ -27,7 +56,7 @@ process.on('message', (packet) => {
     if (packet.topic === 'startWork') {
 
         setTimeout(() => {
-            
+
 
 
 
@@ -48,7 +77,7 @@ process.on('message', (packet) => {
 
 
 
-            let startD = +new Date(2024, 2, 11, 5);
+            let startD = +new Date(2024, 2, 26, 5);
 
             (async () => {
 
@@ -184,10 +213,15 @@ process.on('message', (packet) => {
 
                 console.log(commissionAll)
 
-                console.log(account.comAll - commissionAll)
+                let restC = account.comAll - commissionAll
+                console.log(restC)
 
 
                 console.log(factDealArr.length)
+
+                messageBot = `Комссия у ${account.name} ${restC}`
+
+                botMax.sendMessage(userChatId, messageBot);
 
             })()
         }, 8000)
