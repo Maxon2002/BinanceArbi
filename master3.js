@@ -48,7 +48,7 @@ const accountsObj = {
         id: null,
         index: 0,
         name: 'brusco',
-        comAll: 20,
+        comAll: 84.113066,
         waitUpdate: false
     },
     a2: {
@@ -58,7 +58,7 @@ const accountsObj = {
         id: null,
         index: 1,
         name: 'vanek',
-        comAll: 20,
+        comAll: 84.133958,
         waitUpdate: false
     },
     a3: {
@@ -68,8 +68,8 @@ const accountsObj = {
         id: null,
         index: 2,
         name: 'boris',
-        comAll: 0,
-        waitUpdate: true
+        comAll: 83.85191,
+        waitUpdate: false
     },
     a4: {
         address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
@@ -78,7 +78,7 @@ const accountsObj = {
         id: null,
         index: 3,
         name: 'paul',
-        comAll: 20,
+        comAll: 84.03796,
         waitUpdate: false
     },
     a5: {
@@ -88,8 +88,8 @@ const accountsObj = {
         id: null,
         index: 4,
         name: 'vinsent',
-        comAll: 0,
-        waitUpdate: true
+        comAll: 83.998677,
+        waitUpdate: false
     },
     a6: {
         address: "0xafcca28ca27699da3bf6209dc8723bc6ad43b070",
@@ -98,7 +98,7 @@ const accountsObj = {
         id: null,
         index: 5,
         name: 'rando',
-        comAll: 20,
+        comAll: 84.184562,
         waitUpdate: false
     },
     a7: {
@@ -108,7 +108,7 @@ const accountsObj = {
         id: null,
         index: 6,
         name: 'kihat',
-        comAll: 20,
+        comAll: 84.254875,
         waitUpdate: false
     },
     a8: {
@@ -118,7 +118,7 @@ const accountsObj = {
         id: null,
         index: 7,
         name: 'hank',
-        comAll: 20,
+        comAll: 83.764696,
         waitUpdate: false
     },
     a9: {
@@ -128,7 +128,7 @@ const accountsObj = {
         id: null,
         index: 8,
         name: 'tron',
-        comAll: 20,
+        comAll: 83.883654,
         waitUpdate: false
     },
     a10: {
@@ -138,7 +138,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'lonson',
-        comAll: 20,
+        comAll: 83.864863,
         waitUpdate: false
     },
     a11: {
@@ -148,7 +148,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'klaus',
-        comAll: 20,
+        comAll: 83.826231,
         waitUpdate: false
     },
     a12: {
@@ -158,7 +158,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'dado',
-        comAll: 20,
+        comAll: 83.817633,
         waitUpdate: false
     },
     a13: {
@@ -168,7 +168,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'malmo',
-        comAll: 20,
+        comAll: 84.060748,
         waitUpdate: false
     },
     a14: {
@@ -178,7 +178,7 @@ const accountsObj = {
         id: null,
         index: 9,
         name: 'emelin',
-        comAll: 20,
+        comAll: 84.128306,
         waitUpdate: false
     }
 
@@ -191,7 +191,7 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 112
+let fixAmountUsdt = 140
 
 let maxCommissionAll = 1400
 
