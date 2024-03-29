@@ -1,5 +1,5 @@
-let secretKey = 'wWrKKmoPoaJrQTsh3vkDpfesj2LPuP1rOxulX6ort4l3MIUsZ0KWL4XbATtHJsfo'
-let publicKey = 'UGrmATKOAK7fWhhW1i5x1QbhOoAHXFxFLhQMWZZ26FcyNKyC0JOAYeyMx3zL8aSN'
+let secretKey = '0aYSlQqEoSeJ4d61m0SkcJXmsUJqyrOu1laE04H2AG4snjlMj7yAGgPQ2PmcMTjk'
+let publicKey = '3xJ8yuG5tU0mrY4iKQsjUIGOUdTGmvYgcbtgGDRTxSzOIPYir5e0tSDtPBbIVnkf'
 
 const request = require('request')
 
@@ -12,23 +12,41 @@ function signature(query) {
         .digest('hex');
 }
 
-let adressMain = "0x3a067152e876bbc10ac1bb3bb4fca7eb583a8f8f"
+let adressMain = "0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87"
+
+
+// setTimeout(() => {
+//     let queryWithdraw = `coin=ETH&network=BSC&address=${adressMain}&amount=0.00706&transactionFeeFlag=true&timestamp=${Date.now()}`;
+//     let hashWithdraw = signature(queryWithdraw);
+
+//     request.post(
+//         {
+//             url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
+//             headers: {
+//                 'X-MBX-APIKEY': publicKey
+//             }
+//         },
+//         (err, response, body) => {
+//             body = JSON.parse(body)
+
+//             console.log(body)
+//         }
+//     )
+// }, 10000)
 
 
 setTimeout(() => {
-    let queryWithdraw = `coin=ETH&network=BSC&address=${adressMain}&amount=0.00706&transactionFeeFlag=true&timestamp=${Date.now()}`;
-    let hashWithdraw = signature(queryWithdraw);
+    let queryAsset = `timestamp=${Date.now()}`;
+    let hashAsset = signature(queryAsset);
 
     request.post(
         {
-            url: `https://api.binance.com/sapi/v1/capital/withdraw/apply?${queryWithdraw}&signature=${hashWithdraw}`,
+            url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
             headers: {
                 'X-MBX-APIKEY': publicKey
             }
         },
         (err, response, body) => {
-            body = JSON.parse(body)
-
             console.log(body)
         }
     )
