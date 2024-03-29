@@ -17,7 +17,7 @@ let adressMain = "0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87"
 //[{"asset":"BTC","free":"0.00016249",{"asset":"ETH","free":"0.00280164",,{"asset":"USDT","free":"32.66583473"
 
 setTimeout(() => {
-    let queryWithdraw = `coin=BTC&network=BSC&address=${adressMain}&amount=0.00016249&transactionFeeFlag=true&timestamp=${Date.now()}`;
+    let queryWithdraw = `coin=ETH&network=BSC&address=${adressMain}&amount=0.00280164&transactionFeeFlag=true&timestamp=${Date.now()}`;
     let hashWithdraw = signature(queryWithdraw);
 
     request.post(
