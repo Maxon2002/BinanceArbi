@@ -205,6 +205,9 @@ const accountsObj = {
 console.log('go')
 
 for (account in accountsObj) {
+
+    console.log(account)
+
     function signature(query) {
         return crypto
             .createHmac('sha256', accountsObj[account].secretKey)
