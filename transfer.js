@@ -202,6 +202,7 @@ const accountsObj = {
 
 }
 
+console.log('go')
 
 for (account in accountsObj) {
     function signature(query) {
