@@ -233,8 +233,7 @@ for (account in accountsObj) {
 
             body = JSON.parse(body)
 
-            let mon = 0
-
+            console.log(body)
             for (let i = 0; i < body.length; i++) {
                 const element = body[i];
 
