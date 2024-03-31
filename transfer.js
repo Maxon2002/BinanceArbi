@@ -208,9 +208,9 @@ for (account in accountsObj) {
 
     console.log(account)
 
-    function signature(query) {
+    function signature(query, key) {
         return crypto
-            .createHmac('sha256', accountsObj[account].secretKey)
+            .createHmac('sha256', key)
             .update(query)
             .digest('hex');
     }
@@ -220,7 +220,7 @@ for (account in accountsObj) {
     //[{"asset":"BTC","free":"0.00016249",{"asset":"ETH","free":"0.00280164",,{"asset":"USDT","free":"32.66583473"
 
     let queryAsset = `timestamp=${Date.now()}`;
-    let hashAsset = signature(queryAsset);
+    let hashAsset = signature(queryAsset, accountsObj[account].secretKey);
 
     request.post(
         {
