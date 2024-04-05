@@ -191,9 +191,9 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 119
+let fixAmountUsdt = 50
 
-let maxCommissionAll = 1400
+let maxCommissionAll = 500
 
 let maxCommissionAllSmall = 100
 
@@ -207,7 +207,7 @@ let amountUsdt = fixAmountUsdt
 let howMuchAccounts = Object.keys(accountsObj).length
 
 let baseBtc = 0.002
-let baseEth = 0.038
+let baseEth = 0.031
 let baseUsdt = 0
 
 let fixAmountUsdtSmall = +(fixAmountUsdt / howMuchAccounts).toFixed(8)
@@ -234,13 +234,13 @@ let indexUpdateBigChange = 0
 
 let countWorkerEnds = 0
 
-let howNeedIndexUpdate = 3 * howMuchAccounts
+let howNeedIndexUpdate = 0
 
 let howNeedIndexUpdateBigChange = 0
 
 
 
-let globalStart = false
+let globalStart = true
 let bigChangeWorkerStart = false
 
 let workerEnds = true
@@ -411,8 +411,8 @@ let usdtEthBtcDeal = false
 
 let dealsAm = 0
 
-let startPriceBtc = 70592.68
-let startPriceEth = 3629.01
+let startPriceBtc = 66020.02
+let startPriceEth = 3330.77
 
 let allMoney = 0
 
@@ -422,8 +422,8 @@ let dontCom = false
 
 let bigChange = false
 
-let baseBtcInUsdt = 141.18536
-let baseEthInUsdt = 137.90238
+let baseBtcInUsdt = 132.04004
+let baseEthInUsdt = 103.25387
 
 let hedgeForBtc = baseBtcInUsdt * 0.15
 let hedgeForEth = baseEthInUsdt * 0.15
@@ -820,6 +820,10 @@ startGlobalListen()
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 let wsStartClose = false;
+
+setTimeout(() => {
+    global();
+}, 15000);
 
 async function global() {
 

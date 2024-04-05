@@ -130,9 +130,9 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 140
+let fixAmountUsdt = 50
 
-let maxCommissionAll = 1400
+let maxCommissionAll = 500
 
 let maxCommissionAllSmall = 100
 
@@ -145,8 +145,8 @@ let amountUsdt = fixAmountUsdt
 
 let howMuchAccounts = Object.keys(accountsObj).length
 
-let baseBtc = 0.003
-let baseEth = 0.047
+let baseBtc = 0.002
+let baseEth = 0.0310
 let baseUsdt = 0
 
 let fixAmountUsdtSmall = +(fixAmountUsdt / howMuchAccounts).toFixed(8)
@@ -413,8 +413,8 @@ let usdtEthBtcDeal = false
 
 let dealsAm = 0
 
-let startPriceBtc = 66945
-let startPriceEth = 3455.98
+let startPriceBtc = 66020.02
+let startPriceEth = 3330.77
 
 let allMoney = 0
 
@@ -424,8 +424,8 @@ let dontCom = false
 
 let bigChange = false
 
-let baseBtcInUsdt = 200.835
-let baseEthInUsdt = 162.43106
+let baseBtcInUsdt = 132.04004
+let baseEthInUsdt = 103.25387
 
 let hedgeForBtc = baseBtcInUsdt * 0.15
 let hedgeForEth = baseEthInUsdt * 0.15
