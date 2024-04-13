@@ -471,7 +471,6 @@ request.get(
 
 
 
-
 // let queryFutBal = `timestamp=${Date.now()}`;
 // let hashFutBal = signature(queryFutBal);
 
