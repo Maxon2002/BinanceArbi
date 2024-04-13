@@ -2299,7 +2299,7 @@ async function global() {
                                     }
 
                                     if (deal.symbol === 'BTCUSDT') {
-                                        allMoney = +(allMoney + deal.cummulativeQuoteQty).toFixed(8)
+                                        allMoney = +(allMoney + +deal.cummulativeQuoteQty).toFixed(8)
 
                                         let commissionInUsdt = +deal.cummulativeQuoteQty * 0.00075
 
@@ -2724,6 +2724,83 @@ async function global() {
                             })()
                         }),
                     ])
+
+                    await new Promise((resolve, reject) => {
+
+
+                        let clearAmountBnb = Math.trunc(amountBnb * 1000) / 1000
+                        let sumBnb = clearAmountBnb * pricesBid.bnb.usdt
+
+                        // console.log("clearAmountBnb ", clearAmountBnb)
+                        if (sumBnb <= 5.5) {
+                            (function reRequest() {
+                                let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=6&timestamp=${Date.now()}`;
+                                let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+                                        if (body.code) {
+                                            console.log("End buy some BNB ", body.code)
+                                            reRequest()
+                                        } else {
+                                            clearAmountBnb = +(+body.origQty + clearAmountBnb).toFixed(3);
+                                            (function reRequest() {
+                                                let queryOrderSellBnbUsdt = `symbol=BNBUSDT&side=SELL&type=MARKET&quantity=${clearAmountBnb}&timestamp=${Date.now()}`;
+                                                let hashOrderSellBnbUsdt = signature(queryOrderSellBnbUsdt);
+                                                request.post(
+                                                    {
+                                                        url: `https://api.binance.com/api/v3/order?${queryOrderSellBnbUsdt}&signature=${hashOrderSellBnbUsdt}`,
+                                                        headers: {
+                                                            'X-MBX-APIKEY': publicKey
+                                                        }
+                                                    },
+                                                    (err, response, body) => {
+                                                        body = JSON.parse(body)
+                                                        if (body.code) {
+                                                            console.log("End sell after some BNB ", body.code)
+                                                            reRequest()
+                                                        } else {
+                                                            resolve()
+                                                        }
+                                                    }
+                                                )
+                                            })()
+                                        }
+                                    }
+                                )
+                            })()
+                        } else {
+                            (function reRequest() {
+                                let queryOrderSellBnbUsdt = `symbol=BNBUSDT&side=SELL&type=MARKET&quantity=${clearAmountBnb}&timestamp=${Date.now()}`;
+                                let hashOrderSellBnbUsdt = signature(queryOrderSellBnbUsdt);
+                                request.post(
+                                    {
+                                        url: `https://api.binance.com/api/v3/order?${queryOrderSellBnbUsdt}&signature=${hashOrderSellBnbUsdt}`,
+                                        headers: {
+                                            'X-MBX-APIKEY': publicKey
+                                        }
+                                    },
+                                    (err, response, body) => {
+                                        body = JSON.parse(body)
+
+                                        if (body.code) {
+                                            console.log("End sell BNB ", body.code)
+                                            reRequest()
+                                        } else {
+                                            resolve()
+                                        }
+                                    }
+                                )
+                            })()
+                        }
+                    })
 
 
                     console.log('Дело сделано ' + new Date().toLocaleTimeString())
