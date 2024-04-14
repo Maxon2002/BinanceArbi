@@ -501,6 +501,56 @@ let firstDeal = true;
 
 async function startWorkers() {
 
+    await new Promise((resolve, reject) => {
+        (function reRequest() {
+            let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
+            let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+
+            request.post(
+                {
+                    url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
+                    headers: {
+                        'X-MBX-APIKEY': publicKey
+                    }
+                },
+                (err, response, body) => {
+
+                    try {
+
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            console.log("First buy BNB ", body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
+
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастера
+
+                            First buy BNB ${body.code}
+                            
+                            Заплаченная комиссия ${commissionAll}`
+
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            // amountBnb = +(+body.origQty + amountBnb).toFixed(8)
+
+                            resolve()
+                        }
+                    } catch (error) {
+                        reRequest()
+                    }
+                }
+            )
+        })()
+    })
+
 
     await Promise.all([
 
@@ -529,9 +579,9 @@ async function startWorkers() {
 
                                 messageBot = `Конечная у мастера
 
-                            Depth BTC ${body.code}
+                                Depth BTC ${body.code}
                             
-                            Заплаченная комиссия ${commissionAll}`
+                                Заплаченная комиссия ${commissionAll}`
 
                                 botMax.sendMessage(userChatId, messageBot);
                             } else {
@@ -549,7 +599,7 @@ async function startWorkers() {
 
                                 baseBtc = +(factAmount + 0.001).toFixed(3)
 
-                                
+
 
                                 baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
 
@@ -632,7 +682,7 @@ async function startWorkers() {
 
                                 baseEth = +(factAmount + 0.001).toFixed(3)
 
-                                
+
 
                                 baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
 
@@ -2175,16 +2225,12 @@ async function global() {
                                     for (let j = 0; j < deal.fills.length; j++) {
                                         let fill = deal.fills[j]
 
-                                        if (deal.symbol === 'BTCUSDT' || deal.symbol === 'ETHUSDT') {
-                                            amountBnb -= +fill.commission
-                                        } else {
+                                        amountBnb -= +fill.commission
+
+                                        if (deal.symbol === 'ETHBTC') {
                                             let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
 
                                             commissionAll += commissionInUsdt
-
-                                            // midComission += commissionInUsdt
-
-                                            amountBnb -= +fill.commission
                                         }
 
                                     }
@@ -2315,7 +2361,7 @@ async function global() {
                                                             if (indexError !== 0) {
                                                                 indexError = 0
                                                             }
-                                                            amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+                                                            amountBnb = +(+body.origQty + amountBnb).toFixed(8)
 
                                                             for (let j = 0; j < body.fills.length; j++) {
                                                                 let fill = body.fills[j]
@@ -2576,17 +2622,12 @@ async function global() {
                                     for (let j = 0; j < deal.fills.length; j++) {
                                         let fill = deal.fills[j]
 
-                                        if (deal.symbol === 'BTCUSDT' || deal.symbol === 'ETHUSDT') {
-                                            amountBnb -= +fill.commission
-                                        } else {
+                                        amountBnb -= +fill.commission
 
+                                        if (deal.symbol === 'ETHBTC') {
                                             let commissionInUsdt = +fill.commission * pricesAsk.bnb.usdt
 
                                             commissionAll += commissionInUsdt
-
-                                            // midComission += commissionInUsdt
-
-                                            amountBnb -= +fill.commission
                                         }
                                     }
 
@@ -2693,7 +2734,7 @@ async function global() {
                                                                 indexError = 0
                                                             }
 
-                                                            amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+                                                            amountBnb = +(+body.origQty + amountBnb).toFixed(8)
 
                                                             for (let j = 0; j < body.fills.length; j++) {
                                                                 let fill = body.fills[j]
