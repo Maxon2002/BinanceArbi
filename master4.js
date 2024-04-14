@@ -103,7 +103,7 @@ let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 let fixAmountUsdt = 200
 
-let maxCommissionAll = 38.14 * 1.25
+let maxCommissionAll = 35 * 1.25
 
 let maxCommissionAllSmall = 100
 
