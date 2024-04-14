@@ -133,7 +133,8 @@ let indexError = 0
 let minNotionalEthbtc = 0
 let changeNotionalEthBtc = false
 
-
+let firstSaleEthAmount = 0
+let firstSaleEth = false
 
 let countBalanceUp = 0
 
@@ -1215,15 +1216,13 @@ async function startGlobalListen() {
 
                                         allMoney = +(allMoney + +data.d).toFixed(8)
 
-                                        let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                        if (some <= 0) {
+                                        if (allMoney < fixAmountUsdt) {
                                             amountUsdt = allMoney
-                                            moneyForCommission = 0
                                         } else {
                                             amountUsdt = fixAmountUsdt
-                                            moneyForCommission = some
                                         }
+
+
                                     }
                                 }
 
@@ -1342,14 +1341,10 @@ async function startGlobalListen() {
 
                                                                                         allMoney = +(allMoney + +data.d).toFixed(8)
 
-                                                                                        let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                                                                        if (some <= 0) {
+                                                                                        if (allMoney < fixAmountUsdt) {
                                                                                             amountUsdt = allMoney
-                                                                                            moneyForCommission = 0
                                                                                         } else {
                                                                                             amountUsdt = fixAmountUsdt
-                                                                                            moneyForCommission = some
                                                                                         }
                                                                                     }
 
@@ -1358,14 +1353,10 @@ async function startGlobalListen() {
 
                                                                                             allMoney = +(allMoney + +data.d).toFixed(8)
 
-                                                                                            let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                                                                            if (some <= 0) {
+                                                                                            if (allMoney < fixAmountUsdt) {
                                                                                                 amountUsdt = allMoney
-                                                                                                moneyForCommission = 0
                                                                                             } else {
                                                                                                 amountUsdt = fixAmountUsdt
-                                                                                                moneyForCommission = some
                                                                                             }
                                                                                         }
                                                                                     }
@@ -1440,42 +1431,74 @@ async function global() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
 
-                    if (body.code) {
-                        console.log("Check start USDT ", body.code)
-                        reRequest()
-                    } else {
-                        for (let i = 0; i < body.length; i++) {
-                            if (body[i].asset === 'USDT') {
+                    try {
 
-                                // смотреть чтобы хватало амаунта
-
-
-                                let factMoney = +body[i].free
-
-                                allMoney = factMoney
-
-
-                                break
+                        body = JSON.parse(body)
+                        if (body.code && indexError <= 5) {
+                            console.log(`Старт чек мастер `, body.code)
+                            if (body.code !== -1021) {
+                                indexError++
                             }
 
-                            if (body[i].asset === 'BNB') {
-                                amountBnb = +body[i].free
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
+
+                            messageBot = `Конечная у мастер
+
+                            Старт чек ${body.code}
+                        
+                            Заплаченная комиссия ${commissionAll}`
+
+                            botMax.sendMessage(userChatId, messageBot);
+                        } else {
+                            if (indexError !== 0) {
+                                indexError = 0
                             }
+                            for (let i = 0; i < body.length; i++) {
+                                if (body[i].asset === 'USDT') {
 
-                            if (body[i].asset === 'BTC') {
-                                let diff = +(+body[i].free - baseBtc).toFixed(8)
+                                    // смотреть чтобы хватало амаунта
 
-                                dirtBtc = +(dirtBtc + diff).toFixed(8)
 
-                                dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+                                    let factMoney = +body[i].free
 
-                                dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+                                    allMoney = factMoney
 
+
+                                    break
+                                }
+
+                                if (body[i].asset === 'BNB') {
+                                    amountBnb = +body[i].free
+                                }
+
+                                if (body[i].asset === 'BTC') {
+                                    let diff = +(+body[i].free - baseBtc).toFixed(8)
+
+                                    dirtBtc = +(dirtBtc + diff).toFixed(8)
+
+                                    dirtAmountGo = Math.trunc(dirtBtc * 100000) / 100000
+
+                                    dirtBtc = +(dirtBtc - dirtAmountGo).toFixed(8)
+
+                                }
+
+                                if (body[i].asset === 'ETH') {
+                                    let diff = +(+body[i].free - baseEth).toFixed(8)
+
+                                    firstSaleEthAmount = Math.trunc(diff * 10000) / 10000
+
+                                    if (firstSaleEthAmount > 0) {
+                                        firstSaleEth = true
+                                    }
+                                }
                             }
+                            resolve()
                         }
-                        resolve()
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -1494,135 +1517,190 @@ async function global() {
                     }
                 },
                 (err, response, body) => {
-                    body = JSON.parse(body)
-                    if (body.code) {
-                        console.log("Depth BNB ", body.code)
-                        reRequest()
-                    } else {
+                    try {
+                        body = JSON.parse(body)
 
-                        let price = +body.bids[0][0]
+                        if (body.code && indexError <= 5) {
+                            console.log("Старт стакан BNB ", body.code)
+                            if (body.code !== -1021) {
+                                indexError++
+                            }
 
-                        let myBnbInUsdt = amountBnb * price
+                            reRequest()
+                        } else if (body.code && !fatalError) {
+                            fatalError = true
 
-                        console.log('myBnbInUsdt у мастера ', myBnbInUsdt)
+                            messageBot = `Конечная у мастера
 
-                        if (myBnbInUsdt < 3) {
-                            (function reRequest() {
-                                let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
-                                let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
+                            Старт стакан BNB ${body.code}
+                        
+                            Заплаченная комиссия ${commissionAll}`
 
-                                request.post(
-                                    {
-                                        url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
-                                        headers: {
-                                            'X-MBX-APIKEY': publicKey
-                                        }
-                                    },
-                                    (err, response, body) => {
-                                        body = JSON.parse(body)
-                                        if (body.code) {
-                                            console.log("Buy BNB myBnbInUsdt in start small", body.code)
-                                            reRequest()
-                                        } else {
-                                            amountBnb = +(+body.origQty + amountBnb).toFixed(8)
-
-                                            for (let j = 0; j < body.fills.length; j++) {
-                                                let fill = body.fills[j]
-
-                                                amountBnb -= +fill.commission
-                                            }
-
-
-                                            allMoney = +(allMoney - body.cummulativeQuoteQty).toFixed(8)
-
-                                            let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                            if (some <= 0) {
-                                                amountUsdt = allMoney
-                                                moneyForCommission = 0
-                                            } else {
-                                                amountUsdt = fixAmountUsdt
-                                                moneyForCommission = some
-                                            }
-
-                                            resolve()
-                                        }
-                                    }
-                                )
-                            })()
+                            botMax.sendMessage(userChatId, messageBot);
                         } else {
-                            let howNeedBnb = Math.trunc((5 / price) * 1000) / 1000
+                            if (indexError !== 0) {
+                                indexError = 0
+                            }
+                            let price = +body.bids[0][0]
 
-                            let clearAmountBnb = Math.trunc(amountBnb * 1000) / 1000
+                            let myBnbInUsdt = amountBnb * price
 
-                            let howSellBnb = +(clearAmountBnb - howNeedBnb).toFixed(3)
+                            console.log('myBnbInUsdt у мастера ', myBnbInUsdt)
 
-                            if (howSellBnb * price > 5.5) {
+                            if (myBnbInUsdt < 3) {
                                 (function reRequest() {
-                                    let queryOrderSellBnbUsdt = `symbol=BNBUSDT&side=SELL&type=MARKET&quantity=${howSellBnb}&timestamp=${Date.now()}`;
-                                    let hashOrderSellBnbUsdt = signature(queryOrderSellBnbUsdt);
+                                    let queryOrderBuyBnbUsdt = `symbol=BNBUSDT&side=BUY&type=MARKET&quoteOrderQty=5&timestamp=${Date.now()}`;
+                                    let hashOrderBuyBnbUsdt = signature(queryOrderBuyBnbUsdt);
 
                                     request.post(
                                         {
-                                            url: `https://api.binance.com/api/v3/order?${queryOrderSellBnbUsdt}&signature=${hashOrderSellBnbUsdt}`,
+                                            url: `https://api.binance.com/api/v3/order?${queryOrderBuyBnbUsdt}&signature=${hashOrderBuyBnbUsdt}`,
                                             headers: {
                                                 'X-MBX-APIKEY': publicKey
                                             }
                                         },
                                         (err, response, body) => {
-                                            body = JSON.parse(body)
-                                            if (body.code) {
-                                                console.log("Sell лишний BNB ", body.code)
-                                                reRequest()
-                                            } else {
-                                                amountBnb = +(amountBnb - howSellBnb).toFixed(8)
+                                            try {
+                                                body = JSON.parse(body)
 
-                                                for (let j = 0; j < body.fills.length; j++) {
-                                                    let fill = body.fills[j]
+                                                if (body.code && indexError <= 5) {
+                                                    console.log("Старт покупка BNB < 3 ", body.code)
+                                                    if (body.code !== -1021) {
+                                                        indexError++
+                                                    }
 
-                                                    amountBnb -= +fill.commission
-                                                }
+                                                    reRequest()
+                                                } else if (body.code && !fatalError) {
+                                                    fatalError = true
 
+                                                    messageBot = `Конечная у мастера
 
-                                                allMoney = +(allMoney + body.cummulativeQuoteQty).toFixed(8)
+                                                    Старт покупка BNB < 3 ${body.code}
+                        
+                                                    Заплаченная комиссия ${commissionAll}`
 
-                                                let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                                if (some <= 0) {
-                                                    amountUsdt = allMoney
-                                                    moneyForCommission = 0
+                                                    botMax.sendMessage(userChatId, messageBot);
                                                 } else {
-                                                    amountUsdt = fixAmountUsdt
-                                                    moneyForCommission = some
+                                                    if (indexError !== 0) {
+                                                        indexError = 0
+                                                    }
+                                                    amountBnb = +(+body.origQty + amountBnb).toFixed(8)
+
+                                                    for (let j = 0; j < body.fills.length; j++) {
+                                                        let fill = body.fills[j]
+
+                                                        amountBnb -= +fill.commission
+                                                    }
+
+
+                                                    allMoney = +(allMoney - body.cummulativeQuoteQty).toFixed(8)
+
+                                                    if (allMoney < fixAmountUsdt) {
+                                                        amountUsdt = allMoney
+                                                    } else {
+                                                        amountUsdt = fixAmountUsdt
+                                                    }
+
+                                                    resolve()
                                                 }
-
-
-                                                console.log('amountBnb у мастера после продажи лишнего ', amountBnb)
-                                                console.log('amountBnb в долларах у мастера после продажи лишнего ', amountBnb * price)
-
-
-                                                resolve()
+                                            } catch (error) {
+                                                reRequest()
                                             }
                                         }
                                     )
                                 })()
                             } else {
-                                console.log('bnb недостаточно для продажи')
+                                let howNeedBnb = Math.trunc((5 / price) * 1000) / 1000
 
-                                let some = +(allMoney - fixAmountUsdt).toFixed(8)
+                                let clearAmountBnb = Math.trunc(amountBnb * 1000) / 1000
 
-                                if (some <= 0) {
-                                    amountUsdt = allMoney
-                                    moneyForCommission = 0
+                                let howSellBnb = +(clearAmountBnb - howNeedBnb).toFixed(3)
+
+                                if (howSellBnb * price > 5.5) {
+                                    (function reRequest() {
+                                        let queryOrderSellBnbUsdt = `symbol=BNBUSDT&side=SELL&type=MARKET&quantity=${howSellBnb}&timestamp=${Date.now()}`;
+                                        let hashOrderSellBnbUsdt = signature(queryOrderSellBnbUsdt);
+
+                                        request.post(
+                                            {
+                                                url: `https://api.binance.com/api/v3/order?${queryOrderSellBnbUsdt}&signature=${hashOrderSellBnbUsdt}`,
+                                                headers: {
+                                                    'X-MBX-APIKEY': publicKey
+                                                }
+                                            },
+                                            (err, response, body) => {
+
+                                                try {
+
+                                                    body = JSON.parse(body)
+
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Старт продажа BNB ", body.code)
+                                                        if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+
+                                                        Старт продажа BNB ${body.code}
+                        
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        amountBnb = +(amountBnb - howSellBnb).toFixed(8)
+
+                                                        for (let j = 0; j < body.fills.length; j++) {
+                                                            let fill = body.fills[j]
+
+                                                            amountBnb -= +fill.commission
+                                                        }
+
+
+                                                        allMoney = +(allMoney + body.cummulativeQuoteQty).toFixed(8)
+
+                                                        if (allMoney < fixAmountUsdt) {
+                                                            amountUsdt = allMoney
+                                                        } else {
+                                                            amountUsdt = fixAmountUsdt
+                                                        }
+
+
+                                                        console.log('amountBnb у мастера после продажи лишнего ', amountBnb)
+                                                        console.log('amountBnb в долларах у мастера после продажи лишнего ', amountBnb * price)
+
+
+                                                        resolve()
+                                                    }
+                                                } catch (error) {
+                                                    reRequest()
+                                                }
+                                            }
+                                        )
+                                    })()
                                 } else {
-                                    amountUsdt = fixAmountUsdt
-                                    moneyForCommission = some
+                                    console.log('bnb недостаточно для продажи')
+
+                                    if (allMoney < fixAmountUsdt) {
+                                        amountUsdt = allMoney
+                                    } else {
+                                        amountUsdt = fixAmountUsdt
+                                    }
+
+                                    resolve()
                                 }
-
-                                resolve()
                             }
-                        }
 
+                        }
+                    } catch (error) {
+                        reRequest()
                     }
                 }
             )
@@ -1655,9 +1733,9 @@ async function global() {
 
                             messageBot = `Конечная у мастер
 
-                        Старт exchangeInfo ${body.code}
+                            Старт exchangeInfo ${body.code}
                         
-                        Заплаченная комиссия ${commissionAll}`
+                            Заплаченная комиссия ${commissionAll}`
 
                             botMax.sendMessage(userChatId, messageBot);
                         } else {
@@ -1869,7 +1947,7 @@ async function global() {
 
 
 
-                if (amountUsdt < 7 || amSellBtcUsdt < minNotionalEthbtc || amBuyBtcUsdt <= minNotionalEthbtc) {
+                if (currentAmountUsdt < 7 || amSellBtcUsdt < minNotionalEthbtc || amBuyBtcUsdt <= minNotionalEthbtc) {
                     dontCom = true
 
                     notDontCom = true
@@ -1902,27 +1980,20 @@ async function global() {
 
                     usdtBtcEthIndex++
 
-                    // let wait = false
 
-                    // if (amountUsdt > allMoney) {
-                    //     wait = true
-
-                    //     if (allMoney > 5) {
-                    //         amountUsdt = allMoney
-                    //     } else {
-                    //         dontCom = true
-                    //     }
-                    // }
 
                     if (usdtBtcEthIndex > 6 && !usdtBtcEthDeal && !generalDeal && !dontCom) {
                         usdtBtcEthDeal = true
                         // usdtEthBtcDeal = false
                         generalDeal = true
 
-                        console.log("Deal usdtBtcEth")
+                        // console.log("Deal usdtBtcEth")
                         console.log("dealsAm ", ++dealsAm);
 
-
+                        if (firstSaleEth) {
+                            firstSaleEth = false
+                            amSellEthUsdt = +(amSellEthUsdt + firstSaleEthAmount).toFixed(4)
+                        }
 
 
                         (async () => {
@@ -1940,13 +2011,89 @@ async function global() {
                                                 }
                                             },
                                             (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Buy BTC usdtBtcEth ", body.code)
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Buy BTC usdtBtcEth ", body.code)
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                    Buy BTC usdtBtcEth ${body.code}
+                                            
+                                                    Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('4 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
                                                     reRequest()
-                                                } else {
-                                                    // console.log('4 ', body)
-                                                    resolve(body)
+                                                }
+                                            }
+                                        )
+                                    })()
+                                }),
+
+                                new Promise((resolve) => {
+                                    (function reRequest() {
+                                        let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
+                                        let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+
+                                        request.post(
+                                            {
+                                                url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
+                                                headers: {
+                                                    'X-MBX-APIKEY': publicKey
+                                                }
+                                            },
+                                            (err, response, body) => {
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Sell ETH usdtBtcEth ", body.code)
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                        Sell ETH usdtBtcEth ${body.code}
+                                            
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('6 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
+                                                    reRequest()
                                                 }
                                             }
                                         )
@@ -1965,38 +2112,38 @@ async function global() {
                                                 }
                                             },
                                             (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Buy ETH usdtBtcEth ", body.code)
-                                                    reRequest()
-                                                } else {
-                                                    // console.log('5 ', body)
-                                                    resolve(body)
-                                                }
-                                            }
-                                        )
-                                    })()
-                                }),
-                                new Promise((resolve) => {
-                                    (function reRequest() {
-                                        let queryOrderSellEthUsdt = `symbol=ETHUSDT&side=SELL&type=MARKET&quantity=${amSellEthUsdt}&timestamp=${Date.now()}`;
-                                        let hashOrderSellEthUsdt = signature(queryOrderSellEthUsdt);
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Buy ETH usdtBtcEth ", body.code)
 
-                                        request.post(
-                                            {
-                                                url: `https://api.binance.com/api/v3/order?${queryOrderSellEthUsdt}&signature=${hashOrderSellEthUsdt}`,
-                                                headers: {
-                                                    'X-MBX-APIKEY': publicKey
-                                                }
-                                            },
-                                            (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Sell ETH usdtBtcEth ", body.code)
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                        Buy ETH usdtBtcEth ${body.code}
+                                            
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('5 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
                                                     reRequest()
-                                                } else {
-                                                    // console.log('6 ', body)
-                                                    resolve(body)
                                                 }
                                             }
                                         )
@@ -2014,7 +2161,7 @@ async function global() {
 
                                         commissionAll += commissionInUsdt
 
-                                        midComission += commissionInUsdt
+                                        // midComission += commissionInUsdt
                                     }
 
                                     if (deal.symbol === 'ETHUSDT') {
@@ -2024,7 +2171,7 @@ async function global() {
 
                                         commissionAll += commissionInUsdt
 
-                                        midComission += commissionInUsdt
+                                        // midComission += commissionInUsdt
                                     }
 
 
@@ -2038,7 +2185,7 @@ async function global() {
 
                                             commissionAll += commissionInUsdt
 
-                                            midComission += commissionInUsdt
+                                            // midComission += commissionInUsdt
 
                                             amountBnb -= +fill.commission
                                         }
@@ -2072,7 +2219,7 @@ async function global() {
 
                                         lastDeal = true
 
-                                        moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmountLast)).toFixed(8)
+                                        // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmountLast)).toFixed(8)
 
                                         amountUsdt = howNeedAmountLast
 
@@ -2091,19 +2238,36 @@ async function global() {
                                     let minusCom = false
 
 
-                                    if (moneyForCommission < 5) {
+                                    // if (moneyForCommission < 5) {
 
-                                        minusCom = true
+                                    //     minusCom = true
 
-                                        let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
+                                    //     let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
 
-                                        let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
+                                    //     let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
+                                    //     if (amountUsdtMinus >= 7) {
+
+
+                                    //         amountUsdt = amountUsdtMinus
+                                    //         moneyForCommission = 5
+
+
+                                    //     } else {
+                                    //         dontCom = true
+
+                                    //         if (lastDeal) {
+                                    //             stopGame = true
+                                    //         }
+                                    //     }
+                                    // }
+
+                                    if (allMoney - amountUsdt < 5) {
+
+                                        let amountUsdtMinus = +(allMoney - 5).toFixed(8)
+
                                         if (amountUsdtMinus >= 7) {
 
-
                                             amountUsdt = amountUsdtMinus
-                                            moneyForCommission = 5
-
 
                                         } else {
                                             dontCom = true
@@ -2112,6 +2276,7 @@ async function global() {
                                                 stopGame = true
                                             }
                                         }
+
                                     }
 
 
@@ -2129,30 +2294,55 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code) {
-                                                        console.log("Buy dop BNB usdtBtcEth ", body.code)
-                                                        reRequest()
-                                                    } else {
-                                                        amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+                                                    try {
+                                                        body = JSON.parse(body)
 
-                                                        for (let j = 0; j < body.fills.length; j++) {
-                                                            let fill = body.fills[j]
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Докуп BNB в usdtBtcEth ", body.code)
+                                                            if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                            amountBnb -= +fill.commission
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
+
+                                                            messageBot = `Конечная у мастера
+
+                                                            Докуп BNB в usdtBtcEth ${body.code}
+                        
+                                                            Заплаченная комиссия ${commissionAll}`
+
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+                                                            amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+
+                                                            for (let j = 0; j < body.fills.length; j++) {
+                                                                let fill = body.fills[j]
+
+                                                                amountBnb -= +fill.commission
+                                                            }
+
+                                                            let commissionInUsdt = +deal.cummulativeQuoteQty * 0.00075
+
+                                                            commissionAll += commissionInUsdt
+
+                                                            // moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                            allMoney = +(allMoney - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                            // if (minusCom) {
+                                                            //     amountUsdt = +(amountUsdt + moneyForCommission).toFixed(8)
+                                                            // }
+
+                                                            generalDeal = false
                                                         }
-
-                                                        moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
-
-                                                        allMoney = +(allMoney - +body.cummulativeQuoteQty).toFixed(8)
-
-                                                        // if (minusCom) {
-                                                        //     amountUsdt = +(amountUsdt + moneyForCommission).toFixed(8)
-                                                        // }
-
-                                                        generalDeal = false
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
-
                                                 }
                                             )
                                         })()
@@ -2200,7 +2390,7 @@ async function global() {
                         usdtEthBtcDeal = true
                         // usdtBtcEthDeal = false
                         generalDeal = true
-                        console.log("Deal usdtEthBtc")
+                        // console.log("Deal usdtEthBtc")
                         console.log("dealsAm ", ++dealsAm);
 
 
@@ -2220,13 +2410,89 @@ async function global() {
                                                 }
                                             },
                                             (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Buy ETH usdtEthBtc ", body.code)
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Buy ETH usdtEthBtc ", body.code)
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                        Buy ETH usdtEthBtc ${body.code}
+                                            
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('1 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
                                                     reRequest()
-                                                } else {
-                                                    // console.log('1 ', body)
-                                                    resolve(body)
+                                                }
+                                            }
+                                        )
+                                    })()
+                                }),
+
+                                new Promise((resolve) => {
+                                    (function reRequest() {
+                                        let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${(amSellBtcUsdt + dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
+                                        let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
+
+                                        request.post(
+                                            {
+                                                url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
+                                                headers: {
+                                                    'X-MBX-APIKEY': publicKey
+                                                }
+                                            },
+                                            (err, response, body) => {
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Sell BTC usdtEthBtc ", body.code)
+
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                        Sell BTC usdtEthBtc ${body.code}
+                                            
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('3 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
+                                                    reRequest()
                                                 }
                                             }
                                         )
@@ -2245,38 +2511,38 @@ async function global() {
                                                 }
                                             },
                                             (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Sell ETH usdtEthBtc ", body.code)
-                                                    reRequest()
-                                                } else {
-                                                    // console.log('2 ', body)
-                                                    resolve(body)
-                                                }
-                                            }
-                                        )
-                                    })()
-                                }),
-                                new Promise((resolve) => {
-                                    (function reRequest() {
-                                        let queryOrderSellBtcUsdt = `symbol=BTCUSDT&side=SELL&type=MARKET&quantity=${(amSellBtcUsdt + dirtAmountGo).toFixed(5)}&timestamp=${Date.now()}`;
-                                        let hashOrderSellBtcUsdt = signature(queryOrderSellBtcUsdt);
+                                                try {
+                                                    body = JSON.parse(body)
+                                                    if (body.code && indexError <= 5) {
+                                                        console.log("Sell ETH usdtEthBtc ", body.code)
 
-                                        request.post(
-                                            {
-                                                url: `https://api.binance.com/api/v3/order?${queryOrderSellBtcUsdt}&signature=${hashOrderSellBtcUsdt}`,
-                                                headers: {
-                                                    'X-MBX-APIKEY': publicKey
-                                                }
-                                            },
-                                            (err, response, body) => {
-                                                body = JSON.parse(body)
-                                                if (body.code) {
-                                                    console.log("Sell BTC usdtEthBtc ", body.code)
+                                                        if (body.code === -1013) {
+                                                            changeNotionalEthBtc = true
+                                                            // resolve()
+                                                        } else if (body.code !== -1021) {
+                                                            indexError++
+                                                        }
+
+                                                        reRequest()
+                                                    } else if (body.code && !fatalError) {
+                                                        fatalError = true
+
+                                                        messageBot = `Конечная у мастера
+                    
+                                                        Sell ETH usdtEthBtc ${body.code}
+                                            
+                                                        Заплаченная комиссия ${commissionAll}`
+
+                                                        botMax.sendMessage(userChatId, messageBot);
+                                                    } else {
+                                                        if (indexError !== 0) {
+                                                            indexError = 0
+                                                        }
+                                                        // console.log('2 ', body)
+                                                        resolve(body)
+                                                    }
+                                                } catch (error) {
                                                     reRequest()
-                                                } else {
-                                                    // console.log('3 ', body)
-                                                    resolve(body)
                                                 }
                                             }
                                         )
@@ -2295,7 +2561,7 @@ async function global() {
 
                                         commissionAll += commissionInUsdt
 
-                                        midComission += commissionInUsdt
+                                        // midComission += commissionInUsdt
                                     }
 
                                     if (deal.symbol === 'BTCUSDT') {
@@ -2305,7 +2571,7 @@ async function global() {
 
                                         commissionAll += commissionInUsdt
 
-                                        midComission += commissionInUsdt
+                                        // midComission += commissionInUsdt
                                     }
 
 
@@ -2321,7 +2587,7 @@ async function global() {
 
                                             commissionAll += commissionInUsdt
 
-                                            midComission += commissionInUsdt
+                                            // midComission += commissionInUsdt
 
                                             amountBnb -= +fill.commission
                                         }
@@ -2354,7 +2620,7 @@ async function global() {
 
                                         lastDeal = true
 
-                                        moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmountLast)).toFixed(8)
+                                        // moneyForCommission = +(moneyForCommission + (amountUsdt - howNeedAmountLast)).toFixed(8)
 
                                         amountUsdt = howNeedAmountLast
 
@@ -2373,17 +2639,13 @@ async function global() {
                                     let minusCom = false
 
 
-                                    if (moneyForCommission < 5) {
+                                    if (allMoney - amountUsdt < 5) {
 
-                                        minusCom = true
+                                        let amountUsdtMinus = +(allMoney - 5).toFixed(8)
 
-                                        let howMuchForCom = +(5 - moneyForCommission).toFixed(8)
-
-                                        let amountUsdtMinus = +(amountUsdt - howMuchForCom).toFixed(8)
                                         if (amountUsdtMinus >= 7) {
 
                                             amountUsdt = amountUsdtMinus
-                                            moneyForCommission = 5
 
                                         } else {
                                             dontCom = true
@@ -2392,6 +2654,7 @@ async function global() {
                                                 stopGame = true
                                             }
                                         }
+
                                     }
 
 
@@ -2408,30 +2671,56 @@ async function global() {
                                                     }
                                                 },
                                                 (err, response, body) => {
-                                                    body = JSON.parse(body)
-                                                    if (body.code) {
-                                                        console.log("Buy dop BNB usdtEthBtc ", body.code)
-                                                        reRequest()
-                                                    } else {
-                                                        amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+                                                    try {
+                                                        body = JSON.parse(body)
 
-                                                        for (let j = 0; j < body.fills.length; j++) {
-                                                            let fill = body.fills[j]
+                                                        if (body.code && indexError <= 5) {
+                                                            console.log("Докуп BNB в usdtEthBtc ", body.code)
+                                                            if (body.code !== -1021) {
+                                                                indexError++
+                                                            }
 
-                                                            amountBnb -= +fill.commission
+                                                            reRequest()
+                                                        } else if (body.code && !fatalError) {
+                                                            fatalError = true
+
+                                                            messageBot = `Конечная у мастера
+
+                                                            Докуп BNB в usdtEthBtc ${body.code}
+                        
+                                                            Заплаченная комиссия ${commissionAll}`
+
+                                                            botMax.sendMessage(userChatId, messageBot);
+                                                        } else {
+                                                            if (indexError !== 0) {
+                                                                indexError = 0
+                                                            }
+
+                                                            amountBnb += +(+body.origQty + amountBnb).toFixed(8)
+
+                                                            for (let j = 0; j < body.fills.length; j++) {
+                                                                let fill = body.fills[j]
+
+                                                                amountBnb -= +fill.commission
+                                                            }
+
+                                                            let commissionInUsdt = +deal.cummulativeQuoteQty * 0.00075
+
+                                                            commissionAll += commissionInUsdt
+
+                                                            // moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                            allMoney = +(allMoney - +body.cummulativeQuoteQty).toFixed(8)
+
+                                                            // if (minusCom) {
+                                                            //     amountUsdt = +(amountUsdt + moneyForCommission).toFixed(8)
+                                                            // }
+
+                                                            generalDeal = false
                                                         }
-
-                                                        moneyForCommission = +(moneyForCommission - +body.cummulativeQuoteQty).toFixed(8)
-
-                                                        allMoney = +(allMoney - +body.cummulativeQuoteQty).toFixed(8)
-
-                                                        // if (minusCom) {
-                                                        //     amountUsdt = +(amountUsdt + moneyForCommission).toFixed(8)
-                                                        // }
-
-                                                        generalDeal = false
+                                                    } catch (error) {
+                                                        reRequest()
                                                     }
-
                                                 }
                                             )
                                         })()
@@ -2578,6 +2867,11 @@ async function global() {
                                                     indexError = 0
                                                 }
 
+                                                for (let j = 0; j < body.fills.length; j++) {
+                                                    let fill = body.fills[j]
+                                                    amountBnb -= +fill.commission
+                                                }
+
                                                 resolve()
                                             }
                                         } catch (error) {
@@ -2667,6 +2961,11 @@ async function global() {
                                             } else {
                                                 if (indexError !== 0) {
                                                     indexError = 0
+                                                }
+
+                                                for (let j = 0; j < body.fills.length; j++) {
+                                                    let fill = body.fills[j]
+                                                    amountBnb -= +fill.commission
                                                 }
 
                                                 resolve()
@@ -2810,12 +3109,6 @@ async function global() {
                         Заплаченная комиссия ${commissionAll}`
 
                     botMax.sendMessage(userChatId, messageBot);
-
-
-
-
-
-
 
 
 
@@ -3914,14 +4207,10 @@ async function smoothMoney(change) {
                                                     allMoney -= 60
                                                 }
 
-                                                let some = +(allMoney - fixAmountUsdt).toFixed(8)
-
-                                                if (some <= 0) {
+                                                if (allMoney < fixAmountUsdt) {
                                                     amountUsdt = allMoney
-                                                    moneyForCommission = 0
                                                 } else {
                                                     amountUsdt = fixAmountUsdt
-                                                    moneyForCommission = some
                                                 }
 
 
