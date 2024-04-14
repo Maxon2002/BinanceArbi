@@ -2323,7 +2323,7 @@ async function global() {
                                                                 amountBnb -= +fill.commission
                                                             }
 
-                                                            let commissionInUsdt = +deal.cummulativeQuoteQty * 0.00075
+                                                            let commissionInUsdt = +body.cummulativeQuoteQty * 0.00075
 
                                                             commissionAll += commissionInUsdt
 
@@ -2701,7 +2701,7 @@ async function global() {
                                                                 amountBnb -= +fill.commission
                                                             }
 
-                                                            let commissionInUsdt = +deal.cummulativeQuoteQty * 0.00075
+                                                            let commissionInUsdt = +body.cummulativeQuoteQty * 0.00075
 
                                                             commissionAll += commissionInUsdt
 
