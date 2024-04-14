@@ -549,9 +549,7 @@ async function startWorkers() {
 
                                 baseBtc = +(factAmount + 0.001).toFixed(3)
 
-                                // firstComBtc = +((Math.trunc(baseBtc * 0.0011 * 100000) / 100000) + 0.00001).toFixed(5)
-
-                                // commissionBtc = +(firstComBtc - (+(baseBtc + firstComBtc).toFixed(5) * 0.001)).toFixed(8)
+                                
 
                                 baseBtcInUsdt = +(baseBtc * startPriceBtc).toFixed(8)
 
@@ -634,9 +632,7 @@ async function startWorkers() {
 
                                 baseEth = +(factAmount + 0.001).toFixed(3)
 
-                                // firstComEth = +((Math.trunc(baseEth * 0.0011 * 10000) / 10000) + 0.0001).toFixed(4)
-
-                                // commissionEth = +(firstComEth - (+(baseEth + firstComEth).toFixed(4) * 0.001)).toFixed(8)
+                                
 
                                 baseEthInUsdt = +(baseEth * startPriceEth).toFixed(8)
 
@@ -1417,6 +1413,7 @@ setTimeout(() => {
 
 async function global() {
 
+    console.log('global запущен')
 
     await new Promise((resolve, reject) => {
         (function reRequest() {
