@@ -101,9 +101,9 @@ const accountsObj = {
 let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
 
 
-let fixAmountUsdt = 100
+let fixAmountUsdt = 150
 
-let maxCommissionAll = 100 * 1.25
+let maxCommissionAll = 599.7 * 1.25
 
 let maxCommissionAllSmall = 100
 
@@ -284,7 +284,7 @@ let workerIds = []
 // });
 
 
-let freezMoney = false
+let freezMoney = true
 
 
 const server = http.createServer((req, res) => {
