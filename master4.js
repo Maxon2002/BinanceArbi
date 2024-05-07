@@ -409,8 +409,8 @@ server.listen(port, () => {
 
 
 
-let secretKey = 'ZfnNUtvL3GNAFz8jrNLC27QEX2s0KeJudytOmlN8N37qnEPd9ZJAWtTsuay4mMRr'
-let publicKey = 'ttNTnSDBy8s5NXgBMdnR3EWwEA8SsgxZzIaucK693hL7V2wGWlJhvrBeSN4HDH5f'
+let secretKey = 'zaybhkHWGKW9ng3HFZay9fD4aE7kt4lbEi115NS40lE5Dm84x4PVMSQTQV1cdvnS'
+let publicKey = 'BDc6eAfMaG8wI46Uxr0z48gseiLjPureZkNjUSe9CquIfzJRw2Zd8caBEe6POesw'
 
 function signature(query) {
     return crypto
