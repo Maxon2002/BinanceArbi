@@ -43,51 +43,61 @@ process.on('unhandledRejection', (reason, promise) => {
 const accountsObj = {
     a1: {
         address: "0x40125acedd1dddfb4e1039c137475c6ee866ffd7",
-        secretKey: "riseQF3UCCzTB1lRhrnZ9RoFoLTlqWnC8Aue4n476DMhJsN7gLNQHNKIgcxGQ1rF",
-        publicKey: "uL6vqk6VK0RQpFA3326CKzgtNhHsDptxHXGEh38zyQEb3Qjh5Fcy2h9QZrVorrec",
+        secretKey: "SDTQobFjBs9B2X1KMPw6uwGFTlrxd9Anq3KpDDtdlizVTJH81B2nQtrDwYx9x0Qm",
+        publicKey: "6IyaeQib4NfrWyB64SpcU1AoZwAaV2Bdrso4pinfWNLkxa8eiB147MluHe7KejRK",
         id: null,
         index: 0,
-        name: 'julios',
+        name: 'lias',
         comAll: 100,
         waitUpdate: false
     },
     a2: {
         address: "0x74b051df3fcd8a1d955c6fc7dd2111b509ab800d",
-        secretKey: "zDbD9dsTNwI7yJbZRQ1YxqyE6wxOYrHbD1VzHV6nFy5gJK08Lo6exktm4gKxcoGq",
-        publicKey: "MKYRwaDGnHx2hVqyqPUZ5SmdngjMA2iZ8uTPlhOcdnPoJXhbqqMh5cotNQCpx1xp",
+        secretKey: "ocOcjsUHAcZ2Qffd2ChhQ0H6x8CaGW44qg8tXLWbmLnzV3jBvtW5cE25w2FRZxSQ",
+        publicKey: "xWjt8LnztkqtZROsO2WQhYhr6Smd0DhxGJP7StLlmzFtTyXvVNTrF3meEQXXabLv",
         id: null,
         index: 1,
-        name: 'krid',
+        name: 'susa',
         comAll: 100,
         waitUpdate: false
     },
     a3: {
         address: "0x3981ceb32473d2596d45c4576a4d8cc63edc3aa6",
-        secretKey: "v4F4Ff1AzPBmKrgTDrY6hldpHNq0QBvmuBg1j8o2uRgF2yXSqSXWPBW9jyrmn2GD",
-        publicKey: "sThECYcirRNIxKaQqLBGXTCJq44EJDji6DHXWQT72VgBQueHzZUcZ8guFdScTpnc",
+        secretKey: "Uc8RBQDkCkx2QuT6tsiWZOVT3ZuZPw25sb7NpSsmLtSTwChKoo0pTpNqbqyrNOKj",
+        publicKey: "C151u4jP0wpg0oyn3uMEzynZwhmnDKS3u5KZU6RY12UX0HzBamhz5U9k3tNAsNkM",
         id: null,
         index: 2,
-        name: 'yuron',
+        name: 'popa',
         comAll: 100,
         waitUpdate: false
     },
     a4: {
         address: "0x9cf05c644fe34bce87e88812bf8fe512c332be0c",
-        secretKey: "tHfZbPR2w9TJndtQrNGplzBlam3AfwgwKF8PsokD1CA7Hmo12WXP4bOcwJx2YRbW",
-        publicKey: "125dK8KvayE53vhnUfQzJgKOtTOOSt2fCVsRoERsDFYdcVAmoICeY3PLHO6GPuI3",
+        secretKey: "bCJrGvueO8XsLcRnVll94CqeppX2Ro0DdDrjeE1wwu32DzcXxLvi8vJhM9ztFdr3",
+        publicKey: "0jkkt0ZuWZDmSZ4ORgfpilHgiL0cFA9p1YOMqFmQdbX1qCvEp8BeXq6nep1E18Fs",
         id: null,
         index: 3,
-        name: 'honk',
+        name: 'joshua',
         comAll: 100,
         waitUpdate: false
     },
     a5: {
         address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
-        secretKey: "7bfjCupnKBhQ0j8J9pyXKJ5hMYHYIFiyU8hbwChkswgCErsUuI2UNrqGEg6KVN0x",
-        publicKey: "jBZugINvmJM8XvzU0rs5Giby3tTC6bERnBsKA11ClzXGtWPHstOU2a6JmtWMCB9i",
+        secretKey: "dp2mLkvudBWzH8TgmluzQc9bTg24J10Bzigmd739NDSxOWY2ewsjz5T84GA0vVPN",
+        publicKey: "JnjDu9qtXLsVbbOfd5krNliS6jABz2NuhczPWYeRK0zJaktF9TDSqZAqgv9S96eY",
         id: null,
         index: 4,
-        name: 'riskon',
+        name: 'brons',
+        comAll: 100,
+        waitUpdate: false
+    },
+    a6: {
+        address: "0xf53ceeee03abd7cba905596102c0a74d1cbae758",
+        secretKey: "9bh5st3IG0FN89jHpXIRa1AuYXVeTAg7GfucNkNZi76y6dhem9B1h3P7nILdAUZh",
+        publicKey: "D3hFRoaXMUMdaUi1Auh6hQuNli8h1wnGTP1OlKO9h7i0RkpcrU3mgm4Ospuuupwd",
+        id: null,
+        index: 5,
+        name: 'rohn',
         comAll: 100,
         waitUpdate: false
     },
@@ -98,12 +108,12 @@ const accountsObj = {
 
 
 
-let mainAddress = '0xd742ecbbc74093e2fb3fa34888aeb0eff24d8d87'
+let mainAddress = '0x303b4b7a7dc9038c0510af81031918e304410ada'
 
 
-let fixAmountUsdt = 150
+let fixAmountUsdt = 108
 
-let maxCommissionAll = 599.7 * 1.25
+let maxCommissionAll = 700 * 1.25
 
 let maxCommissionAllSmall = 100
 
@@ -151,137 +161,137 @@ let howNeedIndexUpdateBigChange = 0
 
 
 
-let globalStart = true ///////////////////////////////////////////////////////////////////////////////////////////////
+let globalStart = false 
 let bigChangeWorkerStart = false
 
-let workerEnds = true /////////////////////////////////////////////////////////////////////////////////
+let workerEnds = false 
 
 let workerIds = []
 
-// pm2.connect((err) => {
-//     if (err) {
-//         console.error(err);
-//         process.exit(2);
-//     }
+pm2.connect((err) => {
+    if (err) {
+        console.error(err);
+        process.exit(2);
+    }
 
-//     let workerId = null
-//     // Запуск воркера через PM2
-//     pm2.start({
-//         script: 'workers3.js',
-//         instances: howMuchAccounts,  // Указывает количество воркеров
-//         name: 'worker' // Уникальное имя для процесса
-//     }, (err, apps) => {
-//         // workerId = apps[0].pm_id;
-//         // pm2.disconnect();
-//         if (err) throw err;
-//     });
-
-
+    let workerId = null
+    // Запуск воркера через PM2
+    pm2.start({
+        script: 'workers3.js',
+        instances: howMuchAccounts,  // Указывает количество воркеров
+        name: 'worker' // Уникальное имя для процесса
+    }, (err, apps) => {
+        // workerId = apps[0].pm_id;
+        // pm2.disconnect();
+        if (err) throw err;
+    });
 
 
 
-//     pm2.launchBus((err, bus) => {
-
-//         bus.on('process:msg', (packet) => {
-
-//             // console.log(packet)
-
-//             if (packet.data.type === 'open') {
-//                 workerIds.push(packet.process.pm_id)
-
-//                 if (workerIds.length === howMuchAccounts) {
-
-//                     for (let i = 0; i < workerIds.length; i++) {
-
-//                         let workerId = workerIds[i];
-
-//                         let account = accountsObj[Object.keys(accountsObj)[i]]
-
-//                         account.id = workerId
-
-//                         pm2.sendDataToProcessId({
-//                             id: workerId,
-//                             type: 'process:msg',
-//                             data: {
-//                                 account,
-//                                 maxCommissionAllSmall: account.comAll,
-//                                 fixAmountUsdtSmall,
-//                                 maxChangeProc
-//                             },
-//                             topic: 'startWork'
-//                         }, (err, res) => {
-//                             if (err) console.error(err);
-//                             // else console.log(res);
-//                         });
-
-//                     }
-
-//                     startWorkers()
 
 
-//                 }
-//             }
+    pm2.launchBus((err, bus) => {
+
+        bus.on('process:msg', (packet) => {
+
+            // console.log(packet)
+
+            if (packet.data.type === 'open') {
+                workerIds.push(packet.process.pm_id)
+
+                if (workerIds.length === howMuchAccounts) {
+
+                    for (let i = 0; i < workerIds.length; i++) {
+
+                        let workerId = workerIds[i];
+
+                        let account = accountsObj[Object.keys(accountsObj)[i]]
+
+                        account.id = workerId
+
+                        pm2.sendDataToProcessId({
+                            id: workerId,
+                            type: 'process:msg',
+                            data: {
+                                account,
+                                maxCommissionAllSmall: account.comAll,
+                                fixAmountUsdtSmall,
+                                maxChangeProc
+                            },
+                            topic: 'startWork'
+                        }, (err, res) => {
+                            if (err) console.error(err);
+                            // else console.log(res);
+                        });
+
+                    }
+
+                    startWorkers()
+
+
+                }
+            }
 
 
 
-//             if (packet.data.type === 'balanceUp') {
-//                 countBalanceUp++
+            if (packet.data.type === 'balanceUp') {
+                countBalanceUp++
 
-//                 if (countBalanceUp === howMuchAccounts) {
-//                     setTimeout(() => {
-//                         console.log("Мастер лисен гоу")
-//                         startGlobalListen()
-//                     }, 5000)
-//                 }
-//             }
-
-
-//             if (packet.data.type === 'maxChange') {
-
-//                 if (!workerSayChange) {
-
-//                     howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
-
-//                     workerSayChange = true
+                if (countBalanceUp === howMuchAccounts) {
+                    setTimeout(() => {
+                        console.log("Мастер лисен гоу")
+                        startGlobalListen()
+                    }, 5000)
+                }
+            }
 
 
-//                     messageBot = `Котировки слишком изменились
+            if (packet.data.type === 'maxChange') {
 
-//                     Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
+                if (!workerSayChange) {
 
-//                     botMax.sendMessage(userChatId, messageBot);
-//                 }
-//             }
+                    howNeedIndexUpdateBigChange = depoIndex + 3 * howMuchAccounts
 
-
-//             if (packet.data.type === 'upAfterChange') {
-
-//                 countUpAfterChange++
-
-//                 if (countUpAfterChange === howMuchAccounts) {
-//                     countUpAfterChange = 0
-//                     indexUpdateBigChange = 0
-//                     workerSayChange = false
-//                     bigChangeWorkerStart = false
-//                 }
-//             }
-
-//             if (packet.data.type === 'workerEnd') {
-
-//                 countWorkerEnds++
-
-//                 if (countWorkerEnds === howMuchAccounts) {
-//                     howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
-//                     workerEnds = true
-//                 }
-//             }
+                    workerSayChange = true
 
 
-//             // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
+                    messageBot = `Котировки слишком изменились
 
-//         });
-//     });
-// });
+                    Перевести по: ${baseBtcSmall} BTC, ${baseEthSmall} ETH и весь USDT`
+
+                    botMax.sendMessage(userChatId, messageBot);
+                }
+            }
+
+
+            if (packet.data.type === 'upAfterChange') {
+
+                countUpAfterChange++
+
+                if (countUpAfterChange === howMuchAccounts) {
+                    countUpAfterChange = 0
+                    indexUpdateBigChange = 0
+                    workerSayChange = false
+                    bigChangeWorkerStart = false
+                }
+            }
+
+            if (packet.data.type === 'workerEnd') {
+
+                countWorkerEnds++
+
+                if (countWorkerEnds === howMuchAccounts) {
+                    howNeedIndexUpdate = depoIndex + 3 * howMuchAccounts
+                    workerEnds = true
+                }
+            }
+
+
+            // отслеживать закрытия воркеров и если все закрылись, то сделать дисконект pm2
+
+        });
+    });
+});
 
 
 let freezMoney = true
@@ -1061,7 +1071,7 @@ async function startWorkers() {
 
 };
 
-startWorkers() ////////////////////////////////////////////////////
+
 
 
 
@@ -1451,15 +1461,11 @@ async function startGlobalListen() {
     }
 }
 
-setTimeout(() => {
-    startGlobalListen()
-}, 10000); /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 let wsStartClose = false;
 
-setTimeout(() => {
-    global();
-}, 15000); /////////////////////////////////////////////////////////////////////////////////////////
+
 
 async function global() {
 
