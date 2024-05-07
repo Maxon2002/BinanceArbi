@@ -2029,7 +2029,7 @@ async function global() {
                 }
 
 
-                if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
+                if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00019 && usdtBtcEth !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
 
                     usdtBtcEthIndex++
 
@@ -2419,7 +2419,7 @@ async function global() {
 
 
 
-                if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtEthBtc !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
+                if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00019 && usdtEthBtc !== Infinity && !stopGame && currentAmountUsdt === amountUsdt) {
                     usdtEthBtcIndex++
 
                     // let wait = false

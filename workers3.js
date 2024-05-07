@@ -890,7 +890,7 @@ process.on('message', (packet) => {
                         // console.log('amountUsdt ', amountUsdt)
                         // console.log('dontCom ', dontCom)
 
-                        if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtBtcEth !== Infinity && !stopGame) {
+                        if ((usdtBtcEth - currentAmountUsdt) / currentAmountUsdt > 0.00019 && usdtBtcEth !== Infinity && !stopGame) {
 
                             usdtBtcEthIndex++
 
@@ -1443,7 +1443,7 @@ process.on('message', (packet) => {
 
 
 
-                        if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00017 && usdtEthBtc !== Infinity && !stopGame) {
+                        if ((usdtEthBtc - currentAmountUsdt) / currentAmountUsdt > 0.00019 && usdtEthBtc !== Infinity && !stopGame) {
                             usdtEthBtcIndex++
 
 
