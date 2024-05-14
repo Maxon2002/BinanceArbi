@@ -58,7 +58,7 @@ setTimeout(() => {
     let queryAsset = `timestamp=${Date.now()}`;
     let hashAsset = signature(queryAsset);
 
-    request.post(
+    request.get(
         {
             url: `https://fapi.binance.com/fapi/v2/account?${queryAsset}&signature=${hashAsset}`,
             headers: {
