@@ -60,7 +60,7 @@ setTimeout(() => {
 
     request.post(
         {
-            url: `https://fapi.binance.com/fapi/v2/balance?${queryAsset}&signature=${hashAsset}`,
+            url: `https://fapi.binance.com/fapi/v2/account?${queryAsset}&signature=${hashAsset}`,
             headers: {
                 'X-MBX-APIKEY': publicKey
             }
