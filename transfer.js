@@ -36,13 +36,31 @@ let adressMain = "0x303b4b7a7dc9038c0510af81031918e304410ada"
 // }, 1000)
 
 
+// setTimeout(() => {
+//     let queryAsset = `timestamp=${Date.now()}`;
+//     let hashAsset = signature(queryAsset);
+
+//     request.post(
+//         {
+//             url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+//             headers: {
+//                 'X-MBX-APIKEY': publicKey
+//             }
+//         },
+//         (err, response, body) => {
+//             console.log(body)
+//         }
+//     )
+// }, 1000)
+
+
 setTimeout(() => {
     let queryAsset = `timestamp=${Date.now()}`;
     let hashAsset = signature(queryAsset);
 
     request.post(
         {
-            url: `https://api.binance.com/sapi/v3/asset/getUserAsset?${queryAsset}&signature=${hashAsset}`,
+            url: `https://fapi.binance.com/fapi/v2/balance?${queryAsset}&signature=${hashAsset}`,
             headers: {
                 'X-MBX-APIKEY': publicKey
             }
@@ -52,8 +70,6 @@ setTimeout(() => {
         }
     )
 }, 1000)
-
-
 
 
 
